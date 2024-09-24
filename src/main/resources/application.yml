@@ -1,0 +1,185 @@
+spring:
+  profiles:
+    active: default,groq-cloud
+
+  application:
+    name: sanford
+
+  mvc:
+    async:
+      request-timeout: ${SPRING_MVC_ASYNC_REQUEST-TIMEOUT:-1}
+
+  threads:
+    virtual:
+      enabled: true
+
+  docker:
+    compose:
+      enabled: false
+
+management:
+  info:
+    build:
+      enabled: true
+    git:
+      mode: FULL
+    java:
+      enabled: true
+    os:
+      enabled: true
+  endpoint:
+    health:
+      show-details: ALWAYS
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+    env:
+      enabled: true
+      show-values: ALWAYS
+    configprops:
+      enabled: true
+      show-values: ALWAYS
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics,scheduledtasks,loggers,prometheus,sbom
+  tracing:
+    sampling:
+      probability: 1.0
+
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  accessKey: ${MINIO_ACCESS_KEY:minio}
+  secretKey: ${MINIO_SECRET_KEY:minio}
+  bucket:
+    name: ${MINIO_BUCKET_NAME:sanford}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: groq-cloud
+    import: "optional:file:./config/creds.yml"
+
+  ai:
+    openai:
+      base_url: ${OPENAI_BASE_URL:https://api.groq.com/openai}
+      chat:
+        options:
+          model: ${CHAT_MODEL:llama-3.1-70b-versatile}
+      embedding:
+        options:
+          model: ${EMBEDDING_MODEL:text-embedding-3-large}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: openai
+    import: "optional:file:./config/creds.yml"
+
+  ai:
+    openai:
+      chat:
+        options:
+          model: ${CHAT_MODEL:gpt4o-mini}
+      embedding:
+        options:
+          model: ${EMBEDDING_MODEL:text-embedding-3-large}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: ollama
+
+  autoconfigure:
+    exclude: org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration
+
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        options:
+          model: ${CHAT_MODEL:mistral}
+          num-ctx: ${CHAT_MODEL_CONTEXT_LENGTH:32768}
+          truncate: false
+      embedding:
+        options:
+          model: ${EMBEDDING_MODEL:nomic-embed-text}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  docker:
+    compose:
+      enabled: true
+      lifecycle-management: start-and-stop
+      stop:
+        command: down
+        arguments: -v
+      timeout: 1m
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: chroma
+
+  ai:
+    vectorstore:
+      chroma:
+        initialize-schema: true
+
+  docker:
+    compose:
+      file: ./docker-compose.chroma.yml
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: pgvector
+
+  datasource:
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${SPRING_DATASOURCE_USER:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
+  ai:
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 1536
+
+  docker:
+    compose:
+      file: ./docker-compose.pgvector.yml
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+debug: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

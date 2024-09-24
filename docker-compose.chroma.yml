@@ -1,0 +1,23 @@
+include:
+  - ./docker-compose.observability.yml
+  - ./docker-compose.minio.yml
+
+services:
+  chroma:
+    image: chromadb/chroma:0.5.5
+    environment:
+      - IS_PERSISTENT=TRUE
+    volumes:
+      - chroma-data:/chroma/chroma/
+    ports:
+      - 8000:8000
+    networks:
+      - net
+
+volumes:
+  chroma-data:
+    driver: local
+
+networks:
+  net:
+    driver: bridge
