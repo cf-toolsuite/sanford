@@ -18,7 +18,7 @@ import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
-import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
+import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.KeywordMetadataEnricher;
@@ -177,7 +177,7 @@ public class DocumentIngestionService {
     }
 
     protected List<Document> loadPdf(Resource resource) {
-        ParagraphPdfDocumentReader pdfReader = new ParagraphPdfDocumentReader(resource,
+        PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource,
                 PdfDocumentReaderConfig.builder()
                     .withPageTopMargin(0)
                     .withPageExtractedTextFormatter(ExtractedTextFormatter.builder()

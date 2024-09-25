@@ -12,6 +12,7 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 
 @Service
@@ -29,6 +30,8 @@ public class DocumentSearchService {
     }
 
     public List<FileMetadata> nlSearch(String query) {
+        Assert.hasText(query, "Query cannot be null or empty");
+        log.debug("Preparing to search with query: {}", query);
         List<Document> candidates = store.similaritySearch(SearchRequest.query(query).withTopK(TOP_K));;
         log.trace("Found these: {}", candidates);
         Set<String> fileNames = candidates.stream().map(d -> String.valueOf(d.getMetadata().get("file_name"))).collect(Collectors.toSet());
@@ -36,7 +39,9 @@ public class DocumentSearchService {
     }
 
     public List<Document> search(String fileName) {
+        Assert.hasText(fileName, "File name cannot be null or empty");
         FilterExpressionBuilder b = new FilterExpressionBuilder();
+        log.debug("Preparing to search with fileName: {}", fileName);
         List<Document> candidates = store.similaritySearch(SearchRequest.defaults().withFilterExpression(b.eq("file_name", fileName).build()).withSimilarityThresholdAll());
         log.trace("Found these: {}", candidates);
         return candidates;
