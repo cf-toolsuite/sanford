@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.io.FilenameUtils;
+import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.FileMetadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -38,10 +39,12 @@ public class FileService {
 
     private final MinioClient minioClient;
     private final String bucketName;
+    private final Map<String, String> supportedContentTypes;
 
-    public FileService(MinioClient minioClient, @Value("${minio.bucket.name}") String bucketName) {
+    public FileService(MinioClient minioClient, @Value("${minio.bucket.name}") String bucketName, AppProperties appProperties) {
         this.minioClient = minioClient;
         this.bucketName = bucketName;
+        this.supportedContentTypes = appProperties.supportedContentTypes();
     }
 
     public FileMetadata uploadFile(MultipartFile file) {
@@ -49,7 +52,7 @@ public class FileService {
             String objectId = UUID.randomUUID().toString();
             String fileName = file.getOriginalFilename();
             String fileExtension = FilenameUtils.getExtension(fileName);
-            String mimeType = file.getContentType();
+            String contentType = file.getContentType() == null ? supportedContentTypes.get(fileExtension) : file.getContentType();
 
             InputStream inputStream = file.getInputStream();
             minioClient.putObject(
@@ -57,12 +60,12 @@ public class FileService {
                     .bucket(bucketName)
                     .object(fileName)
                     .stream(inputStream, file.getSize(), -1)
-                    .userMetadata(Map.of("oid", objectId, "mimeType", mimeType))
-                    .contentType(mimeType)
+                    .userMetadata(Map.of("oid", objectId, "contentType", contentType))
+                    .contentType(contentType)
                     .build()
             );
 
-            return new FileMetadata(objectId, fileName, fileExtension, mimeType);
+            return new FileMetadata(objectId, fileName, fileExtension, contentType);
         } catch (ErrorResponseException | InvalidKeyException | InvalidResponseException | InsufficientDataException |
             InternalException | NoSuchAlgorithmException | IOException | ServerException | XmlParserException e) {
             throw new RuntimeException("Failed to upload file", e);
@@ -79,12 +82,12 @@ public class FileService {
             );
 
             String objectId = item.userMetadata().get("oid");
-            String mimeType = item.userMetadata().get("mimeType");
+            String contentType = item.contentType();
             return new FileMetadata(
                 objectId,
                 fileName,
                 FilenameUtils.getExtension(fileName),
-                mimeType
+                contentType
             );
         } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
             InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException | XmlParserException e) {
@@ -95,7 +98,7 @@ public class FileService {
     public List<FileMetadata> getAllFileMetadata() {
         try {
             Iterable<Result<Item>> results = minioClient.listObjects(
-                ListObjectsArgs.builder().bucket(bucketName).build()
+                ListObjectsArgs.builder().bucket(bucketName).includeUserMetadata(true).build()
             );
 
             List<FileMetadata> allFileMetadata = StreamSupport.stream(results.spliterator(), false)
@@ -103,13 +106,13 @@ public class FileService {
                     try {
                         Item item = itemResult.get();
                         String fileName = item.objectName();
-                        String objectId = item.userMetadata().get("oid");
-                        String mimeType = item.userMetadata().get("mimeType");
+                        String objectId = item.userMetadata().get(String.format("X-Amz-Meta-%s", "Oid"));
+                        String contentType = item.userMetadata().get(String.format("X-Amz-Meta-%s", "Contenttype"));
                         return new FileMetadata(
                             objectId,
                             fileName,
                             FilenameUtils.getExtension(fileName),
-                            mimeType
+                            contentType
                         );
                     } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
                         InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException | XmlParserException e) {

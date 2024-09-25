@@ -17,6 +17,11 @@ spring:
     compose:
       enabled: false
 
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
 management:
   info:
     build:
@@ -48,12 +53,35 @@ management:
     sampling:
       probability: 1.0
 
+server:
+  tomcat:
+    max-swallow-size: -1
+
 minio:
-  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  endpoint:
+    host: ${MINIO_ENDPOINT_HOST:localhost}
+    port: ${MINIO_ENDPOINT_PORT:9000}
   accessKey: ${MINIO_ACCESS_KEY:minio}
-  secretKey: ${MINIO_SECRET_KEY:minio}
+  secretKey: ${MINIO_SECRET_KEY:g0dmini0}
   bucket:
     name: ${MINIO_BUCKET_NAME:sanford}
+
+app:
+  supportedContentTypes:
+    md: text/markdown
+    pdf: application/pdf
+    log: text/plain
+    txt: text/plain
+    csv: text/csv
+    tsv: text/tab-separated-values
+    json: application/json
+    xml: application/xml
+    html: text/html
+    htm: text/html
+    doc: application/msword
+    docx: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    ppt: application/vnd.ms-powerpoint
+    pptx: application/vnd.openxmlformats-officedocument.presentationml.presentation
 
 ---
 
@@ -85,7 +113,7 @@ spring:
     openai:
       chat:
         options:
-          model: ${CHAT_MODEL:gpt4o-mini}
+          model: ${CHAT_MODEL:gpt-4o-mini}
       embedding:
         options:
           model: ${EMBEDDING_MODEL:text-embedding-3-large}

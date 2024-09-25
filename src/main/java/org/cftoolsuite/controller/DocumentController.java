@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,14 +38,14 @@ public class DocumentController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<FileMetadata> uploadFile(@RequestBody MultipartFile file) {
+    public ResponseEntity<FileMetadata> uploadFile(@RequestParam("fileName") MultipartFile file) {
         FileMetadata fileMetadata = fileService.uploadFile(file);
         documentIngestionService.ingest(file, fileMetadata);
         return ResponseEntity.ok(fileMetadata);
     }
 
     @GetMapping
-    public ResponseEntity<List<FileMetadata>> getFileMetadata(@RequestParam(value = "f", required = false) String fileName) {
+    public ResponseEntity<List<FileMetadata>> getFileMetadata(@RequestParam(value = "fileName", required = false) String fileName) {
         if (StringUtils.isBlank(fileName)) {
             return ResponseEntity.ok(fileService.getAllFileMetadata());
         }

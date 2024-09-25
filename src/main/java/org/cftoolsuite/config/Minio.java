@@ -9,13 +9,20 @@ import io.minio.MinioClient;
 @Configuration
 public class Minio {
 
+    // @see https://min.io/docs/minio/linux/developers/java/API.html#id1
     @Bean
     public MinioClient minioClient(
-            @Value("${minio.endpoint}") String endpoint,
+            @Value("${minio.endpoint.host}") String host,
+            @Value("${minio.endpoint.port}") int port,
             @Value("${minio.accessKey}") String accessKey,
             @Value("${minio.secretKey}") String secretKey) {
-        return MinioClient.builder()
-                .endpoint(endpoint)
+        MinioClient.Builder mcb = MinioClient.builder();
+        if (port != 443) {
+            mcb.endpoint(host, port, false);
+        } else {
+            mcb.endpoint(host, 443, true);
+        }
+        return mcb
                 .credentials(accessKey, secretKey)
                 .build();
     }

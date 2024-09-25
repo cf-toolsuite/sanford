@@ -1,3 +1,3 @@
 package org.cftoolsuite.domain;
 
-public record FileMetadata(String objectId, String fileName, String fileExtension, String mimeType) {}
+public record FileMetadata(String objectId, String fileName, String fileExtension, String contentType) {}
