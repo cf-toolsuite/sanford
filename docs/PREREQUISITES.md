@@ -10,7 +10,7 @@ One of:
 ### Cloud Foundry
 
 * cf CLI
-* An account with space developer role, and access to an organization and space on a target foundation
+* An account with space developer role and access to an organization and space on a target foundation
 
 ### Kubernetes
 

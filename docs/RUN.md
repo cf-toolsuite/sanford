@@ -192,7 +192,132 @@ and Gradle project properties, like:
 
 ### on Cloud Foundry
 
-TBD
+#### Target a foundation
+
+```bash
+cf api {cloud_foundry_foundation_api_endpoint}
+```
+
+> Replace `{cloud_foundry_foundation_api_endpoint}` above with an API endppint
+
+Sample interaction
+
+```bash
+cf api api.sys.dhaka.cf-app.com
+```
+
+#### Authenticate
+
+Interactively
+
+```bash
+cf login
+```
+
+With single sign-on
+
+```bash
+cf login --sso
+```
+
+With a username and password
+
+```bash
+cf login -u {username} -p "{password}"
+```
+
+> Replace `{username}` and `{password}` above respectively with your account's username and password.
+
+#### Target space
+
+If your user account has `OrgManager` and `SpaceManager` permissions, then you can create your own organization and space with
+
+```bash
+cf create-org {organization_name}
+cf create-space -o {organization_name} {space_name}
+```
+
+> Replace `{organization_name}` and `{space_name}` above with names of your design
+
+To target a space
+
+```bash
+cf target -o {organization_name} -s {space_name}
+```
+
+> Replace `{organization_name}` and `{space_name}` above with an existing organization and space your account has access to
+
+Sample interaction
+
+```bash
+cf create-org zoolabs
+cf create-space -o zoolabs dev
+cf target -o zoolabs -s dev
+```
+
+#### Create services
+
+Verify that the foundation has the service offerings required
+
+```bash
+cf m -e genai
+```
+
+Sample interaction
+
+```bash
+❯ cf m -e genai
+Getting service plan information for service offering genai in org zoolabs / space dev as chris.phillipson@broadcom.com...
+
+broker: genai-service
+   plan               description                                                                                       free or paid   costs
+   llama3.1           Access to the llama3.1 model. Capabilities: chat, tools. Aliases: gpt-turbo-3.5.                  free
+   llava              Access to the llava model. Capabilities: chat, vision.                                            free
+   nomic-embed-text   Access to the nomic-embed-text model. Capabilities: embedding. Aliases: text-ada-embedding-002.   free
+```
+
+Create the service instances.  Note, your platform operator may have provisioned different services than those in the example above.
+
+```bash
+cf create-service genai llama3.1 llm
+cf create-service genai nomic-embed-text embedding
+```
+
+#### Push app with --no-start flag
+
+First, let's clone and build the app
+
+```bash
+gh repo clone cf-toolsuite/sanford
+cd sanford
+gradle build -Pmodel-api-provider=ollama -Pvector-db-provider={vector_db_provider}
+```
+
+> Replace `{vector_db_provider}` above with one of [ `redis`, `pgvector`, or `chroma` ]
+
+Then, let's push with the --no-start flag
+
+```bash
+cf push sanford -k 1G -m 1G -p build/libs/sanford-0.0.1-SNAPSHOT.jar --no-start --random-route
+```
+
+#### Bind services
+
+```bash
+cf bind-service sanford llm
+cf bind-service sanford embedding
+```
+
+#### Set environment variables
+
+```bash
+```
+
+#### Start application
+
+```bash
+cf start sanford
+```
 
 ### on Kubernetes
 
