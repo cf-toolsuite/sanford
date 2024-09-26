@@ -32,7 +32,7 @@ setup)
 	done
 	echo "$PGVECTOR_SERVICE_NAME creation completed."
 
-    cf create-service minio $MINIO_PLAN_NAME $MINIO_SERVICE_NAME -c "{\"accessKey\": $MINIO_USERNAME, \"secretKey\": $MINIO_PASSWORD}" -w
+    cf create-service minio $MINIO_PLAN_NAME $MINIO_SERVICE_NAME -c "{\"accessKey\": \"$MINIO_USERNAME\", \"secretKey\": \"$MINIO_PASSWORD\" }" -w
 	printf "Waiting for service $MINIO_SERVICE_NAME to create."
 	while [ `cf services | grep 'in progress' | wc -l | sed 's/ //g'` != 0 ]; do
   		printf "."
