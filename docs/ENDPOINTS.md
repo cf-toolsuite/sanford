@@ -86,7 +86,7 @@ Transfer-Encoding: chunked
 Retrieve the metadata for a single file
 
 ```python
-GET /?f={fileName}
+GET /?fileName={fileName}
 ```
 
 > Replace `{fileName}` above with the name of a file already stored in an S3-compliant object store's bucket
