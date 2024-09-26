@@ -261,6 +261,8 @@ Verify that the foundation has the service offerings required
 
 ```bash
 cf m -e genai
+cf m -e postgres
+cf m -e minio
 ```
 
 Sample interaction
@@ -274,49 +276,45 @@ broker: genai-service
    llama3.1           Access to the llama3.1 model. Capabilities: chat, tools. Aliases: gpt-turbo-3.5.                  free
    llava              Access to the llava model. Capabilities: chat, vision.                                            free
    nomic-embed-text   Access to the nomic-embed-text model. Capabilities: embedding. Aliases: text-ada-embedding-002.   free
+
+❯ cf m -e postgres
+Getting service plan information for service offering postgres in org zoolabs / space dev as chris.phillipson@broadcom.com...
+
+broker: postgres-odb
+   plan                       description                             free or paid   costs
+   on-demand-postgres-small   A single e2-micro with 2GB of storage   free
+
+❯ cf m -e minio
+Getting service plan information for service offering minio in org zoolabs / space dev as chris.phillipson@broadcom.com...
+
+broker: minio
+   plan       description                             free or paid   costs
+   small      MinIO® with 100GB storage and 1 node.   free
+   large-ha   MinIO® with 1TB storage and 4 node.     free
 ```
 
-Create the service instances.  Note, your platform operator may have provisioned different services than those in the example above.
-
-```bash
-cf create-service genai llama3.1 llm
-cf create-service genai nomic-embed-text embedding
-```
-
-#### Push app with --no-start flag
-
-First, let's clone and build the app
+#### Clone and build the app
 
 ```bash
 gh repo clone cf-toolsuite/sanford
 cd sanford
-gradle build -Pmodel-api-provider=ollama -Pvector-db-provider={vector_db_provider}
+gradle build -Pmodel-api-provider=ollama -Pvector-db-provider=pgvector
 ```
 
-> Replace `{vector_db_provider}` above with one of [ `redis`, `pgvector`, or `chroma` ]
+#### Deploy
 
-Then, let's push with the --no-start flag
+Take a look at the deployment script
 
 ```bash
-cf push sanford -k 1G -m 1G -p build/libs/sanford-0.0.1-SNAPSHOT.jar --no-start --random-route
+cat deploy-on-tp4cf.sh
 ```
 
-#### Bind services
+> Make any required edits to the environment variables for the services and plans.
+
+Execute the deployment script
 
 ```bash
-cf bind-service sanford llm
-cf bind-service sanford embedding
-```
-
-#### Set environment variables
-
-```bash
-```
-
-#### Start application
-
-```bash
-cf start sanford
+./deploy-on-tp4cf.sh setup
 ```
 
 ### on Kubernetes
