@@ -317,6 +317,12 @@ Execute the deployment script
 ./deploy-on-tp4cf.sh setup
 ```
 
+To teardown, execute
+
+```bash
+./deploy-on-tp4cf.sh teardown
+```
+
 ### on Kubernetes
 
 TBD
