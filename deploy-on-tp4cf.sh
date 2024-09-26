@@ -55,7 +55,7 @@ setup)
     cf bind-service $APP_NAME $GENAI_EMBEDDINGS_SERVICE_NAME
     cf bind-service $APP_NAME $MINIO_SERVICE_NAME
 
-    echo && printf "\e[37mℹ️  Setting environemnt variables for use by $APP_NAME application ...\e[m\n" && echo
+    echo && printf "\e[37mℹ️  Setting environment variables for use by $APP_NAME application ...\e[m\n" && echo
 
     cf set-env $APP_NAME JAVA_OPTS "-Djava.security.egd=file:///dev/urandom -XX:+UseG1GC -XX:+UseStringDeduplication"
     cf set-env $APP_NAME SPRING_PROFILES_ACTIVE "cloud,ollama,pgvector"
