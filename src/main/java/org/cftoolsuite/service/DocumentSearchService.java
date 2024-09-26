@@ -42,7 +42,7 @@ public class DocumentSearchService {
         Assert.hasText(fileName, "File name cannot be null or empty");
         FilterExpressionBuilder b = new FilterExpressionBuilder();
         log.debug("Preparing to search with fileName: {}", fileName);
-        List<Document> candidates = store.similaritySearch(SearchRequest.defaults().withFilterExpression(b.eq("file_name", fileName).build()).withSimilarityThresholdAll());
+        List<Document> candidates = store.similaritySearch(SearchRequest.query("Find any document with any word that occurs in this file name: " + fileName).withFilterExpression(b.eq("file_name", fileName).build()).withSimilarityThresholdAll());
         log.trace("Found these: {}", candidates);
         return candidates;
     }

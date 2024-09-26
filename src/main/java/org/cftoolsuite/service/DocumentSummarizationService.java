@@ -18,6 +18,8 @@ public class DocumentSummarizationService {
         this.chatClient = chatClient;
     }
 
+    // FIXME this is a naive summarization implementation which takes all the content from all document fragments and concatentates them together
+    // TODO Optimize the summarization algorithm using chunking and recursive techniques
     public String summarize(String fileName) {
         List<Document> candidates = documentSearchService.search(fileName);
         String content = candidates.stream().map(d -> d.getContent()).reduce("", (a, b) -> a + b);

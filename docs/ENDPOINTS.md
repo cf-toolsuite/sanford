@@ -156,6 +156,26 @@ GET /summarize/{fileName}
 Sample interaction
 
 ```bash
+❯ http :8080/api/files/summarize/Midsummer_Night%27s_Dream_Entire_Play.html
+HTTP/1.1 200
+Connection: keep-alive
+Content-Disposition: inline;filename=f.txt
+Content-Length: 1169
+Content-Type: text/plain;charset=UTF-8
+Date: Thu, 26 Sep 2024 01:54:00 GMT
+Keep-Alive: timeout=60
+
+**Summary of "A Midsummer Night's Dream"**
+
+- **Setting:** The play begins in Athens with Duke Theseus preparing for his wedding to Hippolyta.
+- **Main Conflict:** Egeus seeks the Duke’s support to enforce his decision that his daughter Hermia must marry Demetrius, despite her love for Lysander.
+- **Themes of Love:** The complexities of love and its irrational nature are explored as Hermia and Lysander plan to elope, while Helena, in love with Demetrius, seeks his affection.
+- **Interwoven Stories:** A group of Athenian tradesmen prepare a play for the Duke's wedding, adding a comedic subplot.
+- **Magical Elements:** The fairy realm, led by Oberon and Titania, introduces enchantments that complicate the lovers' relationships, leading to humorous misunderstandings.
+- **Resolution:** The chaos resolves with the intervention of magic, resulting in the correct pairings of lovers and concluding with multiple weddings.
+- **Finale:** The play ends with a reflection on dreams and imagination, with Puck suggesting that the events may have been merely a dream.
+
+This summary captures the central plot, themes, and characters without delving into minor details.
 ```
 
 ### Download
