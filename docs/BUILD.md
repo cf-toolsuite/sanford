@@ -40,3 +40,14 @@ Adds dependency on:
 ./gradlew build -Pvector-db-provider=pgvector
 ```
 > You also have the option of building with `-Pmodel-api-provider=ollama`
+
+#### [Redis Stack](https://redis.io/about/about-stack/)
+
+Adds dependency on:
+
+* [spring-ai-redis-store-spring-boot-starter](https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html)
+
+```bash
+./gradlew build -Pvector-db-provider=redis
+```
+> You also have the option of building with `-Pmodel-api-provider=ollama`

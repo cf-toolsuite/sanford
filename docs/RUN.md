@@ -172,17 +172,23 @@ This setup launches either an instance of Chroma or PgVector for use by the Vect
 ```
 > You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
 
+#### Redis Stack
+
+```bash
+./gradlew build bootRun -Dspring.profiles.active=docker,openai,redis -Pvector-db-provider=redis
+```
+> You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
 
 A key thing to note is that **you must activate a combination** of Spring profiles, like:
 
 * `docker` - required when you are running "off platform"
 * an LLM provider (i.e., `openai`, `groq-cloud` or `ollama`)
-* a Vector database provider (i.e., `chroma` or `pgvector`)
+* a Vector database provider (i.e., `chroma`, `pgvector`, or `redis`)
 
 and Gradle project properties, like:
 
 * `-Pmodel-api-provider=ollama`
-* `-Pvector-db-provider=chroma` or `-Pvector-db-provider=pgvector`
+* `-Pvector-db-provider=chroma` or `-Pvector-db-provider=pgvector` or `-Pvector-db-provider=redis`
 
 ### on Cloud Foundry
 

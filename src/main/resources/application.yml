@@ -202,6 +202,23 @@ spring:
 spring:
   config:
     activate:
+      on-profile: redis
+
+  ai:
+    vectorstore:
+      redis:
+        uri: ${SPRING_REDIS_URI:redis://localhost:6379}
+        initialize-schema: true
+
+  docker:
+    compose:
+      file: ./docker-compose.redis.yml
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: dev
 
 debug: true
