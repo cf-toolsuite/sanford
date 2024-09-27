@@ -345,6 +345,92 @@ To teardown, execute
 ./deploy-on-tp4cf.sh teardown
 ```
 
+#### Inspect the PgVector store database instance
+
+Create a service key for the service instance, with:
+
+```bash
+cf create-service-key sanford-db cf-psql
+```
+
+Sample interaction
+
+```bash
+❯ cf service-key sanford-db cf-psql
+Getting key cf-psql for service instance sanford-db as chris.phillipson@broadcom.com...
+
+{
+  "credentials": {
+    "db": "postgres",
+    "hosts": [
+      "q-s0.postgres-instance.dhaka-services-subnet.service-instance-967aa687-1b73-4448-8505-dca0fa2ee079.bosh"
+    ],
+    "jdbcUrl": "jdbc:postgresql://q-s0.postgres-instance.dhaka-services-subnet.service-instance-967aa687-1b73-4448-8505-dca0fa2ee079.bosh:5432/postgres?user=pgadmin&password=Z8ybS105mdY7i6h923H4",
+...
+```
+
+Open two terminal sessions.
+
+In the first session, execute:
+
+```bash
+❯ cf ssh -L 55432:q-s0.postgres-instance.dhaka-services-subnet.service-instance-967aa687-1b73-4448-8505-dca0fa2ee079.bosh:5432 sanford
+vcap@128bacbc-b0f1-46b5-64cb-709c:~$
+```
+
+> We are creating a tunnel between the host and the service instance via the application. The host will listen on port 55432.
+
+Switch to the second session, then execute:
+
+```bash
+❯ psql -U pgadmin -W postgres -h 127.0.0.1 -p 55432
+Password:
+```
+
+Enter the password.  See that it is specified at the end fo the "jdbcUrl" JSON fragment above.
+
+And you should see:
+
+```bash
+psql (12.9 (Ubuntu 12.9-0ubuntu0.20.04.1), server 15.6)
+WARNING: psql major version 12, server major version 15.
+         Some psql features might not work.
+Type "help" for help.
+
+postgres=#
+```
+
+From here you can show tables with `\dt`
+
+```bash
+postgres=# \dt
+            List of relations
+ Schema |     Name     | Type  |  Owner
+--------+--------------+-------+---------
+ public | vector_store | table | pgadmin
+(1 row)
+```
+
+You can describe the table with `\d vector_store`
+
+```bash
+postgres=# \d vector_store
+                     Table "public.vector_store"
+  Column   |     Type     | Collation | Nullable |      Default
+-----------+--------------+-----------+----------+--------------------
+ id        | uuid         |           | not null | uuid_generate_v4()
+ content   | text         |           |          |
+ metadata  | json         |           |          |
+ embedding | vector(1536) |           |          |
+Indexes:
+    "vector_store_pkey" PRIMARY KEY, btree (id)
+    "spring_ai_vector_index" hnsw (embedding vector_cosine_ops)
+```
+
+And you can execute arbitrary SQL (e.g., `SELECT * from vector_store`).
+
+To exit, just type `exit`.
+
 ### on Kubernetes
 
 TBD
