@@ -218,6 +218,11 @@ spring:
     activate:
       on-profile: dev
 
+  ai:
+    vectorstore:
+      pgvector:
+        remove-existing-vector-store-table: true
+
 debug: true
 
 management:
