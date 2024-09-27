@@ -13,12 +13,23 @@ GENAI_CHAT_PLAN_NAME="llama3.1" # plan must have chat capabilty
 GENAI_EMBEDDINGS_SERVICE_NAME="sanford-embedding"
 GENAI_EMBEDDINGS_PLAN_NAME="nomic-embed-text" # plan must have Embeddings capabilty
 
-MINIO_SERVICE_NAME="sanford-files"
-MINIO_PLAN_NAME="small"
-MINIO_USERNAME="minio"
-MINIO_PASSWORD="g0dmini0"
+MINIO_SERVICE_NAME="sanford-filestore"
+MINIO_PLAN_NAME="default"
 
-case $1 in
+# Easiest thing to do for demo purposes in the absence of having the MinIO tile installed is to spin up an instance of MinIO on StackHero (https://www.stackhero.io/en/)
+
+# Source the $HOME/.minio/config file
+# This file should contain at a minimum the following key-value environment variable pairs:
+# export MINIO_ENDPOINT_HOST=<minio-hostname>
+# export MINIO_ENDPOINT_PORT=<minio-port>
+# export MINIO_ACCESS_KEY=<minio-username>
+# export MINIO_SECRET_KEY=<minio-password>
+# export MINIO_BUCKET_NAME=<minio-bucket>
+source $HOME/.minio/config
+
+COMMAND=$1
+
+case $COMMAND in
 
 setup)
 
@@ -32,13 +43,9 @@ setup)
 	done
 	echo "$PGVECTOR_SERVICE_NAME creation completed."
 
-    cf create-service minio $MINIO_PLAN_NAME $MINIO_SERVICE_NAME -c "{\"accessKey\": \"$MINIO_USERNAME\", \"secretKey\": \"$MINIO_PASSWORD\" }" -w
-	printf "Waiting for service $MINIO_SERVICE_NAME to create."
-	while [ `cf services | grep 'in progress' | wc -l | sed 's/ //g'` != 0 ]; do
-  		printf "."
-  		sleep 5
-	done
-	echo "$MINIO_SERVICE_NAME creation completed."
+    echo && printf "\e[37mℹ️  Creating $MINIO_SERVICE_NAME MinIO service configuration...\e[m\n" && echo
+
+    cf create-service credhub $MINIO_PLAN_NAME $MINIO_SERVICE_NAME -c "{\"MINIO_ENDPOINT_HOST\":\"$MINIO_ENDPOINT_HOST\",\"MINIO_ENDPOINT_PORT\":\"$MINIO_ENDPOINT_PORT\",\"MINIO_ACCESS_KEY\":\"$MINIO_ACCESS_KEY\",\"MINIO_SECRET_KEY\":\"$MINIO_SECRET_KEY\"}"
 
 	echo && printf "\e[37mℹ️  Creating $GENAI_CHAT_SERVICE_NAME and $GENAI_EMBEDDINGS_SERVICE_NAME GenAI services ...\e[m\n" && echo
 

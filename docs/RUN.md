@@ -255,14 +255,13 @@ cf create-space -o zoolabs dev
 cf target -o zoolabs -s dev
 ```
 
-#### Create services
+#### Verify services
 
 Verify that the foundation has the service offerings required
 
 ```bash
 cf m -e genai
 cf m -e postgres
-cf m -e minio
 ```
 
 Sample interaction
@@ -283,15 +282,30 @@ Getting service plan information for service offering postgres in org zoolabs / 
 broker: postgres-odb
    plan                       description                             free or paid   costs
    on-demand-postgres-small   A single e2-micro with 2GB of storage   free
-
-❯ cf m -e minio
-Getting service plan information for service offering minio in org zoolabs / space dev as chris.phillipson@broadcom.com...
-
-broker: minio
-   plan       description                             free or paid   costs
-   small      MinIO® with 100GB storage and 1 node.   free
-   large-ha   MinIO® with 1TB storage and 4 node.     free
 ```
+
+#### Create a MinIO instance
+
+Visit StackHero, create an account, a project, and launch an instance of MinIO.
+
+Then, create a configuration file
+
+```bash
+mkdir -p $HOME/.minio
+touch $HOME/.minio/config
+```
+
+Edit the above file and make sure it has the following environment variables exported:
+
+```python
+export MINIO_ENDPOINT_HOST=<minio-hostname>
+export MINIO_ENDPOINT_PORT=<minio-port>
+export MINIO_ACCESS_KEY=<minio-username>
+export MINIO_SECRET_KEY=<minio-password>
+```
+
+> Replace the values above enclosed in `<>` with appropriate values for your instance hosted on StackHero
+
 
 #### Clone and build the app
 
