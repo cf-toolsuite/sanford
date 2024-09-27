@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active: default,groq-cloud
-
   application:
     name: sanford
 

@@ -262,6 +262,7 @@ Verify that the foundation has the service offerings required
 ```bash
 cf m -e genai
 cf m -e postgres
+cf -m e credhub
 ```
 
 Sample interaction
@@ -282,6 +283,13 @@ Getting service plan information for service offering postgres in org zoolabs / 
 broker: postgres-odb
    plan                       description                             free or paid   costs
    on-demand-postgres-small   A single e2-micro with 2GB of storage   free
+
+❯ cf m -e credhub
+Getting service plan information for service offering credhub in org zoolabs / space dev as chris.phillipson@broadcom.com...
+
+broker: credhub-broker
+   plan      description                                           free or paid   costs
+   default   Stores configuration parameters securely in CredHub   free
 ```
 
 #### Create a MinIO instance
@@ -312,7 +320,7 @@ export MINIO_SECRET_KEY=<minio-password>
 ```bash
 gh repo clone cf-toolsuite/sanford
 cd sanford
-gradle build -Pmodel-api-provider=ollama -Pvector-db-provider=pgvector
+gradle build -Pvector-db-provider=pgvector
 ```
 
 #### Deploy
