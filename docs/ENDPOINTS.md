@@ -6,6 +6,7 @@
   * [Search](#search)
   * [Summarize](#summarize)
   * [Download](#download)
+  * [Delete](#delete)
 
 ## Endpoints
 
@@ -207,3 +208,13 @@ Done. 627.4 kB in 00:0.08617 (7.3 MB/s)
 ❯ ls -la *.pdf
 -rw-rw-r-- 1 cphillipson cphillipson 627430 Sep 25 12:55 United_States_Constitution.pdf
 ```
+
+### Delete
+
+Delete a file in an S3-compliant object store's bucket. As well, prune file metadata from Vector store.
+
+```python
+DELETE /{fileName}
+```
+
+> Replace `{fileName}` above with the name of a file already stored in an S3-compliant object store's bucket

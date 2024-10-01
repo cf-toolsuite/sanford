@@ -16,4 +16,6 @@ public interface FileService {
     public List<FileMetadata> getAllFileMetadata();
 
     public Resource downloadFile(String fileName);
+
+    public void deleteFile(String fileName);
 }

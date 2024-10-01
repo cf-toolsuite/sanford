@@ -97,4 +97,8 @@ public class DellEcsFileService implements FileService {
         InputStream stream = result.getObject();
         return new InputStreamResource(stream);
     }
+
+    public void deleteFile(String fileName) {
+        s3Client.deleteObject(bucketName, fileName);
+    }
 }

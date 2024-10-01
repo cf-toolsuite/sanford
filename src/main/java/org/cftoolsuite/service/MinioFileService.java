@@ -21,6 +21,7 @@ import io.minio.GetObjectArgs;
 import io.minio.ListObjectsArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.Result;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
@@ -137,6 +138,15 @@ public class MinioFileService implements FileService {
         } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
             InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException | XmlParserException e) {
             throw new RuntimeException("Failed to download file", e);
+        }
+    }
+
+    public void deleteFile(String fileName) {
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(fileName).build());
+        } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
+            InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException | XmlParserException e) {
+            throw new RuntimeException("Failed to delete file", e);
         }
     }
 }
