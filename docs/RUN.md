@@ -92,6 +92,26 @@ Note: Recompile with -Xlint:deprecation for details.
 08:23:15.169 [main] INFO  org.cftoolsuite.MinioInitializer - Bucket created successfully: sanford
 ```
 
+### with Storage Provider
+
+The default storage provider is MinIO.  You may override the default provider by specifying either a command-line startup argument or environment variable.
+
+E.g.,
+
+```bash
+-Dstorage-provider=dell-ecs
+```
+
+or
+
+```bash
+export STORAGE_PROVIDER=dell-ecs
+```
+
+This has implications for how you configure the storage provider's connection credentials.
+
+Consult the `minio` and `dell-ecs` Spring profile stanzas inside [application.yml](../src/main/resources/application.yml) for which properties you will need to set.
+
 ### with OpenAI
 
 Build and run a version of the utility that is compatible for use with [OpenAI](https://openai.com).  You will need to [obtain an API key](https://platform.openai.com/settings/profile?tab=api-keys).

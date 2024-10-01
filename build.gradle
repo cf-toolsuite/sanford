@@ -47,6 +47,7 @@ dependencies {
 		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
 	}
 	implementation 'io.minio:minio:8.5.12'
+	implementation 'com.emc.ecs:object-client:3.4.10'
 	implementation 'io.pivotal.cfenv:java-cfenv-all:3.2.0'
 	implementation 'org.springframework.cloud:spring-cloud-bindings:2.0.3'
 	implementation 'org.springframework.ai:spring-ai-markdown-document-reader:1.0.0.M2'
@@ -67,6 +68,10 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+bootJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 bootRun {
