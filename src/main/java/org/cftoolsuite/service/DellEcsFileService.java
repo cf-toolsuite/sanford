@@ -12,11 +12,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.FileMetadata;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.emc.object.s3.S3Client;
@@ -26,15 +23,13 @@ import com.emc.object.s3.bean.ListObjectsResult;
 import com.emc.object.s3.bean.S3Object;
 import com.emc.object.s3.request.PutObjectRequest;
 
-@Profile("dell-ecs")
-@Service
 public class DellEcsFileService implements FileService {
 
     private final S3Client s3Client;
     private final String bucketName;
     private final Map<String, String> supportedContentTypes;
 
-    public DellEcsFileService(S3Client s3Client, @Value("${ecs.bucket.name}") String bucketName, AppProperties appProperties) {
+    public DellEcsFileService(S3Client s3Client, String bucketName, AppProperties appProperties) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.supportedContentTypes = appProperties.supportedContentTypes();

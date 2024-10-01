@@ -13,11 +13,8 @@ import java.util.stream.StreamSupport;
 import org.apache.commons.io.FilenameUtils;
 import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.FileMetadata;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.minio.GetObjectArgs;
@@ -35,15 +32,13 @@ import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
 import io.minio.messages.Item;
 
-@Profile("minio")
-@Service
 public class MinioFileService implements FileService {
 
     private final MinioClient minioClient;
     private final String bucketName;
     private final Map<String, String> supportedContentTypes;
 
-    public MinioFileService(MinioClient minioClient, @Value("${minio.bucket.name}") String bucketName, AppProperties appProperties) {
+    public MinioFileService(MinioClient minioClient, String bucketName, AppProperties appProperties) {
         this.minioClient = minioClient;
         this.bucketName = bucketName;
         this.supportedContentTypes = appProperties.supportedContentTypes();

@@ -160,7 +160,7 @@ spring:
     compose:
       file:
         - ./docker-compose.chroma.yml
-        - ./docker-compose.${file.store}.yml
+        - ./docker-compose.${storage.provider}.yml
 
 ---
 
@@ -187,7 +187,7 @@ spring:
     compose:
       file:
         - ./docker-compose.pgvector.yml
-        - ./docker-compose.${file.store}.yml
+        - ./docker-compose.${storage.provider}.yml
 
 ---
 
@@ -206,7 +206,7 @@ spring:
     compose:
       file:
         - ./docker-compose.redis.yml
-        - ./docker-compose.${file.store}.yml
+        - ./docker-compose.${storage.provider}.yml
 
 ---
 
@@ -214,9 +214,6 @@ spring:
   config:
     activate:
       on-profile: minio
-
-file:
-  store: minio
 
 minio:
   endpoint:
@@ -234,17 +231,15 @@ spring:
     activate:
       on-profile: dell-ecs
 
-file:
-  store: dell-ecs
-
 ecs:
   endpoint:
-    host: ${MINIO_ENDPOINT_HOST:localhost}
-    port: ${MINIO_ENDPOINT_PORT:9020}
-  accessKey: ${MINIO_ACCESS_KEY:admin}
-  secretKey: ${MINIO_SECRET_KEY:g0dECS50}
+    host: ${ECS_ENDPOINT_HOST:localhost}
+    port: ${ECS_ENDPOINT_PORT:9020}
+  accessKey: ${ECS_ACCESS_KEY:admin}
+  secretKey: ${ECS_SECRET_KEY:g0dECS50}
   bucket:
     name: ${ECS_BUCKET_NAME:sanford}
+
 ---
 
 spring:
