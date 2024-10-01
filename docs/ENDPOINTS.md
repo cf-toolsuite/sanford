@@ -218,3 +218,13 @@ DELETE /{fileName}
 ```
 
 > Replace `{fileName}` above with the name of a file already stored in an S3-compliant object store's bucket
+
+Sample interaction
+
+```bash
+❯ http DELETE :8080/api/files/United_States_Constitution.pdf
+HTTP/1.1 204
+Connection: keep-alive
+Date: Tue, 01 Oct 2024 17:32:00 GMT
+Keep-Alive: timeout=60
+```
