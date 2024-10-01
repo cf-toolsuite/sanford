@@ -54,15 +54,6 @@ server:
   tomcat:
     max-swallow-size: -1
 
-minio:
-  endpoint:
-    host: ${MINIO_ENDPOINT_HOST:localhost}
-    port: ${MINIO_ENDPOINT_PORT:9000}
-  accessKey: ${MINIO_ACCESS_KEY:minio}
-  secretKey: ${MINIO_SECRET_KEY:g0dmini0}
-  bucket:
-    name: ${MINIO_BUCKET_NAME:sanford}
-
 app:
   supportedContentTypes:
     md: text/markdown
@@ -167,7 +158,9 @@ spring:
 
   docker:
     compose:
-      file: ./docker-compose.chroma.yml
+      file:
+        - ./docker-compose.chroma.yml
+        - ./docker-compose.${file.store}.yml
 
 ---
 
@@ -192,7 +185,9 @@ spring:
 
   docker:
     compose:
-      file: ./docker-compose.pgvector.yml
+      file:
+        - ./docker-compose.pgvector.yml
+        - ./docker-compose.${file.store}.yml
 
 ---
 
@@ -209,8 +204,47 @@ spring:
 
   docker:
     compose:
-      file: ./docker-compose.redis.yml
+      file:
+        - ./docker-compose.redis.yml
+        - ./docker-compose.${file.store}.yml
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: minio
+
+file:
+  store: minio
+
+minio:
+  endpoint:
+    host: ${MINIO_ENDPOINT_HOST:localhost}
+    port: ${MINIO_ENDPOINT_PORT:9000}
+  accessKey: ${MINIO_ACCESS_KEY:minio}
+  secretKey: ${MINIO_SECRET_KEY:g0dmini0}
+  bucket:
+    name: ${MINIO_BUCKET_NAME:sanford}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dell-ecs
+
+file:
+  store: dell-ecs
+
+ecs:
+  endpoint:
+    host: ${MINIO_ENDPOINT_HOST:localhost}
+    port: ${MINIO_ENDPOINT_PORT:9020}
+  accessKey: ${MINIO_ACCESS_KEY:admin}
+  secretKey: ${MINIO_SECRET_KEY:g0dECS50}
+  bucket:
+    name: ${ECS_BUCKET_NAME:sanford}
 ---
 
 spring:

@@ -1,13 +1,12 @@
 include:
   - ./docker-compose.observability.yml
-  - ./docker-compose.minio.yml
 
 services:
   postgres:
     image: pgvector/pgvector:pg16
     container_name: postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
