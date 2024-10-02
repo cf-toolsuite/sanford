@@ -210,9 +210,9 @@ and Gradle project properties, like:
 * `-Pmodel-api-provider=ollama`
 * `-Pvector-db-provider=chroma` or `-Pvector-db-provider=pgvector` or `-Pvector-db-provider=redis`
 
-### on Cloud Foundry
+## How to run on Cloud Foundry
 
-#### Target a foundation
+### Target a foundation
 
 ```bash
 cf api {cloud_foundry_foundation_api_endpoint}
@@ -226,7 +226,7 @@ Sample interaction
 cf api api.sys.dhaka.cf-app.com
 ```
 
-#### Authenticate
+### Authenticate
 
 Interactively
 
@@ -248,7 +248,7 @@ cf login -u {username} -p "{password}"
 
 > Replace `{username}` and `{password}` above respectively with your account's username and password.
 
-#### Target space
+### Target space
 
 If your user account has `OrgManager` and `SpaceManager` permissions, then you can create your own organization and space with
 
@@ -275,7 +275,7 @@ cf create-space -o zoolabs dev
 cf target -o zoolabs -s dev
 ```
 
-#### Verify services
+### Verify services
 
 Verify that the foundation has the service offerings required
 
@@ -312,7 +312,7 @@ broker: credhub-broker
    default   Stores configuration parameters securely in CredHub   free
 ```
 
-#### Create a MinIO instance
+### Create a MinIO instance
 
 Visit StackHero, create an account, a project, and launch an instance of MinIO.
 
@@ -335,7 +335,7 @@ export MINIO_SECRET_KEY=<minio-password>
 > Replace the values above enclosed in `<>` with appropriate values for your instance hosted on StackHero
 
 
-#### Clone and build the app
+### Clone and build the app
 
 ```bash
 gh repo clone cf-toolsuite/sanford
@@ -343,7 +343,7 @@ cd sanford
 gradle build -Pvector-db-provider=pgvector
 ```
 
-#### Deploy
+### Deploy
 
 Take a look at the deployment script
 
@@ -365,7 +365,7 @@ To teardown, execute
 ./deploy-on-tp4cf.sh teardown
 ```
 
-#### Inspect the PgVector store database instance
+### Inspect the PgVector store database instance
 
 Create a service key for the service instance, with:
 
@@ -451,6 +451,6 @@ And you can execute arbitrary SQL (e.g., `SELECT * from vector_store`).
 
 To exit, just type `exit`.
 
-### on Kubernetes
+## How to run on Kubernetes
 
 TBD
