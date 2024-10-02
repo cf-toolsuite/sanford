@@ -9,8 +9,8 @@ GENAI_CHAT_SERVICE_NAME="sanford-llm"
 GENAI_CHAT_PLAN_NAME="llama3.1" # plan must have chat capabilty
 
 GENAI_EMBEDDINGS_SERVICE_NAME="sanford-embedding"
-GENAI_EMBEDDINGS_PLAN_NAME="nomic-embed-text"
- # plan must have Embeddings capabilty
+GENAI_EMBEDDINGS_PLAN_NAME="nomic-embed-text" # plan must have Embeddings capabilty
+
 PGVECTOR_SERVICE_NAME="sanford-db"
 PGVECTOR_PLAN_NAME="on-demand-postgres-small"
 PGVECTOR_EXTERNAL_PORT=1025
