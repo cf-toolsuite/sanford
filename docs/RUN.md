@@ -314,7 +314,9 @@ broker: credhub-broker
 
 ### Create a MinIO instance
 
-Visit StackHero, create an account, a project, and launch an instance of MinIO.
+Visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.
+
+> When you sign-up for a new account, you'll receive a USD 50 credit that you can use over a 1-month duration.  You can launch new Hobby instances of MinIO.  If you don't supply a payment method each time you launch an instance, it will be automatically destroyed after 24-hours.
 
 Then, create a configuration file
 
