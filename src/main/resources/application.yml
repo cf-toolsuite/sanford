@@ -181,7 +181,7 @@ spring:
         initialize-schema: true
         index-type: HNSW
         distance-type: COSINE_DISTANCE
-        dimensions: 1536
+        dimensions: ${SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS:768}
 
   docker:
     compose:

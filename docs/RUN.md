@@ -367,7 +367,7 @@ To teardown, execute
 ./deploy-on-tp4cf.sh teardown
 ```
 
-### Inspect the PgVector store database instance
+### Inspect and/or update the PgVector store database instance
 
 Create a service key for the service instance, with:
 
@@ -378,6 +378,10 @@ cf create-service-key sanford-db cf-psql
 Sample interaction
 
 ```bash
+❯ cf create-service-key sanford-db cf-psql
+Creating service key cf-psql for service instance sanford-db as chris.phillipson@broadcom.com...
+OK
+
 ❯ cf service-key sanford-db cf-psql
 Getting key cf-psql for service instance sanford-db as chris.phillipson@broadcom.com...
 
@@ -450,6 +454,22 @@ Indexes:
 ```
 
 And you can execute arbitrary SQL (e.g., `SELECT * from vector_store`).
+
+If you need to ALTER the dimensions of the `embedding` column to adapt to the limits of an embedding model you chose, then you could, for example, execute:
+
+```bash
+-- Step 1: Drop the existing index
+DROP INDEX IF EXISTS spring_ai_vector_index;
+
+-- Step 2: Drop the existing column
+ALTER TABLE public.vector_store DROP COLUMN embedding;
+
+-- Step 3: Add the new column with the desired vector size
+ALTER TABLE public.vector_store ADD COLUMN embedding vector(768);
+
+-- Step 4: Recreate the index
+CREATE INDEX spring_ai_vector_index ON public.vector_store USING hnsw (embedding vector_cosine_ops);
+```
 
 To exit, just type `exit`.
 
