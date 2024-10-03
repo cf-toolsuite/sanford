@@ -97,10 +97,10 @@ setup)
     ;;
 
 teardown)
-    cf unbind-service $STORAGE_PROVIDER_SERVICE_NAME -f
-    cf unbind-service $PGVECTOR_SERVICE_NAME -f
-    cf unbind-service $GENAI_CHAT_SERVICE_NAME -f
-    cf unbind-service $GENAI_EMBEDDINGS_SERVICE_NAME -f
+    cf unbind-service $APP_NAME $STORAGE_PROVIDER_SERVICE_NAME
+    cf unbind-service $APP_NAME $PGVECTOR_SERVICE_NAME
+    cf unbind-service $APP_NAME $GENAI_CHAT_SERVICE_NAME
+    cf unbind-service $APP_NAME $GENAI_EMBEDDINGS_SERVICE_NAME
 
     cf delete-service $STORAGE_PROVIDER_SERVICE_NAME -f
     cf delete-service $PGVECTOR_SERVICE_NAME -f
