@@ -1,5 +1,26 @@
 # Sanford
 
+* [How to Run with Gradle](#how-to-run-with-gradle)
+  * [Sample startup with Docker Compose](#sample-startup-with-docker-compose)
+  * [with Storage Provider](#with-storage-provider)
+  * [with OpenAI](#with-openai)
+  * [with Groq Cloud](#with-groq-cloud)
+  * [with Ollama](#with-ollama)
+  * [with Vector database](#with-vector-database)
+    * [Chroma](#chroma)
+    * [PgVector](#pgvector)
+    * [Redis Stack](#redis-stack)
+* [How to run on Cloud Foundry](#how-to-run-on-cloud-foundry)
+  * [Target a foundation](#target-a-foundation)
+  * [Authenticate](#authenticate)
+  * [Target space](#target-space)
+  * [Verify services](#verify-services)
+  * [Create a MinIO instance](#create-a-minio-instance)
+  * [Clone and build the app](#clone-and-build-the-app)
+  * [Deploy](#deploy)
+  * [Inspect and/or update the PgVector store database instance](#inspect-andor-update-the-pgvector-store-database-instance)
+* [How to run on Kubernetes](#how-to-run-on-kubernetes)
+
 Sanford has various modes of operation.
 
 You must activate:
