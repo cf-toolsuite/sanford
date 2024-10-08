@@ -152,8 +152,10 @@ spring:
 Open a terminal shell and execute
 
 ```bash
-./gradlew bootRun
+./gradlew build bootRun -Dspring.profiles.active=docker,openai -Pvector-db-provider={vector_db_provider}
 ```
+
+> Replace `{vector_db_provider}` with one of [ `chroma`, `pgvector`, `redis` ]
 
 ### with Groq Cloud
 
@@ -169,12 +171,19 @@ spring:
   ai:
     openai:
       api-key: {REDACTED-1}
-      # Embedding configuration below only required when spring.profiles.active includes "advanced"
       embedding:
         api-key: {REDACTED-2}
         base_url: https://api.openai.com
 ```
 > Replace `{REDACTED-1}` and `{REDACTED-2}` above with your Groq Cloud API and OpenAPI keys respectively.
+
+Open a terminal shell and execute
+
+```bash
+./gradlew build bootRun -Dspring.profiles.active=docker,groq-cloud -Pvector-db-provider={vector_db_provider}
+```
+
+> Replace `{vector_db_provider}` with one of [ `chroma`, `pgvector`, `redis` ]
 
 ### with Ollama
 
@@ -197,7 +206,7 @@ Open another terminal shell and execute
 
 ### with Vector database
 
-This setup launches either an instance of Chroma or PgVector for use by the VectorStore.
+This setup launches either an instance of Chroma, PgVector, or Redis Stack for use by the VectorStore.
 
 #### Chroma
 
