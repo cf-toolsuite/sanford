@@ -77,7 +77,7 @@ setup)
     cf create-service genai $GENAI_EMBEDDINGS_PLAN_NAME $GENAI_EMBEDDINGS_SERVICE_NAME
 
     echo && printf "\e[37mℹ️  Deploying $APP_NAME application ...\e[m\n" && echo
-    cf push $APP_NAME -k 1GB -m 1GB -p build/libs/$APP_NAME-$APP_VERSION.jar --no-start --random-route
+    cf push $APP_NAME -k 1GB -m 2GB -p build/libs/$APP_NAME-$APP_VERSION.jar --no-start --random-route
 
     echo && printf "\e[37mℹ️  Binding services ...\e[m\n" && echo
     cf bind-service $APP_NAME $PGVECTOR_SERVICE_NAME
@@ -86,7 +86,7 @@ setup)
     cf bind-service $APP_NAME $STORAGE_PROVIDER_SERVICE_NAME
 
     echo && printf "\e[37mℹ️  Setting environment variables for use by $APP_NAME application ...\e[m\n" && echo
-    cf set-env $APP_NAME JAVA_OPTS "-Djava.security.egd=file:///dev/urandom -XX:+UseG1GC -XX:+UseStringDeduplication"
+    cf set-env $APP_NAME JAVA_OPTS "-Djava.security.egd=file:///dev/urandom -XX:+UseZGC -XX:+UseStringDeduplication"
     cf set-env $APP_NAME SPRING_PROFILES_ACTIVE "default,cloud,openai,pgvector"
     cf set-env $APP_NAME JBP_CONFIG_OPEN_JDK_JRE "{ jre: { version: 21.+ } }"
     cf set-env $APP_NAME JBP_CONFIG_SPRING_AUTO_RECONFIGURATION "{ enabled: false }"
