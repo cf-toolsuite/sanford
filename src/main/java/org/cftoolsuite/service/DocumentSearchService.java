@@ -42,13 +42,11 @@ public class DocumentSearchService {
         Assert.hasText(fileName, "File name cannot be null or empty");
         FilterExpressionBuilder b = new FilterExpressionBuilder();
         log.debug("Preparing to search with fileName: {}", fileName);
-        // FIXME Is this the correct way to search for all documents matching a specific metadata key named file_name?
         List<Document> candidates = store.similaritySearch(SearchRequest.query("Find any document with any word that occurs in this file name: " + fileName).withFilterExpression(b.eq("file_name", fileName).build()).withSimilarityThresholdAll());
         log.trace("Found these: {}", candidates);
         return candidates;
     }
 
-    // FIXME Verify that delete pruned all associated documents in VectorStore
     public void delete(String fileName) {
         List<String> candidateIds = search(fileName).stream().map(d -> d.getId()).collect(Collectors.toList());
         log.debug("Preparing to delete documents with metadata file_name equal to {}", fileName);
