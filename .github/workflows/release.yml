@@ -1,0 +1,74 @@
+name: Publish package to GitHub Packages
+on:
+  release:
+    types: [created]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+      issues: read
+      packages: write
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: 21
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update && sudo apt install gh -y
+      - name: Publish package, target Chroma vector store and leverage OpenAI API for model interaction
+        run: |
+          ./gradlew clean setVersion -PnewVersion=${{ github.event.release.tag_name }} build -Pvector-db-provider=chroma -PjarBaseName=sanford-openai-chroma
+          SUFFIX="${{ github.event.release.tag_name }}"
+          echo "Uploading sanford-openai-chroma-$SUFFIX.jar to release ${{ github.event.release.tag_name }}"
+          gh release upload "${{ github.event.release.tag_name }}" build/libs/sanford-openai-chroma-${{ github.event.release.tag_name }}.jar --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish package, target Chroma vector store and leverage Ollama for model interaction
+        run: |
+          ./gradlew clean setVersion -PnewVersion=${{ github.event.release.tag_name }} build -Pvector-db-provider=chroma -Pmodel-api-provider=ollama -PjarBaseName=sanford-ollama-chroma
+          SUFFIX="${{ github.event.release.tag_name }}"
+          echo "Uploading sanford-ollama-chroma-$SUFFIX.jar to release ${{ github.event.release.tag_name }}"
+          gh release upload "${{ github.event.release.tag_name }}" build/libs/sanford-ollama-chroma-${{ github.event.release.tag_name }}.jar --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish package, target PgVector vector store and leverage OpenAI API for model interaction
+        run: |
+          ./gradlew clean setVersion -PnewVersion=${{ github.event.release.tag_name }} build -Pvector-db-provider=pgvector -PjarBaseName=sanford-openai-pgvector
+          SUFFIX="${{ github.event.release.tag_name }}"
+          echo "Uploading sanford-openai-pgvector-$SUFFIX.jar to release ${{ github.event.release.tag_name }}"
+          gh release upload "${{ github.event.release.tag_name }}" build/libs/sanford-openai-pgvector-${{ github.event.release.tag_name }}.jar --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish package, target PgVector vector store and leverage Ollama for model interaction
+        run: |
+          ./gradlew clean setVersion -PnewVersion=${{ github.event.release.tag_name }} build -Pvector-db-provider=pgvector -Pmodel-api-provider=ollama -PjarBaseName=sanford-ollama-pgvector
+          SUFFIX="${{ github.event.release.tag_name }}"
+          echo "Uploading sanford-ollama-pgvector-$SUFFIX.jar to release ${{ github.event.release.tag_name }}"
+          gh release upload "${{ github.event.release.tag_name }}" build/libs/sanford-ollama-pgvector-${{ github.event.release.tag_name }}.jar --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish package, target Redis Stack vector store and leverage OpenAI API for model interaction
+        run: |
+          ./gradlew clean setVersion -PnewVersion=${{ github.event.release.tag_name }} build -Pvector-db-provider=redis -PjarBaseName=sanford-openai-redis
+          SUFFIX="${{ github.event.release.tag_name }}"
+          echo "Uploading sanford-openai-redis-$SUFFIX.jar to release ${{ github.event.release.tag_name }}"
+          gh release upload "${{ github.event.release.tag_name }}" build/libs/sanford-openai-redis-${{ github.event.release.tag_name }}.jar --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish package, target Redis Stack vector store and leverage Ollama for model interaction
+        run: |
+          ./gradlew clean setVersion -PnewVersion=${{ github.event.release.tag_name }} build -Pvector-db-provider=redis -Pmodel-api-provider=ollama -PjarBaseName=sanford-ollama-redis
+          SUFFIX="${{ github.event.release.tag_name }}"
+          echo "Uploading sanford-ollama-redis-$SUFFIX.jar to release ${{ github.event.release.tag_name }}"
+          gh release upload "${{ github.event.release.tag_name }}" build/libs/sanford-ollama-redis-${{ github.event.release.tag_name }}.jar --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
