@@ -92,3 +92,9 @@ task setVersion {
         }
     }
 }
+
+task printArtifactPath {
+    doLast {
+        println bootJar.archiveFile.get().asFile.absolutePath
+    }
+}
