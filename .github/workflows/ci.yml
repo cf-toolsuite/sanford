@@ -11,19 +11,14 @@ jobs:
     name: Java ${{ matrix.java }} build
     steps:
       - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: liberica
           java-version: ${{ matrix.java }}
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Build with Gradle, target Chroma vector store and leverage OpenAI API for model interaction
         run: ./gradlew clean build -Pvector-db-provider=chroma
       - name: Build with Gradle, target Chroma vector store and leverage Ollama for model interaction
