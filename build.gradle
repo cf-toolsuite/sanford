@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'org.cftoolsuite'
-version = '0.0.1-SNAPSHOT'
+
 
 java {
 	toolchain {
@@ -72,9 +72,29 @@ tasks.named('test') {
 }
 
 bootJar {
+	archiveBaseName = project.findProperty('jarBaseName') ?: project.name
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 bootRun {
     systemProperties System.properties
+}
+
+jar {
+    archiveBaseName = project.findProperty('jarBaseName') ?: project.name
+}
+
+task setVersion {
+    doLast {
+        def newVersion = project.hasProperty('newVersion') ? project.newVersion : version
+        ant.propertyfile(file: "gradle.properties") {
+            entry(key: "version", value: newVersion)
+        }
+    }
+}
+
+task printArtifactPath {
+    doLast {
+        println bootJar.archiveFile.get().asFile.absolutePath
+    }
 }

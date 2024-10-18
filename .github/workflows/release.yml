@@ -1,0 +1,77 @@
+name: Publish package to GitHub Packages
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - vector-db: chroma
+            model-api: openai
+            jar-base-name: sanford-openai-chroma
+          - vector-db: chroma
+            model-api: ollama
+            jar-base-name: sanford-ollama-chroma
+          - vector-db: pgvector
+            model-api: openai
+            jar-base-name: sanford-openai-pgvector
+          - vector-db: pgvector
+            model-api: ollama
+            jar-base-name: sanford-ollama-pgvector
+          - vector-db: redis
+            model-api: openai
+            jar-base-name: sanford-openai-redis
+          - vector-db: redis
+            model-api: ollama
+            jar-base-name: sanford-ollama-redis
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build artifact
+        run: |
+          ./gradlew clean setVersion -PnewVersion=${{ github.event.release.tag_name }}
+          cat gradle.properties
+          ./gradlew build -Pvector-db-provider=${{ matrix.vector-db }} -Pmodel-api-provider=${{ matrix.model-api }} -PjarBaseName=${{ matrix.jar-base-name }}
+          echo "Contents of build/libs:"
+          ls -l build/libs
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.jar-base-name }}
+          path: build/libs/${{ matrix.jar-base-name }}-${{ github.event.release.tag_name }}.jar
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      checks: write
+      actions: read
+      issues: read
+      packages: write
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      - name: Publish assets and generate release notes
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            */*.jar
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}

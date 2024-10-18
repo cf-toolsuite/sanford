@@ -11,10 +11,23 @@ jobs:
     name: Java ${{ matrix.java }} build
     steps:
       - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: liberica
           java-version: ${{ matrix.java }}
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build with Gradle, target Chroma vector store and leverage OpenAI API for model interaction
+        run: ./gradlew clean build -Pvector-db-provider=chroma
+      - name: Build with Gradle, target Chroma vector store and leverage Ollama for model interaction
+        run: ./gradlew clean build -Pvector-db-provider=chroma -Pmodel-api-provider=ollama
+      - name: Build with Gradle, target PgVector vector store and leverage OpenAI API for model interaction
+        run: ./gradlew clean build -Pvector-db-provider=pgvector
+      - name: Build with Gradle, target PgVector vector store and leverage Ollama for model interaction
+        run: ./gradlew clean build -Pvector-db-provider=pgvector -Pmodel-api-provider=ollama
+      - name: Build with Gradle, target Redis Stack vector store and leverage OpenAI API for model interaction
+        run: ./gradlew clean build -Pvector-db-provider=redis
+      - name: Build with Gradle, target Redis Stack vector store and leverage Ollama for model interaction
+        run: ./gradlew clean build -Pvector-db-provider=redis -Pmodel-api-provider=ollama
