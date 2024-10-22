@@ -2,6 +2,7 @@
 
 * [Endpoints](#endpoints)
   * [Upload](#upload)
+  * [Chat](#chat)
   * [Get Metadata](#get-metadata)
   * [Search](#search)
   * [Summarize](#summarize)
@@ -54,6 +55,31 @@ You will need to adjust startup arguments, e.g., you could add the following to 
 ```bash
 -Dspring.servlet.multipart.max-file-size=250MB
 ```
+
+### Chat
+
+Converse with an AI chatbot who is aware of all uploaded content.  Ask a question, get a response.
+
+```python
+GET /chat
+```
+
+**Sample interaction**
+
+```bash
+❯ http :8080/api/files/chat q=="Tell me something about the character Hermia from A Midsummer Night's Dream"
+HTTP/1.1 200
+Connection: keep-alive
+Content-Length: 795
+Content-Type: text/plain;charset=UTF-8
+Date: Tue, 22 Oct 2024 12:24:58 GMT
+Keep-Alive: timeout=60
+
+Hermia is a key character in "A Midsummer Night's Dream," portrayed as the daughter of Egeus. She is in love with Lysander, but her father wishes her to marry Demetrius, which creates conflict in the story. Hermia is depicted as strong-willed and defiant; she boldly asserts her feelings and desires, expressing her wish that her father could see things from her perspective (Act I).
+
+She passionately defends her love for Lysander and is determined to be with him despite the obstacles posed by her father and societal expectations. Hermia's character embodies themes of love, rebellion, and the struggle for autonomy within the constraints of Athenian law. Her determination to follow her heart leads her to plan an escape with Lysander, showcasing her bravery and commitment to love (Act I).
+```
+
 
 ### Get Metadata
 
