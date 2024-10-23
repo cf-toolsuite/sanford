@@ -1,6 +1,7 @@
 package org.cftoolsuite.service;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import org.springframework.ai.transformer.KeywordMetadataEnricher;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,60 +52,71 @@ public class DocumentIngestionService {
         this.xmlMapper = new XmlMapper();
     }
 
+    public void ingest(Path filePath, FileMetadata metadata, boolean keywordsEnabled) {
+        ingest(new FileSystemResource(filePath), metadata, keywordsEnabled);
+    }
+
     public void ingest(MultipartFile file, FileMetadata fileMetadata) {
+        ingest(file.getResource(), fileMetadata, true);
+    }
+
+    protected void ingest(Resource resource, FileMetadata fileMetadata, boolean keywordsEnabled) {
         log.info("-- Ingesting file: {}", fileMetadata.fileName());
         List<Document> documents = null;
         switch (fileMetadata.fileExtension().toLowerCase()) {
             case "md":
-                documents = loadMarkdown(fileMetadata.fileName(), file.getResource());
+                documents = loadMarkdown(fileMetadata.fileName(), resource);
                 break;
             case "pdf":
-                documents = loadPdf(file.getResource());
+                documents = loadPdf(resource);
                 break;
             case "log":
-                documents = loadText(fileMetadata.fileName(), file.getResource());
+                documents = loadText(fileMetadata.fileName(), resource);
                 break;
             case "txt":
-                documents = loadText(fileMetadata.fileName(), file.getResource());
+                documents = loadText(fileMetadata.fileName(), resource);
                 break;
             case "csv":
-                documents = loadText(fileMetadata.fileName(), file.getResource());
+                documents = loadText(fileMetadata.fileName(), resource);
                 break;
             case "tsv":
-                documents = loadText(fileMetadata.fileName(), file.getResource());
+                documents = loadText(fileMetadata.fileName(), resource);
                 break;
             case "json":
-                documents = loadJson(file.getResource());
+                documents = loadJson(resource);
             case "xml":
-                documents = loadXml(file.getResource());
+                documents = loadXml(resource);
                 break;
             case "html":
-                documents = loadTika(file.getResource());
+                documents = loadTika(resource);
                 break;
             case "htm":
-                documents = loadTika(file.getResource());
+                documents = loadTika(resource);
                 break;
             case "doc":
-                documents = loadTika(file.getResource());
+                documents = loadTika(resource);
                 break;
             case "docx":
-                documents = loadTika(file.getResource());
+                documents = loadTika(resource);
                 break;
             case "ppt":
-                documents = loadTika(file.getResource());
+                documents = loadTika(resource);
                 break;
             case "pptx":
-                documents = loadTika(file.getResource());
+                documents = loadTika(resource);
                 break;
             default:
                 throw new IllegalArgumentException("Filename [" + fileMetadata.fileName() + "] contains an unsupported file extension [" + fileMetadata.fileExtension() + "]");
         }
 
-        KeywordMetadataEnricher enricher = new KeywordMetadataEnricher(chatModel, 5);
-        List<Document> keywordEnrichedDocuments = enricher.apply(documents);
-
         TokenTextSplitter splitter = new TokenTextSplitter();
-        store.accept(splitter.apply(keywordEnrichedDocuments));
+        if (keywordsEnabled) {
+            KeywordMetadataEnricher enricher = new KeywordMetadataEnricher(chatModel, 5);
+            List<Document> keywordEnrichedDocuments = enricher.apply(documents);
+            store.accept(splitter.apply(keywordEnrichedDocuments));
+        } else {
+            store.accept(documents);
+        }
     }
 
     private List<Document> loadXml(Resource resource) {

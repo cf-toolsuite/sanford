@@ -1,24 +1,25 @@
 package org.cftoolsuite.domain.crawl;
 
+import java.nio.file.Path;
+
 import org.springframework.context.ApplicationEvent;
-import org.springframework.web.multipart.MultipartFile;
 
 public class CrawlCompletedEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private MultipartFile file;
+    private Path filePath;
 
     public CrawlCompletedEvent(Object source) {
         super(source);
     }
 
-    public CrawlCompletedEvent file(MultipartFile file) {
-        this.file = file;
+    public CrawlCompletedEvent filePath(Path filePath) {
+        this.filePath = filePath;
         return this;
     }
 
-    public MultipartFile getFile() {
-        return file;
+    public Path getFilePath() {
+        return filePath;
     }
 }

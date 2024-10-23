@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import crawlercommons.filters.basic.BasicURLNormalizer;
-import de.hshn.mi.crawler4j.frontier.URLFrontierConfiguration;
-import de.hshn.mi.crawler4j.url.URLFrontierWebURLFactory;
+import de.hshn.mi.crawler4j.frontier.HSQLDBFrontierConfiguration;
+import de.hshn.mi.crawler4j.url.HSQLDBWebURLFactory;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -45,14 +45,15 @@ public class WebCrawlController {
             CrawlConfig config = new CrawlConfig();
             config.setCrawlStorageFolder(crawlStorageFolder);
             config.setResumableCrawling(true);
+            config.setMaxDepthOfCrawling(crawlRequest.maxDepthOfCrawling());
 
             BasicURLNormalizer normalizer = new BasicURLNormalizer();
             PageFetcher pageFetcher = new PageFetcher(config, normalizer);
             RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
             RobotstxtServer robotstxtServer =
-                new RobotstxtServer(robotstxtConfig, pageFetcher, new URLFrontierWebURLFactory());
+                new RobotstxtServer(robotstxtConfig, pageFetcher, new HSQLDBWebURLFactory());
             FrontierConfiguration frontierConfiguration =
-                new URLFrontierConfiguration(config, 10, crawlRequest.rootDomain(), 443);
+                new HSQLDBFrontierConfiguration(config, 25);
 
             try {
                 CrawlController controller = new CrawlController(config, normalizer, pageFetcher, robotstxtServer,

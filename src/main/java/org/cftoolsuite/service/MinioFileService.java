@@ -1,7 +1,10 @@
 package org.cftoolsuite.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -14,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.FileMetadata;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,19 +49,41 @@ public class MinioFileService implements FileService {
         this.supportedContentTypes = appProperties.supportedContentTypes();
     }
 
-    public FileMetadata uploadFile(MultipartFile file) {
-        try {
-            String objectId = UUID.randomUUID().toString();
-            String fileName = file.getOriginalFilename();
-            String fileExtension = FilenameUtils.getExtension(fileName);
-            String contentType = file.getContentType() == null ? supportedContentTypes.get(fileExtension) : file.getContentType();
+    @Override
+    public FileMetadata uploadFile(Path filePath) {
+        String objectId = UUID.randomUUID().toString();
+        String fileName = new PathResource(filePath).getFilename();
+        String fileExtension = FilenameUtils.getExtension(fileName);
+        String contentType = supportedContentTypes.get(fileExtension);
+        try(InputStream stream = new ByteArrayInputStream(Files.readAllBytes(filePath))) {
+            long objectSize = Files.size(filePath);
+            return uploadFile(objectId, fileName, fileExtension, contentType, objectSize, stream);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to obtain stream from " + fileName, e);
+        }
+    }
 
-            InputStream inputStream = file.getInputStream();
+    @Override
+    public FileMetadata uploadFile(MultipartFile file) {
+        String objectId = UUID.randomUUID().toString();
+        String fileName = file.getResource().getFilename();
+        String fileExtension = FilenameUtils.getExtension(fileName);
+        String contentType = file.getContentType() == null ? supportedContentTypes.get(fileExtension) : file.getContentType();
+        long objectSize = file.getSize();
+        try(InputStream stream = file.getInputStream()) {
+            return uploadFile(objectId, fileName, fileExtension, contentType, objectSize, stream);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to obtain stream from " + fileName, e);
+        }
+    }
+
+    protected FileMetadata uploadFile(String objectId, String fileName, String fileExtension, String contentType, long objectSize, InputStream stream) {
+        try {
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(fileName)
-                    .stream(inputStream, file.getSize(), -1)
+                    .stream(stream, objectSize, -1)
                     .userMetadata(Map.of("oid", objectId, "contentType", contentType))
                     .contentType(contentType)
                     .build()

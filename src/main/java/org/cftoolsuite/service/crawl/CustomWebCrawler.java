@@ -1,7 +1,6 @@
 package org.cftoolsuite.service.crawl;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,13 +8,12 @@ import java.nio.file.Paths;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.cftoolsuite.domain.crawl.CrawlRequest;
-import org.cftoolsuite.domain.crawl.CrawledMultipartFile;
+import org.apache.commons.lang3.StringUtils;
 import org.cftoolsuite.domain.crawl.CrawlCompletedEvent;
+import org.cftoolsuite.domain.crawl.CrawlRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.web.multipart.MultipartFile;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
@@ -59,22 +57,70 @@ public class CustomWebCrawler extends WebCrawler {
             log.debug("-- HTML length: " + html.length());
             log.debug("-- Number of outgoing links: " + links.size());
 
+            String fileName = "";
             try {
-                String fileName = URLEncoder.encode(url, StandardCharsets.UTF_8.toString()) + ".html";
+                fileName = extractFilename(url);
                 Path filePath = Paths.get(storageFolder, fileName);
                 Files.write(filePath, html.getBytes(StandardCharsets.UTF_8));
-                publisher.publishEvent(new CrawlCompletedEvent(this).file(createMultipartFileFromPath(filePath)));
+                publisher.publishEvent(new CrawlCompletedEvent(this).filePath(filePath));
             } catch (IOException e) {
-                log.error("Error ingesting file from URL: " + url, e);
+                log.error("Error ingesting file " + fileName + " from URL: " + url, e);
+            } catch (NullPointerException e) {
+                log.error("Could not determine filename from URL: " + url, e);
             }
         }
     }
 
-    private MultipartFile createMultipartFileFromPath(Path path) throws IOException {
-        String name = path.getFileName().toString();
-        String originalFileName = name;
-        String contentType = Files.probeContentType(path);
-        byte[] content = Files.readAllBytes(path);
-        return new CrawledMultipartFile(name, originalFileName, contentType, content);
+    private String extractFilename(String url) {
+        if (StringUtils.isBlank(url)) {
+            return null;
+        }
+
+        // Remove any query parameters or fragments
+        int queryIndex = url.indexOf('?');
+        if (queryIndex != -1) {
+            url = url.substring(0, queryIndex);
+        }
+
+        int fragmentIndex = url.indexOf('#');
+        if (fragmentIndex != -1) {
+            url = url.substring(0, fragmentIndex);
+        }
+
+        // Extract the path after the domain
+        int protocolIndex = url.indexOf("://");
+        if (protocolIndex != -1) {
+            url = url.substring(protocolIndex + 3);
+        }
+
+        int domainEndIndex = url.indexOf('/', protocolIndex + 3);
+        if (domainEndIndex != -1) {
+            url = url.substring(domainEndIndex + 1);
+        }
+
+        // Split the remaining path by '/'
+        String[] parts = url.split("/");
+
+        // Get the last non-empty part
+        String lastPart = "";
+        for (int i = parts.length - 1; i >= 0; i--) {
+            if (!parts[i].isEmpty()) {
+                lastPart = parts[i];
+                break;
+            }
+        }
+
+        // If no valid part found, return null
+        if (lastPart.isEmpty()) {
+            return null;
+        }
+
+        // Check if the last part already has a file extension
+        if (lastPart.matches(".*\\.[^.]+")) {
+            return lastPart;
+        } else {
+            // Append "-index.html" if there's no file extension
+            return lastPart + "-index.html";
+        }
     }
 }

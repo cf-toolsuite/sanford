@@ -1,8 +1,11 @@
 package org.cftoolsuite.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.FileMetadata;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,15 +39,35 @@ public class DellEcsFileService implements FileService {
         this.supportedContentTypes = appProperties.supportedContentTypes();
     }
 
-    public FileMetadata uploadFile(MultipartFile file) {
-        try {
-            String objectId = UUID.randomUUID().toString();
-            String fileName = file.getOriginalFilename();
-            String fileExtension = FilenameUtils.getExtension(fileName);
-            String contentType = file.getContentType() == null ? supportedContentTypes.get(fileExtension) : file.getContentType();
+    @Override
+    public FileMetadata uploadFile(Path filePath) {
+        String objectId = UUID.randomUUID().toString();
+        String fileName = new PathResource(filePath).getFilename();
+        String fileExtension = FilenameUtils.getExtension(fileName);
+        String contentType = supportedContentTypes.get(fileExtension);
+        try(InputStream stream = new ByteArrayInputStream(Files.readAllBytes(filePath))) {
+            return uploadFile(objectId, fileName, fileExtension, contentType, stream);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to obtain stream from " + fileName, e);
+        }
+    }
 
-            InputStream inputStream = file.getInputStream();
-            String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+    @Override
+    public FileMetadata uploadFile(MultipartFile file) {
+        String objectId = UUID.randomUUID().toString();
+        String fileName = file.getResource().getFilename();
+        String fileExtension = FilenameUtils.getExtension(fileName);
+        String contentType = file.getContentType() == null ? supportedContentTypes.get(fileExtension) : file.getContentType();
+        try(InputStream stream = file.getInputStream()) {
+            return uploadFile(objectId, fileName, fileExtension, contentType, stream);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to obtain stream from " + fileName, e);
+        }
+    }
+
+    protected FileMetadata uploadFile(String objectId, String fileName, String fileExtension, String contentType, InputStream stream) {
+        try {
+            String content = IOUtils.toString(stream, StandardCharsets.UTF_8);
             S3ObjectMetadata metadata = new S3ObjectMetadata().withContentType(contentType);
             metadata.addUserMetadata("oid", objectId);
             PutObjectRequest request = new PutObjectRequest(bucketName, fileName, content);
