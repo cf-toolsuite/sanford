@@ -14,7 +14,7 @@ spring:
 
   mvc:
     async:
-      request-timeout: ${SPRING_MVC_ASYNC_REQUEST-TIMEOUT:-1}
+      request-timeout: ${SPRING_MVC_ASYNC_REQUEST_TIMEOUT:-1}
 
   threads:
     virtual:

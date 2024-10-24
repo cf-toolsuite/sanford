@@ -43,6 +43,8 @@ public class WebCrawlController {
 
         try {
             CrawlConfig config = new CrawlConfig();
+            config.setRespectNoIndex(false);
+            config.setRespectNoFollow(false);
             config.setCrawlStorageFolder(crawlStorageFolder);
             config.setResumableCrawling(true);
             config.setMaxDepthOfCrawling(crawlRequest.maxDepthOfCrawling());
