@@ -60,9 +60,16 @@ public class CustomWebCrawler extends WebCrawler {
             String fileName = "";
             try {
                 fileName = extractFilename(url);
-                Path filePath = Paths.get(storageFolder, fileName);
-                Files.write(filePath, html.getBytes(StandardCharsets.UTF_8));
-                publisher.publishEvent(new CrawlCompletedEvent(this).filePath(filePath));
+                publisher
+                    .publishEvent(
+                        new CrawlCompletedEvent(this)
+                            .filePath(
+                                Files.write(
+                                    Paths.get(storageFolder, fileName),
+                                    html.getBytes(StandardCharsets.UTF_8)
+                                )
+                        )
+                    );
             } catch (IOException e) {
                 log.error("Error ingesting file " + fileName + " from URL: " + url, e);
             } catch (NullPointerException e) {

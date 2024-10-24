@@ -56,31 +56,33 @@ public class DocumentIngestionService {
         ingest(new FileSystemResource(filePath), metadata, keywordsEnabled);
     }
 
-    public void ingest(MultipartFile file, FileMetadata fileMetadata) {
-        ingest(file.getResource(), fileMetadata, true);
+    public void ingest(MultipartFile file, FileMetadata fileMetadata, boolean keywordsEnabled) {
+        ingest(file.getResource(), fileMetadata, keywordsEnabled);
     }
 
     protected void ingest(Resource resource, FileMetadata fileMetadata, boolean keywordsEnabled) {
-        log.info("-- Ingesting file: {}", fileMetadata.fileName());
+        String fileName = fileMetadata.fileName();
+        String fileExtension = fileMetadata.fileExtension();
+        log.info("-- Ingesting file: {}", fileName);
         List<Document> documents = null;
-        switch (fileMetadata.fileExtension().toLowerCase()) {
+        switch (fileExtension.toLowerCase()) {
             case "md":
-                documents = loadMarkdown(fileMetadata.fileName(), resource);
+                documents = loadMarkdown(fileName, resource);
                 break;
             case "pdf":
                 documents = loadPdf(resource);
                 break;
             case "log":
-                documents = loadText(fileMetadata.fileName(), resource);
+                documents = loadText(fileName, resource);
                 break;
             case "txt":
-                documents = loadText(fileMetadata.fileName(), resource);
+                documents = loadText(fileName, resource);
                 break;
             case "csv":
-                documents = loadText(fileMetadata.fileName(), resource);
+                documents = loadText(fileName, resource);
                 break;
             case "tsv":
-                documents = loadText(fileMetadata.fileName(), resource);
+                documents = loadText(fileName, resource);
                 break;
             case "json":
                 documents = loadJson(resource);
@@ -106,7 +108,7 @@ public class DocumentIngestionService {
                 documents = loadTika(resource);
                 break;
             default:
-                throw new IllegalArgumentException("Filename [" + fileMetadata.fileName() + "] contains an unsupported file extension [" + fileMetadata.fileExtension() + "]");
+                throw new IllegalArgumentException("Filename [" + fileName + "] contains an unsupported file extension [" + fileExtension + "]");
         }
 
         TokenTextSplitter splitter = new TokenTextSplitter();
@@ -115,7 +117,7 @@ public class DocumentIngestionService {
             List<Document> keywordEnrichedDocuments = enricher.apply(documents);
             store.accept(splitter.apply(keywordEnrichedDocuments));
         } else {
-            store.accept(documents);
+            store.accept(splitter.apply(documents));
         }
     }
 

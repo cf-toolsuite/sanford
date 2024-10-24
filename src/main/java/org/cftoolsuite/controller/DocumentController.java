@@ -45,7 +45,7 @@ public class DocumentController {
     @PostMapping("/upload")
     public ResponseEntity<FileMetadata> uploadFile(@RequestParam("fileName") MultipartFile file) {
         FileMetadata fileMetadata = fileService.uploadFile(file);
-        documentIngestionService.ingest(file, fileMetadata);
+        documentIngestionService.ingest(file, fileMetadata, true);
         return ResponseEntity.ok(fileMetadata);
     }
 

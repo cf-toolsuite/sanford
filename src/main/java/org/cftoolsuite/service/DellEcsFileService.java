@@ -1,10 +1,8 @@
 package org.cftoolsuite.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,32 +40,26 @@ public class DellEcsFileService implements FileService {
     @Override
     public FileMetadata uploadFile(Path filePath) {
         String objectId = UUID.randomUUID().toString();
-        String fileName = new PathResource(filePath).getFilename();
+        Resource resource = new PathResource(filePath);
+        String fileName = resource.getFilename();
         String fileExtension = FilenameUtils.getExtension(fileName);
         String contentType = supportedContentTypes.get(fileExtension);
-        try(InputStream stream = new ByteArrayInputStream(Files.readAllBytes(filePath))) {
-            return uploadFile(objectId, fileName, fileExtension, contentType, stream);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to obtain stream from " + fileName, e);
-        }
+        return uploadFile(objectId, fileName, fileExtension, contentType, resource);
     }
 
     @Override
     public FileMetadata uploadFile(MultipartFile file) {
         String objectId = UUID.randomUUID().toString();
-        String fileName = file.getResource().getFilename();
+        Resource resource = file.getResource();
+        String fileName = file.getOriginalFilename();
         String fileExtension = FilenameUtils.getExtension(fileName);
         String contentType = file.getContentType() == null ? supportedContentTypes.get(fileExtension) : file.getContentType();
-        try(InputStream stream = file.getInputStream()) {
-            return uploadFile(objectId, fileName, fileExtension, contentType, stream);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to obtain stream from " + fileName, e);
-        }
+        return uploadFile(objectId, fileName, fileExtension, contentType, resource);
     }
 
-    protected FileMetadata uploadFile(String objectId, String fileName, String fileExtension, String contentType, InputStream stream) {
+    protected FileMetadata uploadFile(String objectId, String fileName, String fileExtension, String contentType, Resource resource) {
         try {
-            String content = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            String content = IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
             S3ObjectMetadata metadata = new S3ObjectMetadata().withContentType(contentType);
             metadata.addUserMetadata("oid", objectId);
             PutObjectRequest request = new PutObjectRequest(bucketName, fileName, content);
