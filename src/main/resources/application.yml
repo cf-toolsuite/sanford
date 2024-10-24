@@ -2,9 +2,19 @@ spring:
   application:
     name: sanford
 
+  httpclient5:
+    pool:
+      max-connper-route: 50
+      pool-concurrency-policy: LAX
+    request-config:
+      '[default]':
+        connect-timeout: 1000
+        connection-request-timeout: 1000
+        response-timeout: 3000
+
   mvc:
     async:
-      request-timeout: ${SPRING_MVC_ASYNC_REQUEST-TIMEOUT:-1}
+      request-timeout: ${SPRING_MVC_ASYNC_REQUEST_TIMEOUT:-1}
 
   threads:
     virtual:
@@ -263,3 +273,4 @@ management:
 logging:
   level:
     org.cftoolsuite: TRACE
+    com.fasterxml.jackson: TRACE

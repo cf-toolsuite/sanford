@@ -49,12 +49,18 @@ dependencies {
 	}
 	implementation 'io.minio:minio:8.5.12'
 	implementation 'com.emc.ecs:object-client:3.4.10'
-	implementation 'io.pivotal.cfenv:java-cfenv-all:3.2.0'
+	implementation 'io.pivotal.cfenv:java-cfenv:3.2.0'
+	implementation 'io.pivotal.cfenv:java-cfenv-boot:3.2.0'
+	implementation 'com.cedarsoftware:json-io:4.30.0'
 	implementation 'org.springframework.cloud:spring-cloud-bindings:2.0.3'
 	implementation 'org.springframework.ai:spring-ai-markdown-document-reader'
 	implementation 'org.springframework.ai:spring-ai-tika-document-reader'
 	implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-resilience4j:1.0.5'
+	implementation ('de.hs-heilbronn.mi:crawler4j-with-hsqldb:5.1.0') {
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+    }
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

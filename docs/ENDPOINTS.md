@@ -2,6 +2,7 @@
 
 * [Endpoints](#endpoints)
   * [Upload](#upload)
+  * [Crawl](#crawl)
   * [Chat](#chat)
   * [Get Metadata](#get-metadata)
   * [Search](#search)
@@ -11,11 +12,11 @@
 
 ## Endpoints
 
-All endpoints below are to be prefixed with `/api/files`.
+All endpoints with exception to `/crawl` below are to be prefixed with `/api/files`.
 
 ### Upload
 
-Upload a file to an S3-compliant object store's bucket
+Upload a file to an S3-compliant object store's bucket; in addition the contents of the file will be vectorized and persisted into a [Vector Database](https://docs.spring.io/spring-ai/reference/api/vectordbs.html) provider.
 
 ```python
 POST /upload
@@ -56,6 +57,32 @@ You will need to adjust startup arguments, e.g., you could add the following to 
 -Dspring.servlet.multipart.max-file-size=250MB
 ```
 
+### Crawl
+
+Facilitate web-crawling.  Users may issue a [CrawlRequest](../src/main/java/org/cftoolsuite/domain/crawl/CrawlRequest.java) and each document found will be (a) uploaded to S3-compliant object store and (b) contents will be vectorized and persisted into a Vector Database provider.
+
+```python
+POST /crawl
+```
+
+**Sample interaction**
+
+```bash
+❯ http POST :8080/crawl rootDomain="https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/" seeds:='["https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/"]' maxDepthOfCrawling=5
+HTTP/1.1 202
+Connection: keep-alive
+Content-Type: application/json
+Date: Thu, 24 Oct 2024 13:38:24 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "id": "1",
+    "result": "Accepted",
+    "storageFolder": "/tmp/crawler4j/1"
+}
+```
+
 ### Chat
 
 Converse with an AI chatbot who is aware of all uploaded content.  Ask a question, get a response.
@@ -79,7 +106,6 @@ Hermia is a key character in "A Midsummer Night's Dream," portrayed as the daugh
 
 She passionately defends her love for Lysander and is determined to be with him despite the obstacles posed by her father and societal expectations. Hermia's character embodies themes of love, rebellion, and the struggle for autonomy within the constraints of Athenian law. Her determination to follow her heart leads her to plan an escape with Lysander, showcasing her bravery and commitment to love (Act I).
 ```
-
 
 ### Get Metadata
 

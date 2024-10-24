@@ -32,8 +32,9 @@ public class DocumentSearchService {
     public List<FileMetadata> nlSearch(String query) {
         Assert.hasText(query, "Query cannot be null or empty");
         log.debug("Preparing to search with query: {}", query);
-        List<Document> candidates = store.similaritySearch(SearchRequest.query(query).withTopK(TOP_K));;
-        log.trace("Found these: {}", candidates);
+        List<Document> candidates = store.similaritySearch(SearchRequest.query(query).withTopK(TOP_K));
+        log.debug("Found {} documents", candidates.size());
+        log.trace("Document content and metadata: {}", candidates);
         Set<String> fileNames = candidates.stream().map(d -> String.valueOf(d.getMetadata().get("file_name"))).collect(Collectors.toSet());
         return fileNames.stream().map(f -> fileService.getFileMetadata(f)).collect(Collectors.toList());
     }
@@ -43,7 +44,8 @@ public class DocumentSearchService {
         FilterExpressionBuilder b = new FilterExpressionBuilder();
         log.debug("Preparing to search with fileName: {}", fileName);
         List<Document> candidates = store.similaritySearch(SearchRequest.query("Find any document with any word that occurs in this file name: " + fileName).withFilterExpression(b.eq("file_name", fileName).build()).withSimilarityThresholdAll());
-        log.trace("Found these: {}", candidates);
+        log.debug("Found {} documents", candidates.size());
+        log.trace("Document content and metadata: {}", candidates);
         return candidates;
     }
 

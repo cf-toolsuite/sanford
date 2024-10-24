@@ -1,5 +1,6 @@
 package org.cftoolsuite.service;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.cftoolsuite.domain.FileMetadata;
@@ -8,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 public interface FileService {
+
+    public FileMetadata uploadFile(Path filePath);
 
     public FileMetadata uploadFile(MultipartFile file);
 

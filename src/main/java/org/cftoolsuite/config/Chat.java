@@ -1,27 +1,48 @@
 package org.cftoolsuite.config;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.autoconfigure.openai.OpenAiChatProperties;
+import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
+import org.springframework.ai.model.function.FunctionCallbackContext;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
+// @see https://github.com/spring-projects/spring-ai/issues/372#issuecomment-2242650500
 public class Chat {
 
     @Bean
-    public ChatClient chatClient(ChatModel model) {
-        return
-            ChatClient
-                .builder(model)
-                .defaultSystem("""
-                    Summarize the following text into a concise paragraph that captures the main points and essential details without losing important information.
-                    The summary should be as short as possible while remaining clear and informative.
-                    Use bullet points or numbered lists to organize the information if it helps to clarify the meaning.
-                    Focus on the key facts, events, and conclusions.
-                    Avoid including minor details or examples unless they are crucial for understanding the main ideas.
-                    """
-                )
-                .build();
+    public OpenAiChatModel chatModel(
+            OpenAiConnectionProperties commonProperties,
+            OpenAiChatProperties chatProperties,
+            WebClient.Builder webClientBuilder,
+            RetryTemplate retryTemplate,
+            FunctionCallbackContext functionCallbackContext,
+            ResponseErrorHandler responseErrorHandler
+    ) {
+        RestClient.Builder restClientBuilder = RestClient.builder()
+                .defaultHeaders(headers -> headers.set(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate"));
+
+        OpenAiApi openAiApi = new OpenAiApi(
+                chatProperties.getBaseUrl() != null ? chatProperties.getBaseUrl() : commonProperties.getBaseUrl(),
+                chatProperties.getApiKey() != null ? chatProperties.getApiKey() : commonProperties.getApiKey(),
+                restClientBuilder,
+                webClientBuilder,
+                responseErrorHandler
+        );
+
+        return new OpenAiChatModel(
+                openAiApi,
+                chatProperties.getOptions(),
+                functionCallbackContext,
+                retryTemplate
+        );
     }
 
 }
