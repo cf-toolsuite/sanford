@@ -1,37 +1,24 @@
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: chroma
   template:
-    metadata:
-      labels:
-        app: chroma
     spec:
       containers:
       - env:
         - name: JAVA_OPTS
           value: "-Djava.security.egd=file:///dev/urandom -XX:+UseZGC -XX:+UseStringDeduplication"
-        - name: SPRING_PROFILES_ACTIVE
-          value: default,cloud,openai,chroma
         - name: MINIO_ENDPOINT_HOST
           value: minio.minio-system.svc.cluster.local
-      - name: chroma
-        image: chromadb/chroma:0.5.15
-        env:
-        - name: IS_PERSISTENT
-          value: "TRUE"
-        ports:
-        - containerPort: 8000
+        - name: SPRING_PROFILES_ACTIVE
+          value: default,cloud,groqcloud,chroma
+        - name: SPRING_CONFIG_IMPORT
+          value: optional:file:/app/config/creds.yml
+        - name: SPRING_AI_VECTORSTORE_CHROMA_CLIENT_HOST
+          value: http://chroma.default.svc.cluster.local
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: http://zipkin.default.svc.cluster.local:9411/api/v2/spans
         volumeMounts:
-        - name: chroma-data
-          mountPath: /chroma/chroma/
         - name: creds-volume
           mountPath: /app/config
-          readOnly: true
       volumes:
-      - name: chroma-data
-        emptyDir: {}
       - name: creds-volume
         secret:
           secretName: spring-ai-creds

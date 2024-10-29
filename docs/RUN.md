@@ -511,9 +511,9 @@ We're going to make use of the [Eclipse JKube Gradle plugin](https://eclipse.dev
 To build targeting the appropriate, supporting, runtime infrastructure, you will need to choose:
 
 * LLM provider
-  * groqcloud, openai
+  * groq-cloud, openai
 * Vector store
-  * chroma
+  * chroma, pgvector
 * Storage provider
   * minio
 
@@ -522,7 +522,7 @@ To build targeting the appropriate, supporting, runtime infrastructure, you will
 To build a container image with Spring Boot, set the container image version, and assemble the required Kubernetes manifests for deployment, execute:
 
 ```bash
-❯ gradle clean setVersion build k8sResource -PnewVersion=$(date +"%Y.%m.%d") -Pvector-db-provider=chroma -Pjkube.environment=openai,chroma,observability,minio --stacktrace
+❯ gradle clean setVersion build bootBuildImage k8sResource -PnewVersion=$(date +"%Y.%m.%d") -Pvector-db-provider=chroma -Pjkube.environment=groq-cloud,chroma,observability,minio --stacktrace
 ```
 
 This will build and tag a container image using [Paketo Buildpacks](https://paketo.io/docs/concepts/buildpacks/) and produce a collection of manifests in `build/classes/META-INF/jkube`.
@@ -656,7 +656,7 @@ stringData:
 
 > Your job is to replace the occurrence of `REPLACE_WITH_OPENAI_API_KEY` with valid API key value from Open AI.
 
-If, however, that set contained `groqcloud`, you would see the following fragment within the secret:
+If, however, that set contained `groq-cloud`, you would see the following fragment within the secret:
 
 ```yaml
 stringData:
@@ -664,7 +664,7 @@ stringData:
     spring:
       ai:
         openai:
-          api-key: REPLACE_WITH_OPENAI_API_KEY
+          api-key: REPLACE_WITH_GROQCLOUD_API_KEY
           embedding:
             api-key: REPLACE_WITH_OPENAI_API_KEY
             base_url: https://api.openai.com
@@ -688,6 +688,20 @@ or
 kubectl apply -f build/classes/java/main/META-INF/jkube/kubernetes.yml
 ```
 
+### Setup port forwarding
+
+At this point you'd probably like to interact with sanford, huh?  We need to setup port-forwarding, so execute:
+
+```bash
+kubectl port-forward service/sanford 8080:8080
+```
+
+Then visit `http://localhost:8080/actuator/info` in your favorite browser.
+
+Consult the [ENDPOINTS.md](ENDPOINTS.md) documentation to learn about what else you can do.
+
+When you're done, revisit the terminal where you started port-forwarding and press `Ctrl+C`.
+
 ### Teardown
 
 ```bash
@@ -698,4 +712,10 @@ or
 
 ```bash
 kubectl delete -f build/classes/java/main/META-INF/jkube/kubernetes.yml
+```
+
+And if we launched a Kind cluster earlier, don't forget to tear it down with:
+
+```bash
+kind delete cluster
 ```
