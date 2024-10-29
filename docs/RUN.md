@@ -705,7 +705,7 @@ When you're done, revisit the terminal where you started port-forwarding and pre
 ### Teardown
 
 ```bash
-gradle k8sUndeploy
+gradle k8sUndeploy -Pvector-db-provider=chroma -Pjkube.environment=openai,chroma,observability,minio
 ```
 
 or
