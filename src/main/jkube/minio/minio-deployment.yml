@@ -1,8 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: minio-system
+  labels:
+    app: minio
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: minio
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -10,18 +18,19 @@ spec:
     spec:
       containers:
       - name: minio
-        image: minio/minio:RELEASE.2024-10-13T13-34-11Z.fips
+        image: bitnami/minio:2024
         ports:
         - containerPort: 9000
         - containerPort: 9001
-        envFrom:
-        - secretRef:
-            name: minio
-        command: ["server"]
-        args: ["--console-address", ":9001", "/data"]
+        env:
+        - name: MINIO_ROOT_USER
+          value: "minio"
+        - name: MINIO_ROOT_PASSWORD
+          value: "g0dmini0"
         volumeMounts:
-        - name: minio-storage
+        - name: data
           mountPath: /data
       volumes:
-      - name: minio-storage
-        emptyDir: {}
+      - name: data
+        persistentVolumeClaim:
+          claimName: minio-data

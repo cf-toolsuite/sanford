@@ -631,13 +631,17 @@ kube-system          kube-scheduler-kind-control-plane            1/1     Runnin
 local-path-storage   local-path-provisioner-57c5987fd4-k27f5      1/1     Running   0          48s
 ```
 
-### Pre-deploy
+### Prepare
 
 Consult DockerHub for the latest available tagged image, [here](https://hub.docker.com/r/cftoolsuite/sanford/tags).
 
+Edit the `build/classes/java/main/META-INF/jkube/kubernetes/sanford-deployment.yml` and `build/classes/java/main/META-INF/jkube/kubernetes/sanford-service.yml` files
+
+You should replace occurrences of `YYYY.MM.DD` (e.g., 2024.10.28) with the latest available tag, and save your changes.
+
 Before deploying you will want to edit the contents of `build/classes/java/main/META-INF/jkube/kubernetes/spring-ai-creds-secret.yml`.
 
-Back when you built the aimage and created the Kubernetes manifests, you had to supply a comma-separated `-Pjkube.environment=` set of argument values.
+Back when you built the image and created the Kubernetes manifests, you had to supply a comma-separated `-Pjkube.environment=` set of argument values.
 
 If that set contained `openai`, you would see the following fragment within the secret:
 
@@ -668,14 +672,14 @@ stringData:
 
 > Your job is to replace the occurrences of values that start with `REPLACE_WITH` with valid API key values from Groq Cloud and Open AI respectively. The Open AI key-value is used for the embedding model as Groq Cloud does not have support for embedding models, yet.
 
-### Deploy
+### Apply
 
 Finally, we can deploy the application and dependent runtime services to our Kubernetes cluster.
 
 Do so, with:
 
 ```bash
-gradle k8sApply -Pjkube.environment=openai,chroma,observability,minio
+gradle k8sApply -Pvector-db-provider=chroma -Pjkube.environment=openai,chroma,observability,minio
 ```
 
 or

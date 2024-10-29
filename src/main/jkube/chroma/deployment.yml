@@ -14,6 +14,8 @@ spec:
           value: "-Djava.security.egd=file:///dev/urandom -XX:+UseZGC -XX:+UseStringDeduplication"
         - name: SPRING_PROFILES_ACTIVE
           value: default,cloud,openai,chroma
+        - name: MINIO_ENDPOINT_HOST
+          value: minio.minio-system.svc.cluster.local
       - name: chroma
         image: chromadb/chroma:0.5.15
         env:
