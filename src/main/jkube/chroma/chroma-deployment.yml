@@ -1,0 +1,24 @@
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chroma
+  template:
+    metadata:
+      labels:
+        app: chroma
+    spec:
+      containers:
+      - name: chroma
+        image: chromadb/chroma:0.5.15
+        env:
+        - name: IS_PERSISTENT
+          value: "TRUE"
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: chroma-data
+          mountPath: /chroma/chroma/
+      volumes:
+      - name: chroma-data
+        emptyDir: {}

@@ -1,0 +1,7 @@
+spec:
+  selector:
+    app: grafana
+  ports:
+  - name: server
+    port: 3000
+    targetPort: 3000

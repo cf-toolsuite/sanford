@@ -1,0 +1,27 @@
+spec:
+  template:
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: "-Djava.security.egd=file:///dev/urandom -XX:+UseZGC -XX:+UseStringDeduplication"
+        - name: MINIO_ENDPOINT_HOST
+          value: minio.minio-system.svc.cluster.local
+        - name: SPRING_PROFILES_ACTIVE
+          value: default,cloud,groqcloud,chroma
+        - name: SPRING_CONFIG_IMPORT
+          value: optional:file:/app/config/creds.yml
+        - name: SPRING_AI_VECTORSTORE_CHROMA_CLIENT_HOST
+          value: http://chroma.default.svc.cluster.local
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: http://zipkin.default.svc.cluster.local:9411/api/v2/spans
+        volumeMounts:
+        - name: creds-volume
+          mountPath: /app/config
+      volumes:
+      - name: creds-volume
+        secret:
+          secretName: spring-ai-creds
+          items:
+          - key: creds.yml
+            path: creds.yml

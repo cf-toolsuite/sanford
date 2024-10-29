@@ -4,6 +4,7 @@ plugins {
 	id 'com.gorylenko.gradle-git-properties' version '2.4.2'
 	id 'org.springframework.boot' version '3.4.0-M3'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'org.eclipse.jkube.kubernetes' version '1.17.0'
 }
 
 group = 'org.cftoolsuite'
@@ -86,8 +87,29 @@ bootRun {
     systemProperties System.properties
 }
 
+tasks.named('bootBuildImage') {
+	imageName = "docker.io/${project.group.contains('.') ? project.group.tokenize('.').last() : project.group}/${project.name}:${project.version}"
+	tags = [ "docker.io/${project.group.contains('.') ? project.group.tokenize('.').last() : project.group}/${project.name}:latest" ]
+}
+
 jar {
     archiveBaseName = project.findProperty('jarBaseName') ?: project.name
+}
+
+kubernetes {
+	buildStrategy = 'buildpacks'
+    generator {
+        config {
+            'spring-boot' {
+                color = 'always'
+            }
+        }
+    }
+    helm {
+        maintainers = [{
+            name = 'Chris Phillipson'
+        }]
+    }
 }
 
 task setVersion {

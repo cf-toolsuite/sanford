@@ -503,6 +503,219 @@ CREATE INDEX spring_ai_vector_index ON public.vector_store USING hnsw (embedding
 
 To exit, just type `exit`.
 
+
 ## How to run on Kubernetes
 
-TBD
+We're going to make use of the [Eclipse JKube Gradle plugin](https://eclipse.dev/jkube/docs/kubernetes-gradle-plugin/#getting-started).
+
+To build targeting the appropriate, supporting, runtime infrastructure, you will need to choose:
+
+* LLM provider
+  * groq-cloud, openai
+* Vector store
+  * chroma, pgvector
+* Storage provider
+  * minio
+
+### Build
+
+To build a container image with Spring Boot, set the container image version, and assemble the required Kubernetes manifests for deployment, execute:
+
+```bash
+❯ gradle clean setVersion build bootBuildImage k8sResource -PnewVersion=$(date +"%Y.%m.%d") -Pvector-db-provider=chroma -Pjkube.environment=groq-cloud,chroma,observability,minio --stacktrace
+```
+
+This will build and tag a container image using [Paketo Buildpacks](https://paketo.io/docs/concepts/buildpacks/) and produce a collection of manifests in `build/classes/META-INF/jkube`.
+
+**Sample output**
+
+```bash
+❯ docker images
+REPOSITORY                            TAG          IMAGE ID       CREATED        SIZE
+paketobuildpacks/run-jammy-tiny       latest       b4e8795ea35a   4 weeks ago    22.6MB
+cftoolsuite/sanford                   2024.10.28   0ba08f8b0c60   44 years ago   360MB
+cftoolsuite/sanford                   latest       0ba08f8b0c60   44 years ago   360MB
+paketobuildpacks/builder-jammy-tiny   latest       7548a7329f38   44 years ago   751MB
+
+❯ ls -la build/classes/java/main/META-INF/jkube
+total 36
+drwxrwxr-x 3 cphillipson cphillipson  4096 Oct 28 17:26 .
+drwxrwxr-x 3 cphillipson cphillipson  4096 Oct 28 17:26 ..
+drwxrwxr-x 2 cphillipson cphillipson  4096 Oct 28 17:26 kubernetes
+-rw-rw-r-- 1 cphillipson cphillipson 21699 Oct 28 17:26 kubernetes.yml
+
+❯ ls -la build/classes/java/main/META-INF/jkube/kubernetes
+total 68
+drwxrwxr-x 2 cphillipson cphillipson 4096 Oct 28 17:26 .
+drwxrwxr-x 3 cphillipson cphillipson 4096 Oct 28 17:26 ..
+-rw-rw-r-- 1 cphillipson cphillipson  871 Oct 28 17:26 chroma-service.yml
+-rw-rw-r-- 1 cphillipson cphillipson 2238 Oct 28 17:26 grafana-deployment.yml
+-rw-rw-r-- 1 cphillipson cphillipson  625 Oct 28 17:26 grafana-persistentvolumeclaim.yml
+-rw-rw-r-- 1 cphillipson cphillipson  873 Oct 28 17:26 grafana-service.yml
+-rw-rw-r-- 1 cphillipson cphillipson 2490 Oct 28 17:26 minio-deployment.yml
+-rw-rw-r-- 1 cphillipson cphillipson  605 Oct 28 17:26 minio-secret.yml
+-rw-rw-r-- 1 cphillipson cphillipson  905 Oct 28 17:26 minio-service.yml
+-rw-rw-r-- 1 cphillipson cphillipson 1029 Oct 28 17:26 prometheus-configmap.yml
+-rw-rw-r-- 1 cphillipson cphillipson 2274 Oct 28 17:26 prometheus-deployment.yml
+-rw-rw-r-- 1 cphillipson cphillipson  879 Oct 28 17:26 prometheus-service.yml
+-rw-rw-r-- 1 cphillipson cphillipson 2953 Oct 28 17:26 sanford-deployment.yml
+-rw-rw-r-- 1 cphillipson cphillipson  906 Oct 28 17:26 sanford-service.yml
+-rw-rw-r-- 1 cphillipson cphillipson  658 Oct 28 17:26 spring-ai-creds-secret.yml
+-rw-rw-r-- 1 cphillipson cphillipson 2123 Oct 28 17:26 zipkin-deployment.yml
+-rw-rw-r-- 1 cphillipson cphillipson  871 Oct 28 17:26 zipkin-service.yml
+```
+
+### (Optional) Authenticate to a container image registry
+
+If you are a contributor with an account that has permissions to push updates to the container image, you will need to authenticate with the container image registry.
+
+For [DockerHub](https://hub.docker.com/), you could execute:
+
+```bash
+docker login docker.io -u cftoolsuite -p REPLACE_ME
+```
+
+> Replace the password value `REPLACE_ME` above with a valid personal access token to DockerHub.
+
+### (Optional) Push image to a container registry
+
+Here's how to push an update:
+
+```bash
+gradle k8sPush
+```
+
+### Target a cluster
+
+You will need to establish a connection context to a cluster you have access to.
+
+The simplest thing to do... is to launch a [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#creating-a-cluster) cluster.
+
+```bash
+kind create cluster
+```
+
+**Sample interaction**
+
+```bash
+❯ kind create cluster
+Creating cluster "kind" ...
+ ✓ Ensuring node image (kindest/node:v1.31.0) 🖼
+ ✓ Preparing nodes 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Installing StorageClass 💾
+Set kubectl context to "kind-kind"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-kind
+
+Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community
+
+
+❯ kubectl get nodes
+NAME                 STATUS   ROLES           AGE    VERSION
+kind-control-plane   Ready    control-plane   105s   v1.31.0
+
+❯ kubectl get pods -A
+NAMESPACE            NAME                                         READY   STATUS    RESTARTS   AGE
+kube-system          coredns-6f6b679f8f-5vjrg                     1/1     Running   0          48s
+kube-system          coredns-6f6b679f8f-w8m42                     1/1     Running   0          48s
+kube-system          etcd-kind-control-plane                      1/1     Running   0          54s
+kube-system          kindnet-rvf6r                                1/1     Running   0          48s
+kube-system          kube-apiserver-kind-control-plane            1/1     Running   0          54s
+kube-system          kube-controller-manager-kind-control-plane   1/1     Running   0          54s
+kube-system          kube-proxy-qq64n                             1/1     Running   0          48s
+kube-system          kube-scheduler-kind-control-plane            1/1     Running   0          54s
+local-path-storage   local-path-provisioner-57c5987fd4-k27f5      1/1     Running   0          48s
+```
+
+### Prepare
+
+Consult DockerHub for the latest available tagged image, [here](https://hub.docker.com/r/cftoolsuite/sanford/tags).
+
+Edit the `build/classes/java/main/META-INF/jkube/kubernetes/sanford-deployment.yml` and `build/classes/java/main/META-INF/jkube/kubernetes/sanford-service.yml` files
+
+You should replace occurrences of `YYYY.MM.DD` (e.g., 2024.10.28) with the latest available tag, and save your changes.
+
+Before deploying you will want to edit the contents of `build/classes/java/main/META-INF/jkube/kubernetes/spring-ai-creds-secret.yml`.
+
+Back when you built the image and created the Kubernetes manifests, you had to supply a comma-separated `-Pjkube.environment=` set of argument values.
+
+If that set contained `openai`, you would see the following fragment within the secret:
+
+```yaml
+stringData:
+  creds.yml: |
+    spring:
+      ai:
+        openai:
+          api-key: REPLACE_WITH_OPENAI_API_KEY
+```
+
+> Your job is to replace the occurrence of `REPLACE_WITH_OPENAI_API_KEY` with valid API key value from Open AI.
+
+If, however, that set contained `groq-cloud`, you would see the following fragment within the secret:
+
+```yaml
+stringData:
+  creds.yml: |
+    spring:
+      ai:
+        openai:
+          api-key: REPLACE_WITH_GROQCLOUD_API_KEY
+          embedding:
+            api-key: REPLACE_WITH_OPENAI_API_KEY
+            base_url: https://api.openai.com
+```
+
+> Your job is to replace the occurrences of values that start with `REPLACE_WITH` with valid API key values from Groq Cloud and Open AI respectively. The Open AI key-value is used for the embedding model as Groq Cloud does not have support for embedding models, yet.
+
+### Apply
+
+Finally, we can deploy the application and dependent runtime services to our Kubernetes cluster.
+
+Do so, with:
+
+```bash
+gradle k8sApply -Pvector-db-provider=chroma -Pjkube.environment=openai,chroma,observability,minio
+```
+
+or
+
+```bash
+kubectl apply -f build/classes/java/main/META-INF/jkube/kubernetes.yml
+```
+
+### Setup port forwarding
+
+At this point you'd probably like to interact with sanford, huh?  We need to setup port-forwarding, so execute:
+
+```bash
+kubectl port-forward service/sanford 8080:8080
+```
+
+Then visit `http://localhost:8080/actuator/info` in your favorite browser.
+
+Consult the [ENDPOINTS.md](ENDPOINTS.md) documentation to learn about what else you can do.
+
+When you're done, revisit the terminal where you started port-forwarding and press `Ctrl+C`.
+
+### Teardown
+
+```bash
+gradle k8sUndeploy
+```
+
+or
+
+```bash
+kubectl delete -f build/classes/java/main/META-INF/jkube/kubernetes.yml
+```
+
+And if we launched a Kind cluster earlier, don't forget to tear it down with:
+
+```bash
+kind delete cluster
+```

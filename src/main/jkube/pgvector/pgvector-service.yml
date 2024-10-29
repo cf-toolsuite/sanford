@@ -1,0 +1,6 @@
+spec:
+  selector:
+    app: pgvector
+  ports:
+  - port: 5432
+    targetPort: 5432

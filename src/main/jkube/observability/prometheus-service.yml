@@ -1,0 +1,7 @@
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - name: server
+    port: 9090
+    targetPort: 9090

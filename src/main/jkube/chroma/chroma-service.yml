@@ -1,0 +1,7 @@
+spec:
+  selector:
+    app: chroma
+  ports:
+  - name: server
+    port: 8000
+    targetPort: 8000

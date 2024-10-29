@@ -1,0 +1,7 @@
+spec:
+  selector:
+    app: zipkin
+  ports:
+  - name: server
+    port: 9411
+    targetPort: 9411
