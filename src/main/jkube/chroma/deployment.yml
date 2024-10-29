@@ -1,0 +1,38 @@
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chroma
+  template:
+    metadata:
+      labels:
+        app: chroma
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: "-Djava.security.egd=file:///dev/urandom -XX:+UseZGC -XX:+UseStringDeduplication"
+        - name: SPRING_PROFILES_ACTIVE
+          value: default,cloud,openai,chroma
+      - name: chroma
+        image: chromadb/chroma:0.5.15
+        env:
+        - name: IS_PERSISTENT
+          value: "TRUE"
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: chroma-data
+          mountPath: /chroma/chroma/
+        - name: creds-volume
+          mountPath: /app/config
+          readOnly: true
+      volumes:
+      - name: chroma-data
+        emptyDir: {}
+      - name: creds-volume
+        secret:
+          secretName: spring-ai-creds
+          items:
+          - key: creds.yml
+            path: creds.yml

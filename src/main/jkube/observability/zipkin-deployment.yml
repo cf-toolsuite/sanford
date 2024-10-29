@@ -1,0 +1,18 @@
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin
+  template:
+    metadata:
+      labels:
+        app: zipkin
+    spec:
+      containers:
+      - name: zipkin
+        image: openzipkin/zipkin-slim:3
+        env:
+        - name: STORAGE_TYPE
+          value: mem
+        ports:
+        - containerPort: 9411
