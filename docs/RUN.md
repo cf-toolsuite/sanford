@@ -20,6 +20,14 @@
   * [Deploy](#deploy)
   * [Inspect and/or update the PgVector store database instance](#inspect-andor-update-the-pgvector-store-database-instance)
 * [How to run on Kubernetes](#how-to-run-on-kubernetes)
+  * [Build](#build)
+  * [(Optional) Authenticate to a container image registry](#optional-authenticate-to-a-container-image-registry)
+  * [(Optional) Push image to a container registry](#optional-push-image-to-a-container-registry)
+  * [Target a cluster](#target-a-cluster)
+  * [Prepare](#prepare)
+  * [Apply](#apply)
+  * [Setup port forwarding](#setup-port-forwarding)
+  * [Teardown](#teardown)
 
 Sanford has various modes of operation.
 
@@ -702,6 +710,8 @@ Consult the [ENDPOINTS.md](ENDPOINTS.md) documentation to learn about what else 
 
 When you're done, revisit the terminal where you started port-forwarding and press `Ctrl+C`.
 
+> Yeah, this only gets you so far.  For a more production-ready footprint, there's quite a bit more work involved.  But this suffices for an inner-loop development experience. 
+
 ### Teardown
 
 ```bash
@@ -714,7 +724,7 @@ or
 kubectl delete -f build/classes/java/main/META-INF/jkube/kubernetes.yml
 ```
 
-And if we launched a Kind cluster earlier, don't forget to tear it down with:
+And if you launched a Kind cluster earlier, don't forget to tear it down with:
 
 ```bash
 kind delete cluster
