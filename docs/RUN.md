@@ -29,6 +29,7 @@
   * [Apply](#apply)
   * [Setup port forwarding](#setup-port-forwarding)
   * [Teardown](#teardown)
+* [How to run on Tanzu Platform for Kubernetes](#how-to-run-on-tanzu-platform-for-kubernetes)
 
 Sanford has various modes of operation.
 
@@ -718,7 +719,7 @@ Consult the [ENDPOINTS.md](ENDPOINTS.md) documentation to learn about what else 
 
 When you're done, revisit the terminal where you started port-forwarding and press `Ctrl+C`.
 
-> Yeah, this only gets you so far.  For a more production-ready footprint, there's quite a bit more work involved.  But this suffices for an inner-loop development experience. 
+> Yeah, this only gets you so far.  For a more production-ready footprint, there's quite a bit more work involved.  But this suffices for an inner-loop development experience.
 
 ### Teardown
 
@@ -736,4 +737,165 @@ And if you launched a Kind cluster earlier, don't forget to tear it down with:
 
 ```bash
 kind delete cluster
+```
+
+## How to run on Tanzu Platform for Kubernetes
+
+Consider this a Quick Start guide to getting `sanford` deployed using the [tanzu](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.12/tap/install-tanzu-cli.html) CLI.
+
+We'll be focused on a subset of commands to get the job done.  That said, you will likely need to work with a Platform engineer within your enterprise to pre-provision an environment for your use.
+
+This [Github gist](https://gist.github.com/pacphi/b9a7bb0f9538db1d11d1671d8a2b5566) should give you sense of how to get started with infrastructure provisioning and operational concerns, before attempting to deploy.
+
+### Clone this repo
+
+```bash
+gh repo clone cf-toolsuite/sanford
+```
+
+### Initialize
+
+```bash
+cd sanford
+git checkout -b tp4k8s-experiment
+tanzu app init
+```
+
+Edit the file `~/.tanzu/config/sanford.yml`.
+
+It should look like this after editing.  Save your work.
+
+```yaml
+apiVersion: apps.tanzu.vmware.com/v1
+kind: ContainerApp
+metadata:
+  name: sanford
+spec:
+  nonSecretEnv:
+    - name: JAVA_TOOL_OPTIONS
+      value: "-Djava.security.egd=file:///dev/urandom -XX:+UseZGC -XX:+UseStringDeduplication"
+  build:
+    nonSecretEnv:
+    - name: BP_JVM_VERSION
+      value: "21"
+    buildpacks: {}
+    path: ../..
+  contact:
+    team: pacphi
+  ports:
+  - name: main
+    port: 8080
+```
+
+### Pre-provision services
+
+Place yourself in the `config` directory.  We'll create `PreProvisionedService` and `Secret` manifests for a handful of the off-platform services that `sanford` will need to interact with.
+
+```bash
+cd ~/.tanzu/config
+```
+
+#### Minio
+
+Create a file named `minio.yml`, adjust and save the content below:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-creds
+type: servicebinding.io/ai
+stringData:
+  host: CHANGE_ME
+  port: 443
+  access-key: CHANGE_ME
+  secret-key: CHANGE_ME
+  bucket-name: sanford
+  provider: minio
+  type: minio
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: PreProvisionedService
+metadata:
+  name: minio
+spec:
+  bindingConnectors:
+  - name: main
+    description: MinIO credentials
+    type: minio
+    secretRef:
+      name: minio-creds
+```
+
+> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  Also see [Create a MinIO instance](#create-a-minio-instance).
+
+#### Open AI
+
+Create a file named `openai.yml`, adjust and save the content below:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openai-creds
+type: servicebinding.io/ai
+stringData:
+  uri: CHANGE_ME
+  api-key: CHANGE_ME
+  provider: openai
+  type: openai
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: PreProvisionedService
+metadata:
+  name: openai
+spec:
+  bindingConnectors:
+  - name: main
+    description: Open AI credentials
+    type: openai
+    secretRef:
+      name: openai-creds
+```
+
+> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to your account on the Open AI platform.
+
+#### Weaviate Cloud
+
+Create a file named `weaviate-cloud.yml`, adjust and save the content below:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: weaviate-cloud-creds
+type: servicebinding.io/ai
+stringData:
+  uri: CHANGE_ME
+  api-key: CHANGE_ME
+  provider: weaviate-cloud
+  type: weaviate-cloud
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: PreProvisionedService
+metadata:
+  name: weaviate-cloud
+spec:
+  bindingConnectors:
+  - name: main
+    description: Weaviate Cloud credentials
+    type: weaviate-cloud
+    secretRef:
+      name: weaviate-cloud-creds
+```
+
+> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to the instance of Weaviate you are hosting on [Weaviate Cloud](https://console.weaviate.io).
+
+### Deploy application and services
+
+```bash
+tanzu deploy -y
 ```

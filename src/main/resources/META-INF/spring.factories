@@ -1,0 +1,2 @@
+org.springframework.cloud.bindings.boot.BindingsPropertiesProcessor=\
+  org.cftoolsuite.cloud.bindings.boot.MinioBindingsPropertiesProcessor
