@@ -43,6 +43,9 @@ dependencies {
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'redis') {
 		implementation 'org.springframework.ai:spring-ai-redis-store-spring-boot-starter'
 	}
+	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'weaviate') {
+		implementation 'org.springframework.ai:spring-ai-weaviate-store-spring-boot-starter'
+	}
 	implementation 'org.apache.commons:commons-lang3'
 	if (project.hasProperty('vector-db-provider') || project.hasProperty('model-api-provider')) {
 		implementation 'io.micrometer:micrometer-tracing-bridge-otel'

@@ -10,6 +10,7 @@
     * [Chroma](#chroma)
     * [PgVector](#pgvector)
     * [Redis Stack](#redis-stack)
+    * [Weaviate](#weaviate)
 * [How to run on Cloud Foundry](#how-to-run-on-cloud-foundry)
   * [Target a foundation](#target-a-foundation)
   * [Authenticate](#authenticate)
@@ -214,7 +215,18 @@ Open another terminal shell and execute
 
 ### with Vector database
 
-This setup launches either an instance of Chroma, PgVector, or Redis Stack for use by the VectorStore.
+This setup launches either an instance of Chroma, PgVector, Redis Stack, or Weaviate for use by the VectorStore.
+
+A key thing to note is that **you must activate a combination** of Spring profiles, like:
+
+* `docker` - required when you are running "off platform"
+* an LLM provider (i.e., `openai`, `groq-cloud` or `ollama`)
+* a Vector database provider (i.e., `chroma`, `pgvector`, `redis`, or `weaviate`)
+
+and Gradle project properties, like:
+
+* `-Pmodel-api-provider=ollama`
+* `-Pvector-db-provider=chroma` or `-Pvector-db-provider=pgvector` or `-Pvector-db-provider=redis` or `-Pvector-db-provider=weaviate`
 
 #### Chroma
 
@@ -237,16 +249,12 @@ This setup launches either an instance of Chroma, PgVector, or Redis Stack for u
 ```
 > You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
 
-A key thing to note is that **you must activate a combination** of Spring profiles, like:
+#### Weaviate
 
-* `docker` - required when you are running "off platform"
-* an LLM provider (i.e., `openai`, `groq-cloud` or `ollama`)
-* a Vector database provider (i.e., `chroma`, `pgvector`, or `redis`)
-
-and Gradle project properties, like:
-
-* `-Pmodel-api-provider=ollama`
-* `-Pvector-db-provider=chroma` or `-Pvector-db-provider=pgvector` or `-Pvector-db-provider=redis`
+```bash
+./gradlew build bootRun -Dspring.profiles.active=docker,openai,weaviate -Pvector-db-provider=weaviate
+```
+> You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
 
 ## How to run on Cloud Foundry
 

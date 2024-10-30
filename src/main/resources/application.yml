@@ -223,6 +223,26 @@ spring:
 spring:
   config:
     activate:
+      on-profile: weaviate
+
+  ai:
+    vectorstore:
+      weaviate:
+        host: ${WEAVIATE_HOST:localhost:8088}
+        scheme: ${WEAVIATE_SCHEME:http}
+        initialize-schema: true
+
+  docker:
+    compose:
+      file:
+        - ./docker-compose.weaviate.yml
+        - ./docker-compose.${storage.provider}.yml
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: minio
 
 minio:

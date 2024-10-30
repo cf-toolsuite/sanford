@@ -44,3 +44,6 @@ tmp/
 config/
 !src/main/java/org/cftoolsuite/config/
 logs/
+
+# Tanzu Platform
+tanzu.yml
