@@ -11,7 +11,7 @@
     * [PgVector](#pgvector)
     * [Redis Stack](#redis-stack)
     * [Weaviate](#weaviate)
-* [How to run on Cloud Foundry](#how-to-run-on-cloud-foundry)
+* [How to run on Tanzu Platform for Cloud Foundry](#how-to-run-on-tanzu-platform-for-cloud-foundry)
   * [Target a foundation](#target-a-foundation)
   * [Authenticate](#authenticate)
   * [Target space](#target-space)
@@ -30,6 +30,14 @@
   * [Setup port forwarding](#setup-port-forwarding)
   * [Teardown](#teardown)
 * [How to run on Tanzu Platform for Kubernetes](#how-to-run-on-tanzu-platform-for-kubernetes)
+  * [Clone this repo](#clone-this-repo)
+  * [Initialize](#initialize)
+  * [Pre-provision services](#pre-provision-services)
+    * [Minio](#minio)
+    * [Open AI](#open-ai)
+    * [Weaviate Cloud](#weaviate-cloud)
+  * [Specify service bindings](#specify-service-bindings)
+  * [Deploy application and services](#deploy-application-and-services)
 
 Sanford has various modes of operation.
 
@@ -257,7 +265,7 @@ and Gradle project properties, like:
 ```
 > You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
 
-## How to run on Cloud Foundry
+## How to run on Tanzu Platform for Cloud Foundry
 
 ### Target a foundation
 
@@ -774,10 +782,14 @@ spec:
   nonSecretEnv:
     - name: JAVA_TOOL_OPTIONS
       value: "-Djava.security.egd=file:///dev/urandom -XX:+UseZGC -XX:+UseStringDeduplication"
+    - name: SPRING_PROFILES_ACTIVE
+      value: "default,cloud,openai,weaviate"
   build:
     nonSecretEnv:
     - name: BP_JVM_VERSION
       value: "21"
+    - name: BP_GRADLE_BUILD_ARGUMENTS
+      value: "-Pvector-db-provider=weaviate"
     buildpacks: {}
     path: ../..
   contact:
@@ -785,6 +797,25 @@ spec:
   ports:
   - name: main
     port: 8080
+  probes:
+    liveness:
+      httpGet:
+        path: /actuator/health/liveness
+        port: 8080
+        scheme: HTTP
+    readiness:
+      httpGet:
+        path: /actuator/health/readiness
+        port: 8080
+        scheme: HTTP
+    startup:
+      failureThreshold: 120
+      httpGet:
+        path: /actuator/health/readiness
+        port: 8080
+        scheme: HTTP
+      initialDelaySeconds: 2
+      periodSeconds: 2
 ```
 
 ### Pre-provision services
@@ -894,8 +925,68 @@ spec:
 
 > You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to the instance of Weaviate you are hosting on [Weaviate Cloud](https://console.weaviate.io).
 
+### Specify service bindings
+
+Create another file named `sanford-service-bindings.yml` and save the content below into it.  This file should live in same directoy as the services and the application.
+
+```yaml
+apiVersion: services.tanzu.vmware.com/v1
+kind: ServiceBinding
+metadata:
+  name: minio-service-binding
+spec:
+  targetRef:
+    apiGroup: apps.tanzu.vmware.com
+    kind: ContainerApp
+    name: sanford
+
+  serviceRef:
+    apiGroup: services.tanzu.vmware.com
+    kind: PreProvisionedService
+    name: minio
+    connectorName: read-write
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: ServiceBinding
+metadata:
+  name: openai-service-binding
+spec:
+  targetRef:
+    apiGroup: apps.tanzu.vmware.com
+    kind: ContainerApp
+    name: sanford
+
+  serviceRef:
+    apiGroup: services.tanzu.vmware.com
+    kind: PreProvisionedService
+    name: openai
+    connectorName: read-write
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: ServiceBinding
+metadata:
+  name: weaviate-cloud-service-binding
+spec:
+  targetRef:
+    apiGroup: apps.tanzu.vmware.com
+    kind: ContainerApp
+    name: sanford
+
+  serviceRef:
+    apiGroup: services.tanzu.vmware.com
+    kind: PreProvisionedService
+    name: weaviate-cloud
+    connectorName: read-write
+```
+
 ### Deploy application and services
 
 ```bash
 tanzu deploy -y
 ```
+
+**Sample interaction**
+
+TBD

@@ -8,7 +8,7 @@ One or multiple of:
 * An [Open AI](https://platform.openai.com/docs/overview) account and API Key
 * A [Groq Cloud](https://console.groq.com/docs/overview) account and API Key
 
-### Cloud Foundry
+### Tanzu Platform for Cloud Foundry
 
 * cf CLI
 * An account with space developer role and access to an organization and space on a target foundation
