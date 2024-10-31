@@ -764,8 +764,8 @@ gh repo clone cf-toolsuite/sanford
 ### Initialize
 
 ```bash
-git checkout -b tp4k8s-experiment
 cd sanford
+git checkout -b tp4k8s-experiment
 tanzu app init
 ```
 
