@@ -764,12 +764,12 @@ gh repo clone cf-toolsuite/sanford
 ### Initialize
 
 ```bash
-cd sanford
 git checkout -b tp4k8s-experiment
+cd sanford
 tanzu app init
 ```
 
-Edit the file `~/.tanzu/config/sanford.yml`.
+Edit the file `.tanzu/config/sanford.yml`.
 
 It should look like this after editing.  Save your work.
 
@@ -823,7 +823,7 @@ spec:
 Place yourself in the `config` directory.  We'll create `PreProvisionedService` and `Secret` manifests for a handful of the off-platform services that `sanford` will need to interact with.
 
 ```bash
-cd ~/.tanzu/config
+cd .tanzu/config
 ```
 
 #### Minio
@@ -984,6 +984,7 @@ spec:
 ### Deploy application and services
 
 ```bash
+cd ../..
 tanzu deploy -y
 ```
 
