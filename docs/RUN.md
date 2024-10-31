@@ -810,12 +810,11 @@ git checkout -b tp4k8s-experiment
 tanzu app init
 ```
 
-We'll also need to remove any large files.  Any file in excess of 2Mb shoud be pruned.
+We'll also need to remove any large files or sensitive configuration files.
 
 ```
 du -sh * -c
-mkdir -p /tmp/sanford
-mv -f .history .github .gradle .trunk docker* gradle* prometheus.yml bin build data samples /tmp/sanford
+./prune.sh
 ```
 
 Edit the file `.tanzu/config/sanford.yml`.
