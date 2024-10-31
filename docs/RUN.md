@@ -763,6 +763,17 @@ gh repo clone cf-toolsuite/sanford
 
 ### Initialize
 
+Set the context for `kubectl`, just in case we need to inspect resources.
+
+```bash
+tanzu context current
+# Use the value after "Kube Config:"
+# Likely this will work consistently for you
+export KUBECONFIG=$HOME/.config/tanzu/kube/config
+```
+
+Now, let's jump into the root-level directory of the Git repository's project we cloned earlier, create a new branch, and freshly initialize Tanzu application configuation.
+
 ```bash
 cd sanford
 git checkout -b tp4k8s-experiment
@@ -817,6 +828,14 @@ spec:
       initialDelaySeconds: 2
       periodSeconds: 2
 ```
+
+If we wanted to, we could customize the build configuration, e.g., with
+
+```bash
+tanzu build config --build-plan-source-type=ucp --containerapp-registry us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry/{contact.team}/{name} --build-plan-source custom-build-plan-ingressv2
+```
+
+> Take caution when specifying `--container-registry` and `--build-plan-source` above.  Consult [How to build and deploy from source](https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/how-to-build-and-deploy-from-source.html).
 
 ### Pre-provision services
 
@@ -982,6 +1001,12 @@ spec:
 ```
 
 ### Deploy application and services
+
+Let's verify that the appropriate build plan is set.
+
+```bash
+kubectl get containerappbuildplans
+```
 
 ```bash
 cd ../..
