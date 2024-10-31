@@ -763,21 +763,59 @@ gh repo clone cf-toolsuite/sanford
 
 ### Initialize
 
-Set the context for `kubectl`, just in case we need to inspect resources.
+Login, set a project and space.
+
+```bash
+tanzu login
+tanzu project list
+tanzu project use AMER-West
+tanzu space list
+tanzu space use cphillipson-sbx
+```
+
+> You will set a different `project` and `space`.  The above is just illustrative of what you'll need to do to target where you'll deploy your own instance of this application.
+
+Set the context for `kubectl`, just in case you need to inspect resources.
 
 ```bash
 tanzu context current
+```
+
+**Sample interaction**
+
+```bash
+❯ tanzu context current
+  Name:            sa-tanzu-platform
+  Type:            tanzu
+  Organization:    sa-tanzu-platform (77aee83b-308f-4c8e-b9c4-3f7a6f19ba75)
+  Project:         AMER-West (3b65ba5e-52a4-4666-ad29-4eefab93127b)
+  Space:           cphillipson-sbx
+  Kube Config:     /home/cphillipson/.config/tanzu/kube/config
+  Kube Context:    tanzu-cli-sa-tanzu-platform:AMER-West:cphillipson-sbx
+```
+
+Then
+
+```bash
 # Use the value after "Kube Config:"
 # Likely this will work consistently for you
 export KUBECONFIG=$HOME/.config/tanzu/kube/config
 ```
 
-Now, let's jump into the root-level directory of the Git repository's project we cloned earlier, create a new branch, and freshly initialize Tanzu application configuation.
+Now, let's jump into the root-level directory of the Git repository's project we cloned earlier, create a new branch, and freshly initialize Tanzu application configuration.
 
 ```bash
 cd sanford
 git checkout -b tp4k8s-experiment
 tanzu app init
+```
+
+We'll also need to remove any large files.  Any file in excess of 2Mb shoud be pruned.
+
+```
+du -sh * -c
+mkdir -p /tmp/sanford
+mv -f .history .github .gradle .trunk docker* gradle* prometheus.yml bin build data samples /tmp/sanford
 ```
 
 Edit the file `.tanzu/config/sanford.yml`.
@@ -836,6 +874,29 @@ tanzu build config --build-plan-source-type=ucp --containerapp-registry us-west1
 ```
 
 > Take caution when specifying `--container-registry` and `--build-plan-source` above.  Consult [How to build and deploy from source](https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/how-to-build-and-deploy-from-source.html).
+
+What we really must verify is that the build engine is set to `platform`
+
+**Sample interaction**
+
+```bash
+❯ tanzu build config view
+Using config file: /home/cphillipson/.config/tanzu/build/config.yaml
+Success: Getting config
+buildengine: platform
+buildPlanSource: custom-build-plan-ingressv2
+buildPlanSourceType: ucp
+containerAppRegistry: us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry/{contact.team}/{name}
+experimentalFeatures: false
+```
+
+If the build engine is not set to `platform`, then execute
+
+```bash
+tanzu build config --build-engine platform
+```
+
+> Why? Because for this particular environment we've configured server-side builds.
 
 ### Pre-provision services
 
@@ -1001,12 +1062,6 @@ spec:
 ```
 
 ### Deploy application and services
-
-Let's verify that the appropriate build plan is set.
-
-```bash
-kubectl get containerappbuildplans
-```
 
 ```bash
 cd ../..
