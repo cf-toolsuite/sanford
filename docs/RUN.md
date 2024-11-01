@@ -942,7 +942,7 @@ metadata:
 type: servicebinding.io/ai
 stringData:
   host: CHANGE_ME
-  port: 443
+  port: "443"
   access-key: CHANGE_ME
   secret-key: CHANGE_ME
   bucket-name: sanford
@@ -1089,15 +1089,12 @@ spec:
 
 ```bash
 cd ../..
-tanzu build -o ./tanzu/build
+tanzu build -o .tanzu/build
 ```
 
 ### Deploy application and services
 
 ```bash
-tanzu deploy --from-build ./tanzu/build
+tanzu deploy --from-build .tanzu/build -y
 ```
 
-**Sample interaction**
-
-TBD
