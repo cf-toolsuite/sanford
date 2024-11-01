@@ -751,7 +751,7 @@ kind delete cluster
 
 Consider this a Quick Start guide to getting `sanford` deployed using the [tanzu](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.12/tap/install-tanzu-cli.html) CLI.
 
-We'll be focused on a subset of commands to get the job done.  That said, you will likely need to work with a Platform engineer within your enterprise to pre-provision an environment for your use.
+We'll be focused on a subset of commands to get the job done.  That said, you will likely need to work with a Platform Engineer within your enterprise to pre-provision an environment for your use.
 
 This [Github gist](https://gist.github.com/pacphi/b9a7bb0f9538db1d11d1671d8a2b5566) should give you sense of how to get started with infrastructure provisioning and operational concerns, before attempting to deploy.
 
@@ -762,6 +762,8 @@ gh repo clone cf-toolsuite/sanford
 ```
 
 ### Initialize
+
+> We're going to assume that your account is a member of an organization and has apprpriate access-level permssions to work with an existing project and space(s).
 
 Login, set a project and space.
 
@@ -841,7 +843,7 @@ spec:
     buildpacks: {}
     path: ../..
   contact:
-    team: pacphi
+    team: cftoolsuite
   ports:
   - name: main
     port: 8080
@@ -866,36 +868,59 @@ spec:
       periodSeconds: 2
 ```
 
-If we wanted to, we could customize the build configuration, e.g., with
+#### Configuring daemon builds
 
 ```bash
-tanzu build config --build-plan-source-type=ucp --containerapp-registry us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry/{contact.team}/{name} --build-plan-source custom-build-plan-ingressv2
+tanzu build config \
+  --build-plan-source-type ucp \
+  --containerapp-registry docker.io/{contact.team}/{name} \
+  --build-plan-source custom-build-plan-ingressv2  \
+  --build-engine=daemon
 ```
 
-> Take caution when specifying `--container-registry` and `--build-plan-source` above.  Consult [How to build and deploy from source](https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/how-to-build-and-deploy-from-source.html).
+Builds will be performed locally.  (Docker must be installed).  We are targeting Dockerhub as the container image registry.  If you wish to target another registry provider you would have to change the prefix value of `docker.io` above to something else.  Pay attention to `{contact.team}`.  In the `ContainerApp` resource definition above, you will have to change `cftoolsuite` to an existing repository name in your registry.
 
-What we really must verify is that the build engine is set to `platform`
+You will also have to authenticate with the registry, e.g.
 
-**Sample interaction**
+```bash
+export REGISTRY_USERNAME=cftoolsuite
+export REGISTRY_PASSWORD=xxx
+export REGISTRY_HOST=docker.io
+echo $REGISTRY_PASSWORD | docker login $REGISTRY_HOST -u $REGISTRY_USERNAME --password-stdin
+```
+
+> Replace the values of `REGISTRY_` environment variables above as appropriate.
+
+By the way, whatever container image registry provider you choose, make sure to restrict access to the repository.  If you're using DockerHub, set the visibility of your repository to private.
+
+#### Configuring platform builds
+
+```bash
+tanzu build config \
+  --build-plan-source-type ucp \
+  --containerapp-registry us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry/{contact.team}/{name} \
+  --build-plan-source custom-build-plan-ingressv2 \
+  --build-engine=platform
+```
+
+A benefit of platform builds is that they occur on-platform.  (Therefore, Docker does not need to be installed).  We will assume that a Platform Engineer has set this up on our behalf.
+
+> You will likely need to change `us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry` above to an appropriate prefix targeting a shared contianer image registry.
+
+#### Validating build configuration
+
+For daemon builds, e.g.
 
 ```bash
 ❯ tanzu build config view
 Using config file: /home/cphillipson/.config/tanzu/build/config.yaml
 Success: Getting config
-buildengine: platform
+buildengine: daemon
 buildPlanSource: custom-build-plan-ingressv2
 buildPlanSourceType: ucp
-containerAppRegistry: us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry/{contact.team}/{name}
+containerAppRegistry: docker.io/{contact.team}/{name}
 experimentalFeatures: false
 ```
-
-If the build engine is not set to `platform`, then execute
-
-```bash
-tanzu build config --build-engine platform
-```
-
-> Why? Because for this particular environment we've configured server-side builds.
 
 ### Pre-provision services
 
@@ -1060,11 +1085,17 @@ spec:
     connectorName: read-write
 ```
 
-### Deploy application and services
+### Create and publish package to container image registry repository
 
 ```bash
 cd ../..
-tanzu deploy -y
+tanzu build -o ./tanzu/build
+```
+
+### Deploy application and services
+
+```bash
+tanzu deploy --from-build ./tanzu/build
 ```
 
 **Sample interaction**
