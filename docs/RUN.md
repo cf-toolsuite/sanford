@@ -32,12 +32,17 @@
 * [How to run on Tanzu Platform for Kubernetes](#how-to-run-on-tanzu-platform-for-kubernetes)
   * [Clone this repo](#clone-this-repo)
   * [Initialize](#initialize)
+    * [Configuring daemon builds](#configuring-daemon-builds)
+    * [Configuring platform builds](#configuring-platform-builds)
+    * [Validating build configuration](#validating-build-configuration)
   * [Pre-provision services](#pre-provision-services)
     * [Minio](#minio)
     * [Open AI](#open-ai)
     * [Weaviate Cloud](#weaviate-cloud)
   * [Specify service bindings](#specify-service-bindings)
-  * [Deploy application and services](#deploy-application-and-services)
+  * [Deploy services](#deploy-services)
+  * [Deploy application with service bindings](#deploy-application-with-service-bindings)
+  * [Destroy the app and services](#destroy-the-app-and-services)
 
 Sanford has various modes of operation.
 
@@ -809,7 +814,7 @@ Now, let's jump into the root-level directory of the Git repository's project we
 ```bash
 cd sanford
 git checkout -b tp4k8s-experiment
-tanzu app init
+tanzu app init -y
 ```
 
 We'll also need to remove any large files or sensitive configuration files.
@@ -905,7 +910,7 @@ tanzu build config \
 
 A benefit of platform builds is that they occur on-platform.  (Therefore, Docker does not need to be installed).  We will assume that a Platform Engineer has set this up on our behalf.
 
-> You will likely need to change `us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry` above to an appropriate prefix targeting a shared contianer image registry.
+> You will likely need to change `us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry` above to an appropriate prefix targeting a shared container image registry.
 
 #### Validating build configuration
 
@@ -924,10 +929,17 @@ experimentalFeatures: false
 
 ### Pre-provision services
 
-Place yourself in the `config` directory.  We'll create `PreProvisionedService` and `Secret` manifests for a handful of the off-platform services that `sanford` will need to interact with.
+Create a new sibling directory of `.tanzu/config` to contain service manifests.
 
 ```bash
-cd .tanzu/config
+mkdir .tanzu/service
+```
+
+Place yourself in the `.tanzu/service` directory.  We'll create `PreProvisionedService` and `Secret` manifests for a handful of the off-platform services that `sanford` will need to interact with.
+
+```bash
+
+cd .tanzu/service
 ```
 
 #### Minio
@@ -1031,6 +1043,12 @@ spec:
 
 ### Specify service bindings
 
+Change directories again.  Place yourself back into the direcotry containing `sanford.yml`.
+
+```bash
+cd ../config
+```
+
 Create another file named `sanford-service-bindings.yml` and save the content below into it.  This file should live in same directoy as the services and the application.
 
 ```yaml
@@ -1085,16 +1103,37 @@ spec:
     connectorName: read-write
 ```
 
-### Create and publish package to container image registry repository
+### Deploy services
+
+Let's place ourselves back into the root-level directory
 
 ```bash
 cd ../..
+```
+
+then execute
+
+```bash
+tanzu deploy --only .tanzu/service
+```
+
+### Create and publish package to container image registry repository
+
+```bash
 tanzu build -o .tanzu/build
 ```
 
-### Deploy application and services
+### Deploy application with service bindings
 
 ```bash
 tanzu deploy --from-build .tanzu/build -y
 ```
 
+### Destroy the app and services
+
+```bash
+tanzu services delete PreProvisionedService/minio -y
+tanzu services delete PreProvisionedService/openai -y
+tanzu services delete PreProvisionedService/weaviate-cloud -y
+tanzu app delete sanford -y
+```
