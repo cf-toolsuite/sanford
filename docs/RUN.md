@@ -1186,11 +1186,11 @@ tanzu domain-binding create sanford --domain sanford.sbx.tpk8s.cloudmonk.me --en
 
 > Replace the portion of the value of `--domain` before the application name above with your own sub-domain (or with one your Platform Enginer setup on your behalf).
 
+Checkout [ENDPOINTS.md](ENDPOINTS.md) to see what you can do.
+
 ### Destroy the app and services
 
 ```bash
-tanzu services delete PreProvisionedService/minio -y
-tanzu services delete PreProvisionedService/openai -y
-tanzu services delete PreProvisionedService/weaviate-cloud -y
+kubectl delete -f .tanzu/service
 tanzu app delete sanford -y
 ```
