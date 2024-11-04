@@ -898,6 +898,8 @@ echo $REGISTRY_PASSWORD | docker login $REGISTRY_HOST -u $REGISTRY_USERNAME --pa
 
 By the way, whatever container image registry provider you choose, make sure to restrict access to the repository.  If you're using DockerHub, set the visibility of your repository to private.
 
+> If your app will work with a private registry, then your Platform Engineer will have to have had to configure the [Registry Credentials Pull Only Installer](https://www.platform.tanzu.broadcom.com/hub/application-engine/capabilities/registry-pull-only-credentials-installer.tanzu.vmware.com/details).
+
 #### Configuring platform builds
 
 ```bash
