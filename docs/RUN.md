@@ -42,6 +42,7 @@
   * [Specify service bindings](#specify-service-bindings)
   * [Deploy services](#deploy-services)
   * [Deploy application with service bindings](#deploy-application-with-service-bindings)
+  * [Establish a domain binding](#establish-a-domain-binding)
   * [Destroy the app and services](#destroy-the-app-and-services)
 
 Sanford has various modes of operation.
@@ -975,9 +976,22 @@ spec:
     type: minio
     secretRef:
       name: minio-creds
+
+---
+apiVersion: networking.tanzu.vmware.com/v1alpha1
+kind: EgressPoint
+metadata:
+   name: minio-egress
+spec:
+   targets:
+   - hosts:
+     - "CHANGE_ME"
+     port:
+      number: 443
+      protocol: HTTPS
 ```
 
-> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  Also see [Create a MinIO instance](#create-a-minio-instance).
+> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  If you're looking for an easy way to provision MinIO, visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.  Note the `EgressPoint`'s `hosts` value above should be the same as the `Secret`'s `host` value but without the scheme (i.e., do not include `https://`).
 
 #### Open AI
 
@@ -1007,9 +1021,22 @@ spec:
     type: openai
     secretRef:
       name: openai-creds
+
+---
+apiVersion: networking.tanzu.vmware.com/v1alpha1
+kind: EgressPoint
+metadata:
+   name: openai-egress
+spec:
+   targets:
+   - hosts:
+     - "CHANGE_ME"
+     port:
+      number: 443
+      protocol: HTTPS
 ```
 
-> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to your account on the Open AI platform.
+> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to your account on the Open AI platform.  Note the `EgressPoint`'s `hosts` value above should be the same as the `Secret`'s `uri` value but without the scheme (i.e., do not include `https://`).
 
 #### Weaviate Cloud
 
@@ -1039,13 +1066,26 @@ spec:
     type: weaviate-cloud
     secretRef:
       name: weaviate-cloud-creds
+
+---
+apiVersion: networking.tanzu.vmware.com/v1alpha1
+kind: EgressPoint
+metadata:
+   name: weaviate-cloud-egress
+spec:
+   targets:
+   - hosts:
+     - "CHANGE_ME"
+     port:
+      number: 443
+      protocol: HTTPS
 ```
 
-> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to the instance of Weaviate you are hosting on [Weaviate Cloud](https://console.weaviate.io).
+> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to the instance of Weaviate you are hosting on [Weaviate Cloud](https://console.weaviate.io).  Note the `EgressPoint`'s `hosts` value above should be the same as the `Secret`'s `uri` value but without the scheme (i.e., do not include `https://`).
 
 ### Specify service bindings
 
-Change directories again.  Place yourself back into the direcotry containing `sanford.yml`.
+Change directories again.  Place yourself back into the directory containing `sanford.yml`.
 
 ```bash
 cd ../config
@@ -1130,6 +1170,14 @@ tanzu build -o .tanzu/build
 ```bash
 tanzu deploy --from-build .tanzu/build -y
 ```
+
+### Establish a domain binding
+
+```bash
+tanzu domain-binding create sanford --domain sanford.sbx.tpk8s.cloudmonk.me --entrypoint main --port 443
+```
+
+> Replace the portion of the value of `--domain` before the application name above with your own sub-domain (or with one your Platform Enginer setup on your behalf).
 
 ### Destroy the app and services
 
