@@ -1091,7 +1091,7 @@ Change directories again.  Place yourself back into the directory containing `sa
 cd ../config
 ```
 
-Create another file named `sanford-service-bindings.yml` and save the content below into it.  This file should live in same directoy as the services and the application.
+Create another file named `sanford-service-bindings.yml` and save the content below into it.  This file should live in same directory as the services and the application.
 
 ```yaml
 apiVersion: services.tanzu.vmware.com/v1
@@ -1108,7 +1108,7 @@ spec:
     apiGroup: services.tanzu.vmware.com
     kind: PreProvisionedService
     name: minio
-    connectorName: read-write
+    connectorName: main
 
 ---
 apiVersion: services.tanzu.vmware.com/v1
@@ -1125,7 +1125,7 @@ spec:
     apiGroup: services.tanzu.vmware.com
     kind: PreProvisionedService
     name: openai
-    connectorName: read-write
+    connectorName: main
 
 ---
 apiVersion: services.tanzu.vmware.com/v1
@@ -1142,7 +1142,7 @@ spec:
     apiGroup: services.tanzu.vmware.com
     kind: PreProvisionedService
     name: weaviate-cloud
-    connectorName: read-write
+    connectorName: main
 ```
 
 ### Deploy services
@@ -1156,7 +1156,7 @@ cd ../..
 then execute
 
 ```bash
-tanzu deploy --only .tanzu/service
+tanzu deploy --only .tanzu/service -y
 ```
 
 ### Create and publish package to container image registry repository
@@ -1169,6 +1169,13 @@ tanzu build -o .tanzu/build
 
 ```bash
 tanzu deploy --from-build .tanzu/build -y
+```
+
+Here's a few optional commands you could run afterwards to check on the state of deployment
+
+```bash
+tanzu app get sanford
+tanzu app logs sanford --lines -1
 ```
 
 ### Establish a domain binding
