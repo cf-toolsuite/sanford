@@ -39,6 +39,7 @@
     * [Minio](#minio)
     * [Open AI](#open-ai)
     * [Weaviate Cloud](#weaviate-cloud)
+  * [Define an Egress Point](#define-an-egress-point)
   * [Specify service bindings](#specify-service-bindings)
   * [Deploy services](#deploy-services)
   * [Deploy application with service bindings](#deploy-application-with-service-bindings)
@@ -926,6 +927,8 @@ tanzu build config \
 
 and finally, make sure that `contact.name` in the `ContainerApp` is updated to be `cf-toolsuite` which matches the organization name for the Github repository.
 
+> The first time you build and publish the container image, if you do not want to have to configure `Registry Credentials Pull Only Installer`, you will need to visit the `Package settings`, then set the visibility of the package to `Public`.
+
 </details>
 
 #### Configuring platform builds
@@ -1003,22 +1006,9 @@ spec:
     type: minio
     secretRef:
       name: minio-creds
-
----
-apiVersion: networking.tanzu.vmware.com/v1alpha1
-kind: EgressPoint
-metadata:
-   name: minio-egress
-spec:
-   targets:
-   - hosts:
-     - "CHANGE_ME"
-     port:
-      number: 443
-      protocol: HTTPS
 ```
 
-> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  If you're looking for an easy way to provision MinIO, visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.  Note the `EgressPoint`'s `hosts` value above should be the same as the `Secret`'s `host` value but without the scheme (i.e., do not include `https://`).
+> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  If you're looking for an easy way to provision MinIO, visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.
 
 #### Open AI
 
@@ -1048,22 +1038,9 @@ spec:
     type: openai
     secretRef:
       name: openai-creds
-
----
-apiVersion: networking.tanzu.vmware.com/v1alpha1
-kind: EgressPoint
-metadata:
-   name: openai-egress
-spec:
-   targets:
-   - hosts:
-     - "CHANGE_ME"
-     port:
-      number: 443
-      protocol: HTTPS
 ```
 
-> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to your account on the Open AI platform.  Note the `EgressPoint`'s `hosts` value above should be the same as the `Secret`'s `uri` value but without the scheme (i.e., do not include `https://`).
+> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to your account on the Open AI platform.
 
 #### Weaviate Cloud
 
@@ -1093,22 +1070,40 @@ spec:
     type: weaviate-cloud
     secretRef:
       name: weaviate-cloud-creds
+```
 
----
+> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to the instance of Weaviate you are hosting on [Weaviate Cloud](https://console.weaviate.io).
+
+### Define an Egress Point
+
+```bash
 apiVersion: networking.tanzu.vmware.com/v1alpha1
 kind: EgressPoint
 metadata:
-   name: weaviate-cloud-egress
+   name: sanford-services-egress
 spec:
    targets:
+   # Open AI host
    - hosts:
-     - "CHANGE_ME"
-     port:
+    - api.openai.com
+    port:
+      number: 443
+      protocol: HTTPS
+  # MinIO host
+  - hosts:
+    - CHANGE_ME
+    port:
+      number: 443
+      protocol: HTTPS
+  # Weaviate Cloud host
+  - hosts:
+    - CHANGE_ME
+    port:
       number: 443
       protocol: HTTPS
 ```
 
-> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to the instance of Weaviate you are hosting on [Weaviate Cloud](https://console.weaviate.io).  Note the `EgressPoint`'s `hosts` value above should be the same as the `Secret`'s `uri` value but without the scheme (i.e., do not include `https://`).
+> You will need to replace occurrences of `CHANGE_ME` above with your own.  Note the `EgressPoint`'s `hosts` values above should be the same as those for the `Secret`'s `host` or `uri` values but without the scheme (i.e., do not include `https://`).
 
 ### Specify service bindings
 
