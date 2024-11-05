@@ -1085,21 +1085,21 @@ metadata:
    name: sanford-services-egress
 spec:
   targets:
+  # MinIO host
+  - hosts:
+    - CHANGE_ME.stackhero-network.com
+    port:
+      number: 443
+      protocol: HTTPS
   # Open AI host
   - hosts:
     - api.openai.com
     port:
       number: 443
       protocol: HTTPS
-  # MinIO host
-  - hosts:
-    - CHANGE_ME.gcp.weaviate.cloud
-    port:
-      number: 443
-      protocol: HTTPS
   # Weaviate Cloud host
   - hosts:
-    - CHANGE_ME.stackhero-network.com
+    - CHANGE_ME.gcp.weaviate.cloud
     port:
       number: 443
       protocol: HTTPS
