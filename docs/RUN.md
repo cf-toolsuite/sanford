@@ -901,6 +901,33 @@ By the way, whatever container image registry provider you choose, make sure to 
 
 > If your app will work with a private registry, then your Platform Engineer will have to have had to configure the [Registry Credentials Pull Only Installer](https://www.platform.tanzu.broadcom.com/hub/application-engine/capabilities/registry-pull-only-credentials-installer.tanzu.vmware.com/details).
 
+<details>
+
+<summary>Working with a container registry hosted on Github</summary>
+
+Alternatively, if you intend to use [Github](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry) as a container image registry provider for your repository, you could authenticate to the registry with
+
+```bash
+export REGISTRY_USERNAME=cf-toolsuite
+export REGISTRY_PASSWORD=xxx
+export REGISTRY_HOST=ghcr.io
+echo $REGISTRY_PASSWORD | docker login $REGISTRY_HOST -u $REGISTRY_USERNAME --password-stdin
+```
+
+then update the build configuration to be
+
+```bash
+tanzu build config \
+  --build-plan-source-type ucp \
+  --containerapp-registry ghcr.io/{contact.team}/{name} \
+  --build-plan-source custom-build-plan-ingressv2  \
+  --build-engine=daemon
+```
+
+and finally, make sure that `contact.name` in the `ContainerApp` is updated to be `cf-toolsuite` which matches the organization name for the Github repository.
+
+</details>
+
 #### Configuring platform builds
 
 ```bash
