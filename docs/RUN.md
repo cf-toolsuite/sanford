@@ -1076,28 +1076,30 @@ spec:
 
 ### Define an Egress Point
 
+Create a file named `sanford-services-egress.yml`, adjust and save the content below:
+
 ```bash
 apiVersion: networking.tanzu.vmware.com/v1alpha1
 kind: EgressPoint
 metadata:
    name: sanford-services-egress
 spec:
-   targets:
-   # Open AI host
-   - hosts:
+  targets:
+  # Open AI host
+  - hosts:
     - api.openai.com
     port:
       number: 443
       protocol: HTTPS
   # MinIO host
   - hosts:
-    - CHANGE_ME
+    - CHANGE_ME.gcp.weaviate.cloud
     port:
       number: 443
       protocol: HTTPS
   # Weaviate Cloud host
   - hosts:
-    - CHANGE_ME
+    - CHANGE_ME.stackhero-network.com
     port:
       number: 443
       protocol: HTTPS
