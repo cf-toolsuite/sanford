@@ -37,10 +37,16 @@ out/
 
 ### VS Code ###
 .history/
+.trunk/
 .vscode/
 
 ### Miscellaneous ###
+data/
 tmp/
 config/
 !src/main/java/org/cftoolsuite/config/
 logs/
+
+# Tanzu Platform
+.tanzu/
+tanzu.yml

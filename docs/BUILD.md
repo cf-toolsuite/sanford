@@ -41,3 +41,15 @@ Adds dependency on:
 ./gradlew build -Pvector-db-provider=redis
 ```
 > You also have the option of building with `-Pmodel-api-provider=ollama`
+
+
+### [Weaviate](https://weaviate.io/developers/weaviate)
+
+Adds dependency on:
+
+* [spring-ai-weaviate-store-spring-boot-starter](https://docs.spring.io/spring-ai/reference/api/vectordbs/weaviate.html)
+
+```bash
+./gradlew build -Pvector-db-provider=weaviate
+```
+> You also have the option of building with `-Pmodel-api-provider=ollama`

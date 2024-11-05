@@ -10,7 +10,8 @@
     * [Chroma](#chroma)
     * [PgVector](#pgvector)
     * [Redis Stack](#redis-stack)
-* [How to run on Cloud Foundry](#how-to-run-on-cloud-foundry)
+    * [Weaviate](#weaviate)
+* [How to run on Tanzu Platform for Cloud Foundry](#how-to-run-on-tanzu-platform-for-cloud-foundry)
   * [Target a foundation](#target-a-foundation)
   * [Authenticate](#authenticate)
   * [Target space](#target-space)
@@ -28,6 +29,22 @@
   * [Apply](#apply)
   * [Setup port forwarding](#setup-port-forwarding)
   * [Teardown](#teardown)
+* [How to run on Tanzu Platform for Kubernetes](#how-to-run-on-tanzu-platform-for-kubernetes)
+  * [Clone this repo](#clone-this-repo)
+  * [Initialize](#initialize)
+    * [Configuring daemon builds](#configuring-daemon-builds)
+    * [Configuring platform builds](#configuring-platform-builds)
+    * [Validating build configuration](#validating-build-configuration)
+  * [Pre-provision services](#pre-provision-services)
+    * [Minio](#minio)
+    * [Open AI](#open-ai)
+    * [Weaviate Cloud](#weaviate-cloud)
+  * [Define an Egress Point](#define-an-egress-point)
+  * [Specify service bindings](#specify-service-bindings)
+  * [Deploy services](#deploy-services)
+  * [Deploy application with service bindings](#deploy-application-with-service-bindings)
+  * [Establish a domain binding](#establish-a-domain-binding)
+  * [Destroy the app and services](#destroy-the-app-and-services)
 
 Sanford has various modes of operation.
 
@@ -214,7 +231,18 @@ Open another terminal shell and execute
 
 ### with Vector database
 
-This setup launches either an instance of Chroma, PgVector, or Redis Stack for use by the VectorStore.
+This setup launches either an instance of Chroma, PgVector, Redis Stack, or Weaviate for use by the VectorStore.
+
+A key thing to note is that **you must activate a combination** of Spring profiles, like:
+
+* `docker` - required when you are running "off platform"
+* an LLM provider (i.e., `openai`, `groq-cloud` or `ollama`)
+* a Vector database provider (i.e., `chroma`, `pgvector`, `redis`, or `weaviate`)
+
+and Gradle project properties, like:
+
+* `-Pmodel-api-provider=ollama`
+* `-Pvector-db-provider=chroma` or `-Pvector-db-provider=pgvector` or `-Pvector-db-provider=redis` or `-Pvector-db-provider=weaviate`
 
 #### Chroma
 
@@ -237,18 +265,14 @@ This setup launches either an instance of Chroma, PgVector, or Redis Stack for u
 ```
 > You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
 
-A key thing to note is that **you must activate a combination** of Spring profiles, like:
+#### Weaviate
 
-* `docker` - required when you are running "off platform"
-* an LLM provider (i.e., `openai`, `groq-cloud` or `ollama`)
-* a Vector database provider (i.e., `chroma`, `pgvector`, or `redis`)
+```bash
+./gradlew build bootRun -Dspring.profiles.active=docker,openai,weaviate -Pvector-db-provider=weaviate
+```
+> You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
 
-and Gradle project properties, like:
-
-* `-Pmodel-api-provider=ollama`
-* `-Pvector-db-provider=chroma` or `-Pvector-db-provider=pgvector` or `-Pvector-db-provider=redis`
-
-## How to run on Cloud Foundry
+## How to run on Tanzu Platform for Cloud Foundry
 
 ### Target a foundation
 
@@ -710,7 +734,7 @@ Consult the [ENDPOINTS.md](ENDPOINTS.md) documentation to learn about what else 
 
 When you're done, revisit the terminal where you started port-forwarding and press `Ctrl+C`.
 
-> Yeah, this only gets you so far.  For a more production-ready footprint, there's quite a bit more work involved.  But this suffices for an inner-loop development experience. 
+> Yeah, this only gets you so far.  For a more production-ready footprint, there's quite a bit more work involved.  But this suffices for an inner-loop development experience.
 
 ### Teardown
 
@@ -728,4 +752,469 @@ And if you launched a Kind cluster earlier, don't forget to tear it down with:
 
 ```bash
 kind delete cluster
+```
+
+## How to run on Tanzu Platform for Kubernetes
+
+Consider this a Quick Start guide to getting `sanford` deployed using the [tanzu](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.12/tap/install-tanzu-cli.html) CLI.
+
+We'll be focused on a subset of commands to get the job done.  That said, you will likely need to work with a Platform Engineer within your enterprise to pre-provision an environment for your use.
+
+This [Github gist](https://gist.github.com/pacphi/b9a7bb0f9538db1d11d1671d8a2b5566) should give you sense of how to get started with infrastructure provisioning and operational concerns, before attempting to deploy.
+
+### Clone this repo
+
+```bash
+gh repo clone cf-toolsuite/sanford
+```
+
+### Initialize
+
+> We're going to assume that your account is a member of an organization and has apprpriate access-level permssions to work with an existing project and space(s).
+
+Login, set a project and space.
+
+```bash
+tanzu login
+tanzu project list
+tanzu project use AMER-West
+tanzu space list
+tanzu space use cphillipson-sbx
+```
+
+> You will set a different `project` and `space`.  The above is just illustrative of what you'll need to do to target where you'll deploy your own instance of this application.
+
+Set the context for `kubectl`, just in case you need to inspect resources.
+
+```bash
+tanzu context current
+```
+
+**Sample interaction**
+
+```bash
+❯ tanzu context current
+  Name:            sa-tanzu-platform
+  Type:            tanzu
+  Organization:    sa-tanzu-platform (77aee83b-308f-4c8e-b9c4-3f7a6f19ba75)
+  Project:         AMER-West (3b65ba5e-52a4-4666-ad29-4eefab93127b)
+  Space:           cphillipson-sbx
+  Kube Config:     /home/cphillipson/.config/tanzu/kube/config
+  Kube Context:    tanzu-cli-sa-tanzu-platform:AMER-West:cphillipson-sbx
+```
+
+Then
+
+```bash
+# Use the value after "Kube Config:"
+# Likely this will work consistently for you
+export KUBECONFIG=$HOME/.config/tanzu/kube/config
+```
+
+Now, let's jump into the root-level directory of the Git repository's project we cloned earlier, create a new branch, and freshly initialize Tanzu application configuration.
+
+```bash
+cd sanford
+git checkout -b tp4k8s-experiment
+tanzu app init -y
+```
+
+We'll also need to remove any large files or sensitive configuration files.
+
+```
+du -sh * -c
+./prune.sh
+```
+
+Edit the file `.tanzu/config/sanford.yml`.
+
+It should look like this after editing.  Save your work.
+
+```yaml
+apiVersion: apps.tanzu.vmware.com/v1
+kind: ContainerApp
+metadata:
+  name: sanford
+spec:
+  nonSecretEnv:
+    - name: JAVA_TOOL_OPTIONS
+      value: "-Djava.security.egd=file:///dev/urandom -XX:+UseZGC -XX:+UseStringDeduplication"
+    - name: SPRING_PROFILES_ACTIVE
+      value: "default,cloud,openai,weaviate"
+  build:
+    nonSecretEnv:
+    - name: BP_JVM_VERSION
+      value: "21"
+    - name: BP_GRADLE_BUILD_ARGUMENTS
+      value: "-Pvector-db-provider=weaviate"
+    buildpacks: {}
+    path: ../..
+  contact:
+    team: cftoolsuite
+  ports:
+  - name: main
+    port: 8080
+  probes:
+    liveness:
+      httpGet:
+        path: /actuator/health/liveness
+        port: 8080
+        scheme: HTTP
+    readiness:
+      httpGet:
+        path: /actuator/health/readiness
+        port: 8080
+        scheme: HTTP
+    startup:
+      failureThreshold: 120
+      httpGet:
+        path: /actuator/health/readiness
+        port: 8080
+        scheme: HTTP
+      initialDelaySeconds: 2
+      periodSeconds: 2
+```
+
+#### Configuring daemon builds
+
+```bash
+tanzu build config \
+  --build-plan-source-type ucp \
+  --containerapp-registry docker.io/{contact.team}/{name} \
+  --build-plan-source custom-build-plan-ingressv2  \
+  --build-engine=daemon
+```
+
+Builds will be performed locally.  (Docker must be installed).  We are targeting Dockerhub as the container image registry.  If you wish to target another registry provider you would have to change the prefix value of `docker.io` above to something else.  Pay attention to `{contact.team}`.  In the `ContainerApp` resource definition above, you will have to change `cftoolsuite` to an existing repository name in your registry.
+
+You will also have to authenticate with the registry, e.g.
+
+```bash
+export REGISTRY_USERNAME=cftoolsuite
+export REGISTRY_PASSWORD=xxx
+export REGISTRY_HOST=docker.io
+echo $REGISTRY_PASSWORD | docker login $REGISTRY_HOST -u $REGISTRY_USERNAME --password-stdin
+```
+
+> Replace the values of `REGISTRY_` environment variables above as appropriate.
+
+By the way, whatever container image registry provider you choose, make sure to restrict access to the repository.  If you're using DockerHub, set the visibility of your repository to private.
+
+> If your app will work with a private registry, then your Platform Engineer will have to have had to configure the [Registry Credentials Pull Only Installer](https://www.platform.tanzu.broadcom.com/hub/application-engine/capabilities/registry-pull-only-credentials-installer.tanzu.vmware.com/details).
+
+<details>
+
+<summary>Working with a container registry hosted on Github</summary>
+
+Alternatively, if you intend to use [Github](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry) as a container image registry provider for your repository, you could authenticate to the registry with
+
+```bash
+export REGISTRY_USERNAME=cf-toolsuite
+export REGISTRY_PASSWORD=xxx
+export REGISTRY_HOST=ghcr.io
+echo $REGISTRY_PASSWORD | docker login $REGISTRY_HOST -u $REGISTRY_USERNAME --password-stdin
+```
+
+then update the build configuration to be
+
+```bash
+tanzu build config \
+  --build-plan-source-type ucp \
+  --containerapp-registry ghcr.io/{contact.team}/{name} \
+  --build-plan-source custom-build-plan-ingressv2  \
+  --build-engine=daemon
+```
+
+and finally, make sure that `contact.name` in the `ContainerApp` is updated to be `cf-toolsuite` which matches the organization name for the Github repository.
+
+> The first time you build and publish the container image, if you do not want to have to configure `Registry Credentials Pull Only Installer`, you will need to visit the `Package settings`, then set the visibility of the package to `Public`.
+
+</details>
+
+#### Configuring platform builds
+
+```bash
+tanzu build config \
+  --build-plan-source-type ucp \
+  --containerapp-registry us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry/{contact.team}/{name} \
+  --build-plan-source custom-build-plan-ingressv2 \
+  --build-engine=platform
+```
+
+A benefit of platform builds is that they occur on-platform.  (Therefore, Docker does not need to be installed).  We will assume that a Platform Engineer has set this up on our behalf.
+
+> You will likely need to change `us-west1-docker.pkg.dev/fe-cpage/west-sa-build-registry` above to an appropriate prefix targeting a shared container image registry.
+
+#### Validating build configuration
+
+For daemon builds, e.g.
+
+```bash
+❯ tanzu build config view
+Using config file: /home/cphillipson/.config/tanzu/build/config.yaml
+Success: Getting config
+buildengine: daemon
+buildPlanSource: custom-build-plan-ingressv2
+buildPlanSourceType: ucp
+containerAppRegistry: docker.io/{contact.team}/{name}
+experimentalFeatures: false
+```
+
+### Pre-provision services
+
+Create a new sibling directory of `.tanzu/config` to contain service manifests.
+
+```bash
+mkdir .tanzu/service
+```
+
+Place yourself in the `.tanzu/service` directory.  We'll create `PreProvisionedService` and `Secret` manifests for a handful of the off-platform services that `sanford` will need to interact with.
+
+```bash
+
+cd .tanzu/service
+```
+
+#### Minio
+
+Create a file named `minio.yml`, adjust and save the content below:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-creds
+type: servicebinding.io/ai
+stringData:
+  host: CHANGE_ME
+  port: "443"
+  access-key: CHANGE_ME
+  secret-key: CHANGE_ME
+  bucket-name: sanford
+  provider: minio
+  type: minio
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: PreProvisionedService
+metadata:
+  name: minio
+spec:
+  bindingConnectors:
+  - name: main
+    description: MinIO credentials
+    type: minio
+    secretRef:
+      name: minio-creds
+```
+
+> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  If you're looking for an easy way to provision MinIO, visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.
+
+#### Open AI
+
+Create a file named `openai.yml`, adjust and save the content below:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openai-creds
+type: servicebinding.io/ai
+stringData:
+  uri: CHANGE_ME
+  api-key: CHANGE_ME
+  provider: openai
+  type: openai
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: PreProvisionedService
+metadata:
+  name: openai
+spec:
+  bindingConnectors:
+  - name: main
+    description: Open AI credentials
+    type: openai
+    secretRef:
+      name: openai-creds
+```
+
+> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to your account on the Open AI platform.
+
+#### Weaviate Cloud
+
+Create a file named `weaviate-cloud.yml`, adjust and save the content below:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: weaviate-cloud-creds
+type: servicebinding.io/ai
+stringData:
+  uri: CHANGE_ME
+  api-key: CHANGE_ME
+  provider: weaviate-cloud
+  type: weaviate-cloud
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: PreProvisionedService
+metadata:
+  name: weaviate-cloud
+spec:
+  bindingConnectors:
+  - name: main
+    description: Weaviate Cloud credentials
+    type: weaviate-cloud
+    secretRef:
+      name: weaviate-cloud-creds
+```
+
+> You will need to replace occurrences of `CHANGE_ME` above with your own `uri` and `api-key` values that will authenticate and authorize a connection to the instance of Weaviate you are hosting on [Weaviate Cloud](https://console.weaviate.io).
+
+### Define an Egress Point
+
+Create a file named `sanford-services-egress.yml`, adjust and save the content below:
+
+```bash
+apiVersion: networking.tanzu.vmware.com/v1alpha1
+kind: EgressPoint
+metadata:
+   name: sanford-services-egress
+spec:
+  targets:
+  # MinIO host
+  - hosts:
+    - CHANGE_ME.stackhero-network.com
+    port:
+      number: 443
+      protocol: HTTPS
+  # Open AI host
+  - hosts:
+    - api.openai.com
+    port:
+      number: 443
+      protocol: HTTPS
+  # Weaviate Cloud host
+  - hosts:
+    - CHANGE_ME.gcp.weaviate.cloud
+    port:
+      number: 443
+      protocol: HTTPS
+```
+
+> You will need to replace occurrences of `CHANGE_ME` above with your own.  Note the `EgressPoint`'s `hosts` values above should be the same as those for the `Secret`'s `host` or `uri` values but without the scheme (i.e., do not include `https://`).
+
+### Specify service bindings
+
+Change directories again.  Place yourself back into the directory containing `sanford.yml`.
+
+```bash
+cd ../config
+```
+
+Create another file named `sanford-service-bindings.yml` and save the content below into it.  This file should live in same directory as the services and the application.
+
+```yaml
+apiVersion: services.tanzu.vmware.com/v1
+kind: ServiceBinding
+metadata:
+  name: minio-service-binding
+spec:
+  targetRef:
+    apiGroup: apps.tanzu.vmware.com
+    kind: ContainerApp
+    name: sanford
+
+  serviceRef:
+    apiGroup: services.tanzu.vmware.com
+    kind: PreProvisionedService
+    name: minio
+    connectorName: main
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: ServiceBinding
+metadata:
+  name: openai-service-binding
+spec:
+  targetRef:
+    apiGroup: apps.tanzu.vmware.com
+    kind: ContainerApp
+    name: sanford
+
+  serviceRef:
+    apiGroup: services.tanzu.vmware.com
+    kind: PreProvisionedService
+    name: openai
+    connectorName: main
+
+---
+apiVersion: services.tanzu.vmware.com/v1
+kind: ServiceBinding
+metadata:
+  name: weaviate-cloud-service-binding
+spec:
+  targetRef:
+    apiGroup: apps.tanzu.vmware.com
+    kind: ContainerApp
+    name: sanford
+
+  serviceRef:
+    apiGroup: services.tanzu.vmware.com
+    kind: PreProvisionedService
+    name: weaviate-cloud
+    connectorName: main
+```
+
+### Deploy services
+
+Let's place ourselves back into the root-level directory
+
+```bash
+cd ../..
+```
+
+then execute
+
+```bash
+tanzu deploy --only .tanzu/service -y
+```
+
+### Create and publish package to container image registry repository
+
+```bash
+tanzu build -o .tanzu/build
+```
+
+### Deploy application with service bindings
+
+```bash
+tanzu deploy --from-build .tanzu/build -y
+```
+
+Here's a few optional commands you could run afterwards to check on the state of deployment
+
+```bash
+tanzu app get sanford
+tanzu app logs sanford --lines -1
+```
+
+### Establish a domain binding
+
+```bash
+tanzu domain-binding create sanford --domain sanford.sbx.tpk8s.cloudmonk.me --entrypoint main --port 443
+```
+
+> Replace the portion of the value of `--domain` before the application name above with your own sub-domain (or with one your Platform Enginer setup on your behalf).
+
+Checkout [ENDPOINTS.md](ENDPOINTS.md) to see what you can do.
+
+### Destroy the app and services
+
+```bash
+kubectl delete -f .tanzu/service
+tanzu app delete sanford -y
 ```
