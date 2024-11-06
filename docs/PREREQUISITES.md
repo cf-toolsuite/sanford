@@ -12,6 +12,8 @@ One or multiple of:
 
 * cf CLI
 * An account with space developer role and access to an organization and space on a target foundation
+* [Postgres](https://support.broadcom.com/group/ecx/productdownloads?subfamily=VMware%20Tanzu%20for%20Postgres%20on%20Cloud%20Foundry) tile 1.2.0 or better
+* [GenAI](https://support.broadcom.com/group/ecx/productdownloads?subfamily=GenAI%20on%20Tanzu%20Platform%20for%20Cloud%20Foundry) tile 1.0.1 or better
 
 ### Kubernetes
 
