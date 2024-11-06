@@ -604,10 +604,16 @@ If you are a contributor with an account that has permissions to push updates to
 For [DockerHub](https://hub.docker.com/), you could execute:
 
 ```bash
-docker login docker.io -u cftoolsuite -p REPLACE_ME
+echo "REPLACE_ME" | docker login docker.io -u cftoolsuite --password-stdin
 ```
 
-> Replace the password value `REPLACE_ME` above with a valid personal access token to DockerHub.
+For [GitHub CR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry), you could execute:
+
+```bash
+echo "REPLACE_ME" | docker login ghcr.io -u cf-toolsuite --password-stdin
+```
+
+> Replace the password value `REPLACE_ME` above with a valid personal access token to DockerHub or GitHub CR.
 
 ### (Optional) Push image to a container registry
 
@@ -665,11 +671,13 @@ local-path-storage   local-path-provisioner-57c5987fd4-k27f5      1/1     Runnin
 
 ### Prepare
 
-Consult DockerHub for the latest available tagged image, [here](https://hub.docker.com/r/cftoolsuite/sanford/tags).
+Consult GitHub CR for the latest available tagged image, [here](https://github.com/cf-toolsuite/sanford/pkgs/container/sanford).
 
 Edit the `build/classes/java/main/META-INF/jkube/kubernetes/sanford-deployment.yml` and `build/classes/java/main/META-INF/jkube/kubernetes/sanford-service.yml` files
 
 You should replace occurrences of `YYYY.MM.DD` (e.g., 2024.10.28) with the latest available tag, and save your changes.
+
+> Note: the image tag in Github CR will have a slightly different format (e.g., 20241105.1847.10602)
 
 Before deploying you will want to edit the contents of `build/classes/java/main/META-INF/jkube/kubernetes/spring-ai-creds-secret.yml`.
 
