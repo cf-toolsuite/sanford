@@ -778,7 +778,7 @@ gh repo clone cf-toolsuite/sanford
 
 ### Initialize
 
-> We're going to assume that your account is a member of an organization and has apprpriate access-level permssions to work with an existing project and space(s).
+> We're going to assume that your account is a member of an organization and has appropriate access-level permissions to work with an existing project and space(s).
 
 Login, set a project and space.
 
@@ -1216,7 +1216,7 @@ tanzu app logs sanford --lines -1
 tanzu domain-binding create sanford --domain sanford.sbx.tpk8s.cloudmonk.me --entrypoint main --port 443
 ```
 
-> Replace the portion of the value of `--domain` before the application name above with your own sub-domain (or with one your Platform Enginer setup on your behalf).
+> Replace the portion of the value of `--domain` before the application name above with your own sub-domain (or with one your Platform Engineer setup on your behalf).
 
 Checkout [ENDPOINTS.md](ENDPOINTS.md) to see what you can do.
 
