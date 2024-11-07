@@ -8,7 +8,7 @@ spec:
         - name: MINIO_ENDPOINT_HOST
           value: minio.minio-system.svc.cluster.local
         - name: SPRING_PROFILES_ACTIVE
-          value: default,cloud,groqcloud,pgvector
+          value: default,cloud,groq-cloud,pgvector
         - name: SPRING_CONFIG_IMPORT
           value: optional:file:/app/config/creds.yml
         - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
