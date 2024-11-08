@@ -280,7 +280,7 @@ and Gradle project properties, like:
 cf api {cloud_foundry_foundation_api_endpoint}
 ```
 
-> Replace `{cloud_foundry_foundation_api_endpoint}` above with an API endppint
+> Replace `{cloud_foundry_foundation_api_endpoint}` above with an API endpoint
 
 Sample interaction
 
