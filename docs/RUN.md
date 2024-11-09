@@ -854,7 +854,7 @@ spec:
     - name: BP_JVM_VERSION
       value: "21"
     - name: BP_GRADLE_BUILD_ARGUMENTS
-      value: "-Pvector-db-provider=weaviate"
+      value: "clean build -Pvector-db-provider=weaviate"
     buildpacks: {}
     path: ../..
   contact:
