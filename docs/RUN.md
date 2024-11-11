@@ -671,7 +671,7 @@ local-path-storage   local-path-provisioner-57c5987fd4-k27f5      1/1     Runnin
 
 ### Prepare
 
-Consult GitHub CR for the latest available tagged image, [here](https://github.com/cf-toolsuite/sanford/pkgs/container/sanford).
+Consult GitHub CR for the latest available tagged image, [here](https://github.com/orgs/cf-toolsuite/packages/container/package/sanford).
 
 Edit the `build/classes/java/main/META-INF/jkube/kubernetes/sanford-deployment.yml` and `build/classes/java/main/META-INF/jkube/kubernetes/sanford-service.yml` files
 
