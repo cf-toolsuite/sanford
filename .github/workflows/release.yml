@@ -27,6 +27,12 @@ jobs:
           - vector-db: redis
             model-api: ollama
             jar-base-name: sanford-ollama-redis
+          - vector-db: weaviate
+            model-api: openai
+            jar-base-name: sanford-openai-weaviate
+          - vector-db: weaviate
+            model-api: ollama
+            jar-base-name: sanford-ollama-weaviate
     steps:
       - uses: actions/checkout@v4
       - uses: gradle/actions/wrapper-validation@v4

@@ -31,3 +31,7 @@ jobs:
         run: ./gradlew clean build -Pvector-db-provider=redis
       - name: Build with Gradle, target Redis Stack vector store and leverage Ollama for model interaction
         run: ./gradlew clean build -Pvector-db-provider=redis -Pmodel-api-provider=ollama
+      - name: Build with Gradle, target Weaviate vector store and leverage OpenAI API for model interaction
+        run: ./gradlew clean build -Pvector-db-provider=weaviate
+      - name: Build with Gradle, target Weaviate vector store and leverage Ollama for model interaction
+        run: ./gradlew clean build -Pvector-db-provider=weaviate -Pmodel-api-provider=ollama
