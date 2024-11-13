@@ -56,7 +56,7 @@ dependencies {
 	implementation 'io.pivotal.cfenv:java-cfenv:3.3.0'
 	implementation 'io.pivotal.cfenv:java-cfenv-boot:3.3.0'
 	implementation 'com.cedarsoftware:json-io:4.30.0'
-	implementation 'org.springframework.cloud:spring-cloud-bindings:2.0.3'
+	implementation 'org.springframework.cloud:spring-cloud-bindings:2.0.4'
 	implementation 'org.springframework.ai:spring-ai-spring-cloud-bindings'
 	implementation 'org.springframework.ai:spring-ai-markdown-document-reader'
 	implementation 'org.springframework.ai:spring-ai-tika-document-reader'
