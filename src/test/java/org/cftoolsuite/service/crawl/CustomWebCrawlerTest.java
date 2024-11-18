@@ -1,9 +1,16 @@
 package org.cftoolsuite.service.crawl;
 
-import edu.uci.ics.crawler4j.crawler.Page;
-import edu.uci.ics.crawler4j.parser.HtmlParseData;
-import edu.uci.ics.crawler4j.url.WebURL;
-import org.cftoolsuite.domain.AppProperties;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.cftoolsuite.domain.crawl.CrawlCompletedEvent;
 import org.cftoolsuite.domain.crawl.CrawlRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,17 +27,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
-import java.io.IOException;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import edu.uci.ics.crawler4j.crawler.Page;
+import edu.uci.ics.crawler4j.parser.HtmlParseData;
+import edu.uci.ics.crawler4j.url.WebURL;
 
 @ExtendWith(MockitoExtension.class)
 class CustomWebCrawlerTest {
@@ -43,21 +42,7 @@ class CustomWebCrawlerTest {
     @Mock
     private ApplicationEventPublisher publisher;
 
-    private AppProperties appProperties;
     private CustomWebCrawler crawler;
-    private Map<String, String> supportedContentTypes;
-
-    @BeforeEach
-    void setUp() {
-        supportedContentTypes = new HashMap<>();
-        supportedContentTypes.put("html", "text/html");
-        supportedContentTypes.put("htm", "text/html");
-        supportedContentTypes.put("json", "application/json");
-        supportedContentTypes.put("pdf", "application/pdf");
-        supportedContentTypes.put("txt", "text/plain");
-
-        appProperties = new AppProperties(supportedContentTypes);
-    }
 
     @Nested
     @DisplayName("shouldVisit tests")
@@ -70,9 +55,8 @@ class CustomWebCrawlerTest {
                     new String[] { ROOT_DOMAIN },
                     tempDir.toString(),
                     null,
-                    null,
                     null);
-            crawler = new CustomWebCrawler(request, appProperties, publisher);
+            crawler = new CustomWebCrawler(request, publisher);
         }
 
         @Test
@@ -102,7 +86,7 @@ class CustomWebCrawlerTest {
         @ParameterizedTest
         @CsvSource({
                 "https://example.com/page.html,true",
-                "https://example.com/data.json,true",
+                "https://example.com/data.json,false",
                 "https://example.com/doc.xyz,false"
         })
         @DisplayName("Should correctly handle URLs with supported and unsupported extensions")
@@ -126,9 +110,8 @@ class CustomWebCrawlerTest {
                     new String[] { ROOT_DOMAIN },
                     tempDir.toString(),
                     null,
-                    null,
                     null);
-            crawler = new CustomWebCrawler(request, appProperties, publisher);
+            crawler = new CustomWebCrawler(request, publisher);
         }
 
         @Test
@@ -173,40 +156,6 @@ class CustomWebCrawlerTest {
             assertThat(savedContent)
                     .withFailMessage("Expected file to contain HTML content but got: " + savedContent)
                     .isEqualTo(html);
-        }
-
-        @Test
-        @DisplayName("Should process JSON content correctly")
-        void shouldProcessJsonContent() throws IOException {
-            // Arrange
-            Page page = mock(Page.class);
-            WebURL webURL = mock(WebURL.class);
-            String json = "{\"key\":\"value\"}";
-            String url = "https://example.com/api/data.json";
-
-            when(page.getWebURL()).thenReturn(webURL);
-            when(webURL.getURL()).thenReturn(url);
-            when(page.getContentType()).thenReturn("application/json");
-            when(page.getContentData()).thenReturn(json.getBytes(StandardCharsets.UTF_8));
-
-            // Create parent directory
-            Files.createDirectories(tempDir);
-
-            // Act
-            crawler.visit(page);
-
-            // Assert
-            ArgumentCaptor<CrawlCompletedEvent> eventCaptor = ArgumentCaptor.forClass(CrawlCompletedEvent.class);
-            verify(publisher).publishEvent(eventCaptor.capture());
-
-            CrawlCompletedEvent capturedEvent = eventCaptor.getValue();
-            assertThat(capturedEvent).isNotNull();
-            assertThat(capturedEvent.getFilePath()).isNotNull();
-            assertThat(capturedEvent.getFilePath().toString()).endsWith(".json");
-
-            // Verify file was actually created and contains correct content
-            assertThat(Files.exists(capturedEvent.getFilePath())).isTrue();
-            assertThat(Files.readString(capturedEvent.getFilePath())).isEqualTo(json);
         }
 
         @Test

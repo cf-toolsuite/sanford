@@ -3,6 +3,7 @@
 * [Endpoints](#endpoints)
   * [Upload](#upload)
   * [Crawl](#crawl)
+  * [Fetch](#fetch)
   * [Chat](#chat)
   * [Get Metadata](#get-metadata)
   * [Search](#search)
@@ -59,7 +60,7 @@ You will need to adjust startup arguments, e.g., you could add the following to 
 
 ### Crawl
 
-Facilitate web-crawling.  Users may issue a [CrawlRequest](../src/main/java/org/cftoolsuite/domain/crawl/CrawlRequest.java) and each document found will be (a) uploaded to S3-compliant object store and (b) contents will be vectorized and persisted into a Vector Database provider.
+Facilitate web-crawling (i.e., fetch HTML pages and any hyperlinks to HTML pages within them).  Users may issue a [CrawlRequest](../src/main/java/org/cftoolsuite/domain/crawl/CrawlRequest.java) and each document found will be (a) uploaded to S3-compliant object store and (b) contents will be vectorized and persisted into a Vector Database provider.
 
 ```python
 POST /crawl
@@ -80,6 +81,40 @@ Transfer-Encoding: chunked
     "id": "1",
     "result": "Accepted",
     "storageFolder": "/tmp/crawler4j/1"
+}
+```
+
+### Fetch
+
+Facilitate fetching content from one or more URLs.  Users may issue a [FetchRequest](../src/main/java/org/cftoolsuite/domain/fetch/FetchRequest.java) and each document found will be (a) uploaded to S3-compliant object store and (b) contents will be vectorized and persisted into a Vector Database provider.
+
+```python
+POST /fetch
+```
+
+**Sample interaction**
+
+```bash
+❯ http POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200
+Connection: keep-alive
+Content-Type: application/json
+Date: Mon, 18 Nov 2024 15:10:10 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.11.18.07.10.03/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
 }
 ```
 

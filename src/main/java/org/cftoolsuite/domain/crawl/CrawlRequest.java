@@ -8,7 +8,6 @@ public record CrawlRequest(
     String[] seeds,
     String storageFolder,
     Integer maxDepthOfCrawling,
-    String includesRegexFilter,
     Integer numberOfCrawlers
 ) {
     public CrawlRequest {

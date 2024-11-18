@@ -10,12 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.crawl.CrawlCompletedEvent;
 import org.cftoolsuite.domain.crawl.CrawlRequest;
 import org.slf4j.Logger;
@@ -34,18 +32,12 @@ public class CustomWebCrawler extends WebCrawler {
     private final String rootDomain;
     private final String storageFolder;
     private final ApplicationEventPublisher publisher;
-    private final Pattern includesFilter;
 
-    public CustomWebCrawler(CrawlRequest crawlRequest, AppProperties appProperties,
-            ApplicationEventPublisher publisher) {
+    public CustomWebCrawler(CrawlRequest crawlRequest, ApplicationEventPublisher publisher) {
         this.rootDomain = crawlRequest.rootDomain();
         this.storageFolder = crawlRequest.storageFolder();
         this.publisher = publisher;
-        this.contentTypeHandler = new ContentTypeHandler(appProperties.supportedContentTypes());
-        this.includesFilter = Pattern.compile(
-                StringUtils.isNotBlank(crawlRequest.includesRegexFilter())
-                        ? crawlRequest.includesRegexFilter()
-                        : "");
+        this.contentTypeHandler = new ContentTypeHandler(Map.of("htm", "text/html", "html", "text/html"));
     }
 
     @Override
@@ -57,8 +49,6 @@ public class CustomWebCrawler extends WebCrawler {
 
             if (StringUtils.isBlank(extension)) {
                 shouldVisit = true;
-            } else if (StringUtils.isNotBlank(includesFilter.pattern())) {
-                shouldVisit = includesFilter.matcher(href).matches();
             } else {
                 shouldVisit = contentTypeHandler.isSupportedExtension(extension);
             }

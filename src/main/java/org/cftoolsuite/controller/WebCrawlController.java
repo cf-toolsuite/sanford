@@ -5,7 +5,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.crawl.CrawlRequest;
 import org.cftoolsuite.domain.crawl.CrawlResponse;
 import org.cftoolsuite.service.crawl.CustomWebCrawler;
@@ -32,14 +31,12 @@ public class WebCrawlController {
     private static final AtomicInteger crawlId = new AtomicInteger(0);
 
     private final ApplicationEventPublisher publisher;
-    private final AppProperties appProperties;
 
-    public WebCrawlController(ApplicationEventPublisher publisher, AppProperties appProperties) {
+    public WebCrawlController(ApplicationEventPublisher publisher) {
         this.publisher = publisher;
-        this.appProperties = appProperties;
     }
 
-    @PostMapping("/crawl")
+    @PostMapping("/api/crawl")
     public ResponseEntity<CrawlResponse> startCrawl(@RequestBody CrawlRequest crawlRequest) {
         String id = String.valueOf(crawlId.incrementAndGet());
         String crawlStorageFolder = crawlRequest.storageFolder() + "/" + id;
@@ -68,7 +65,7 @@ public class WebCrawlController {
                     controller.addSeed(seed);
                 }
 
-                CrawlController.WebCrawlerFactory<CustomWebCrawler> factory = () -> new CustomWebCrawler(crawlRequest, appProperties, publisher);
+                CrawlController.WebCrawlerFactory<CustomWebCrawler> factory = () -> new CustomWebCrawler(crawlRequest, publisher);
 
                 controller.start(factory, crawlRequest.numberOfCrawlers());
 

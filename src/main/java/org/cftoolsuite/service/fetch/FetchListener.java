@@ -1,4 +1,4 @@
-package org.cftoolsuite.service.crawl;
+package org.cftoolsuite.service.fetch;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -6,9 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 
 import org.cftoolsuite.domain.FileMetadata;
-import org.cftoolsuite.domain.crawl.CrawlCompletedEvent;
+import org.cftoolsuite.domain.fetch.FetchCompletedEvent;
+import org.cftoolsuite.domain.fetch.FetchResult;
 import org.cftoolsuite.service.DocumentIngestionService;
 import org.cftoolsuite.service.FileService;
 import org.slf4j.Logger;
@@ -19,14 +21,14 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PreDestroy;
 
 @Component
-public class CrawlListener implements ApplicationListener<CrawlCompletedEvent> {
+public class FetchListener implements ApplicationListener<FetchCompletedEvent> {
 
-    private static Logger log = LoggerFactory.getLogger(CrawlListener.class);
+    private static Logger log = LoggerFactory.getLogger(FetchListener.class);
 
     private final DocumentIngestionService documentIngestionService;
     private final FileService fileService;
 
-    public CrawlListener(FileService fileService, DocumentIngestionService documentIngestionService) {
+    public FetchListener(FileService fileService, DocumentIngestionService documentIngestionService) {
         this.fileService = fileService;
         this.documentIngestionService = documentIngestionService;
     }
@@ -38,8 +40,13 @@ public class CrawlListener implements ApplicationListener<CrawlCompletedEvent> {
     }
 
     @Override
-    public void onApplicationEvent(CrawlCompletedEvent event) {
-        accept(event.getFilePath());
+    public void onApplicationEvent(FetchCompletedEvent event) {
+        List<FetchResult> results = event.getResults();
+        for (FetchResult r: results) {
+            if (r.savedPath() != null) {
+                accept(Path.of(r.savedPath()));
+            }
+        }
     }
 
     private void cleanup(Path filePath) {
@@ -53,7 +60,7 @@ public class CrawlListener implements ApplicationListener<CrawlCompletedEvent> {
 
     @PreDestroy
     private void onShutdown() {
-        Path storageFolderParent = Path.of(String.join(System.getProperty("file.separator"), System.getProperty("java.io.tmpdir"), "crawler4j"));
+        Path storageFolderParent = Path.of(String.join(System.getProperty("file.separator"), System.getProperty("java.io.tmpdir"), "fetch"));
         try {
             Files.walkFileTree(storageFolderParent, new SimpleFileVisitor<Path>() {
                 @Override
