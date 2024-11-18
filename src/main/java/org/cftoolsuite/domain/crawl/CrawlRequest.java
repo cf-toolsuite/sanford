@@ -8,7 +8,6 @@ public record CrawlRequest(
     String[] seeds,
     String storageFolder,
     Integer maxDepthOfCrawling,
-    String includesRegexFilter,
     Integer numberOfCrawlers
 ) {
     public CrawlRequest {
@@ -19,9 +18,6 @@ public record CrawlRequest(
             storageFolder = parentForStorageFolder;
         } else {
             storageFolder = String.join(System.getProperty("file.separator"), parentForStorageFolder, storageFolder);
-        }
-        if (StringUtils.isBlank(includesRegexFilter)) {
-            includesRegexFilter = ".*(\\.(htm|html))$";
         }
         if (maxDepthOfCrawling == null || maxDepthOfCrawling <= 0) {
             maxDepthOfCrawling = -1;

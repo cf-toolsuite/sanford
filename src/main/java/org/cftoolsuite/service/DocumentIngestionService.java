@@ -86,6 +86,7 @@ public class DocumentIngestionService {
                 break;
             case "json":
                 documents = loadJson(resource);
+                break;
             case "xml":
                 documents = loadXml(resource);
                 break;

@@ -36,7 +36,7 @@ public class WebCrawlController {
         this.publisher = publisher;
     }
 
-    @PostMapping("/crawl")
+    @PostMapping("/api/crawl")
     public ResponseEntity<CrawlResponse> startCrawl(@RequestBody CrawlRequest crawlRequest) {
         String id = String.valueOf(crawlId.incrementAndGet());
         String crawlStorageFolder = crawlRequest.storageFolder() + "/" + id;
