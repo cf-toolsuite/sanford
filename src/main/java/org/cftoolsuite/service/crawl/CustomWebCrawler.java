@@ -3,11 +3,19 @@ package org.cftoolsuite.service.crawl;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.crawl.CrawlCompletedEvent;
 import org.cftoolsuite.domain.crawl.CrawlRequest;
 import org.slf4j.Logger;
@@ -20,113 +28,177 @@ import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 public class CustomWebCrawler extends WebCrawler {
+    private static final Logger log = LoggerFactory.getLogger(CustomWebCrawler.class);
 
-    private static Logger log = LoggerFactory.getLogger(CustomWebCrawler.class);
-
-    private final Pattern INCLUDES_FILTER;
+    private final ContentTypeHandler contentTypeHandler;
     private final String rootDomain;
     private final String storageFolder;
     private final ApplicationEventPublisher publisher;
+    private final Pattern includesFilter;
 
-    public CustomWebCrawler(CrawlRequest crawlRequest, ApplicationEventPublisher publisher) {
-        this.INCLUDES_FILTER = Pattern.compile(crawlRequest.includesRegexFilter());
+    public CustomWebCrawler(CrawlRequest crawlRequest, AppProperties appProperties,
+            ApplicationEventPublisher publisher) {
         this.rootDomain = crawlRequest.rootDomain();
         this.storageFolder = crawlRequest.storageFolder();
         this.publisher = publisher;
+        this.contentTypeHandler = new ContentTypeHandler(appProperties.supportedContentTypes());
+        this.includesFilter = Pattern.compile(
+                StringUtils.isNotBlank(crawlRequest.includesRegexFilter())
+                        ? crawlRequest.includesRegexFilter()
+                        : "");
     }
 
     @Override
     public boolean shouldVisit(Page referringPage, WebURL url) {
         String href = url.getURL().toLowerCase();
-        return INCLUDES_FILTER.matcher(href).matches() && href.startsWith(rootDomain);
+        boolean shouldVisit = false;
+        if (href.startsWith(rootDomain)) {
+            String extension = FilenameUtils.getExtension(href);
+
+            if (StringUtils.isBlank(extension)) {
+                shouldVisit = true;
+            } else if (StringUtils.isNotBlank(includesFilter.pattern())) {
+                shouldVisit = includesFilter.matcher(href).matches();
+            } else {
+                shouldVisit = contentTypeHandler.isSupportedExtension(extension);
+            }
+        }
+        String action = shouldVisit ? "will": "will NOT";
+        log.debug("{} {} be visited", href, action);
+        return shouldVisit;
     }
 
     @Override
     public void visit(Page page) {
         String url = page.getWebURL().getURL();
-        log.debug("Crawling URL: " + url);
+        log.debug("Crawling URL: {}", url);
 
-        if (page.getParseData() instanceof HtmlParseData) {
-            HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-            String text = htmlParseData.getText();
-            String html = htmlParseData.getHtml();
-            Set<WebURL> links = htmlParseData.getOutgoingUrls();
+        try {
+            Optional<CrawlResult> result = processPage(page);
+            if (result.isPresent()) {
+                CrawlResult crawlResult = result.get();
+                String fileName = FileNameGenerator.generate(url, crawlResult.extension());
+                Path filePath = Paths.get(storageFolder, fileName);
 
-            log.debug("-- Text length: " + text.length());
-            log.debug("-- HTML length: " + html.length());
-            log.debug("-- Number of outgoing links: " + links.size());
+                // Create parent directories if they don't exist
+                Files.createDirectories(filePath.getParent());
 
-            String fileName = "";
-            try {
-                fileName = extractFilename(url);
-                publisher
-                    .publishEvent(
-                        new CrawlCompletedEvent(this)
-                            .filePath(
-                                Files.write(
-                                    Paths.get(storageFolder, fileName),
-                                    html.getBytes(StandardCharsets.UTF_8)
-                                )
-                        )
-                    );
-            } catch (IOException e) {
-                log.error("Error ingesting file " + fileName + " from URL: " + url, e);
-            } catch (NullPointerException e) {
-                log.error("Could not determine filename from URL: " + url, e);
+                // Write the content to file
+                Files.write(filePath, crawlResult.content().getBytes(StandardCharsets.UTF_8));
+
+                // Publish the event
+                publisher.publishEvent(new CrawlCompletedEvent(this).filePath(filePath));
+
+                log.debug("Successfully processed and saved content from URL: {} to file: {}", url, filePath);
+            } else {
+                log.warn("Unsupported content type for URL: {}", url);
             }
+        } catch (IOException e) {
+            log.error("Error processing URL: {}", url, e);
         }
     }
 
-    private String extractFilename(String url) {
-        if (StringUtils.isBlank(url)) {
-            return null;
+    private Optional<CrawlResult> processPage(Page page) {
+        String contentType = page.getContentType();
+        if (StringUtils.isBlank(contentType)) {
+            log.debug("Content type is blank for page");
+            return Optional.empty();
         }
 
-        // Remove any query parameters or fragments
-        int queryIndex = url.indexOf('?');
-        if (queryIndex != -1) {
-            url = url.substring(0, queryIndex);
+        // Clean up content type (remove charset, etc.)
+        contentType = contentType.split(";")[0].trim().toLowerCase();
+        log.debug("Processing page with content type: {}", contentType);
+
+        // Check if content type is supported
+        if (!contentTypeHandler.isSupportedContentType(contentType)) {
+            log.debug("Unsupported content type: {}", contentType);
+            return Optional.empty();
         }
 
-        int fragmentIndex = url.indexOf('#');
-        if (fragmentIndex != -1) {
-            url = url.substring(0, fragmentIndex);
-        }
+        String url = page.getWebURL().getURL().toLowerCase();
+        String extension = FilenameUtils.getExtension(url);
 
-        // Extract the path after the domain
-        int protocolIndex = url.indexOf("://");
-        if (protocolIndex != -1) {
-            url = url.substring(protocolIndex + 3);
-        }
-
-        int domainEndIndex = url.indexOf('/', protocolIndex + 3);
-        if (domainEndIndex != -1) {
-            url = url.substring(domainEndIndex + 1);
-        }
-
-        // Split the remaining path by '/'
-        String[] parts = url.split("/");
-
-        // Get the last non-empty part
-        String lastPart = "";
-        for (int i = parts.length - 1; i >= 0; i--) {
-            if (!parts[i].isEmpty()) {
-                lastPart = parts[i];
-                break;
+        if (StringUtils.isBlank(extension)) {
+            // Get the set of extensions for the content type
+            Set<String> extensions = contentTypeHandler.getExtensionsForContentType(contentType);
+            if (extensions.isEmpty()) {
+                log.debug("No extensions found for content type: {}", contentType);
+                return Optional.empty();
             }
+            extension = extensions.iterator().next();
         }
 
-        // If no valid part found, return null
-        if (lastPart.isEmpty()) {
-            return null;
+        // Special handling for HTML content
+        if (page.getParseData() instanceof HtmlParseData htmlParseData) {
+            return Optional.of(new CrawlResult(
+                    htmlParseData.getHtml(),
+                    extension));
         }
 
-        // Check if the last part already has a file extension
-        if (lastPart.matches(".*\\.[^.]+")) {
-            return lastPart;
-        } else {
-            // Append "-index.html" if there's no file extension
-            return lastPart + "-index.html";
-        }
+        // Handle other content types
+        return Optional.of(new CrawlResult(
+                new String(page.getContentData(), StandardCharsets.UTF_8),
+                extension));
+    }
+
+}
+
+class ContentTypeHandler {
+    private final Map<String, String> extensionToContentType;
+    private final Map<String, Set<String>> contentTypeToExtensions;
+
+    public ContentTypeHandler(Map<String, String> supportedContentTypes) {
+        this.extensionToContentType = new HashMap<>(supportedContentTypes);
+
+        this.contentTypeToExtensions = supportedContentTypes.entrySet().stream()
+                .collect(Collectors.groupingBy(
+                        entry -> entry.getValue().toLowerCase(),
+                        Collectors.mapping(
+                                entry -> entry.getKey().toLowerCase(),
+                                Collectors.toSet())));
+    }
+
+    public boolean isSupportedExtension(String extension) {
+        return extensionToContentType.containsKey(extension.toLowerCase());
+    }
+
+    public boolean isSupportedContentType(String contentType) {
+        return contentTypeToExtensions.containsKey(contentType.toLowerCase());
+    }
+
+    public Set<String> getExtensionsForContentType(String contentType) {
+        return contentTypeToExtensions.getOrDefault(contentType.toLowerCase(), Collections.emptySet());
+    }
+
+    public Optional<String> getContentTypeForExtension(String extension) {
+        return Optional.ofNullable(extensionToContentType.get(extension.toLowerCase()));
+    }
+}
+
+record CrawlResult(String content, String extension) {
+}
+
+class FileNameGenerator {
+    public static String generate(String url, String extension) {
+        String baseName = extractBaseName(url);
+        return baseName + "." + extension;
+    }
+
+    private static String extractBaseName(String url) {
+        // Remove protocol and domain
+        String path = StringUtils.substringAfter(url, "://");
+        path = StringUtils.substringAfter(path, "/");
+
+        // Remove query parameters and fragments
+        path = StringUtils.substringBefore(path, "?");
+        path = StringUtils.substringBefore(path, "#");
+
+        // Remove file extension if present
+        path = FilenameUtils.removeExtension(path);
+
+        // Replace remaining slashes with hyphens and clean up
+        return path.replace("/", "-")
+                .replaceAll("-+", "-") // Replace multiple hyphens with single hyphen
+                .replaceAll("^-|-$", ""); // Remove leading/trailing hyphens
     }
 }

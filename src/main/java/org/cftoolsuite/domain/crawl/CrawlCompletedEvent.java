@@ -22,4 +22,8 @@ public class CrawlCompletedEvent extends ApplicationEvent {
     public Path getFilePath() {
         return filePath;
     }
+
+    public Object getSource() {
+        return source;
+    }
 }

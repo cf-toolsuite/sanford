@@ -20,9 +20,6 @@ public record CrawlRequest(
         } else {
             storageFolder = String.join(System.getProperty("file.separator"), parentForStorageFolder, storageFolder);
         }
-        if (StringUtils.isBlank(includesRegexFilter)) {
-            includesRegexFilter = ".*(\\.(htm|html))$";
-        }
         if (maxDepthOfCrawling == null || maxDepthOfCrawling <= 0) {
             maxDepthOfCrawling = -1;
         }
