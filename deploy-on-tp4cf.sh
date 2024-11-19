@@ -26,6 +26,7 @@ if  [[ -f ${HOME}/.minio/config ]]; then
 # This file should contain at a minimum the following key-value environment variable pairs:
 # export MINIO_ENDPOINT_HOST=<minio-hostname>
 # export MINIO_ENDPOINT_PORT=<minio-port>
+# export MINIO_ENDPOINT_IS_SECURE=<true|false>
 # export MINIO_ACCESS_KEY=<minio-username>
 # export MINIO_SECRET_KEY=<minio-password>
 # export MINIO_BUCKET_NAME=<minio-bucket>
@@ -49,7 +50,7 @@ setup)
 
     if [[ -n "$MINIO_ENDPOINT_HOST" ]]; then
         echo && printf "\e[37mℹ️  Creating $MINIO_SERVICE_NAME MinIO service configuration...\e[m\n" && echo
-        cf create-service credhub $STORAGE_PROVIDER_PLAN_NAME $STORAGE_PROVIDER_SERVICE_NAME -c "{\"MINIO_ENDPOINT_HOST\":\"$MINIO_ENDPOINT_HOST\",\"MINIO_ENDPOINT_PORT\":\"$MINIO_ENDPOINT_PORT\",\"MINIO_ACCESS_KEY\":\"$MINIO_ACCESS_KEY\",\"MINIO_SECRET_KEY\":\"$MINIO_SECRET_KEY\"}"
+        cf create-service credhub $STORAGE_PROVIDER_PLAN_NAME $STORAGE_PROVIDER_SERVICE_NAME -c "{\"MINIO_ENDPOINT_HOST\":\"$MINIO_ENDPOINT_HOST\",\"MINIO_ENDPOINT_PORT\":\"$MINIO_ENDPOINT_PORT\",\"MINIO_ENDPOINT_SECURE\":\"$MINIO_ENDPOINT_SECURE\",\"MINIO_ACCESS_KEY\":\"$MINIO_ACCESS_KEY\",\"MINIO_SECRET_KEY\":\"$MINIO_SECRET_KEY\"}"
     fi
 
     echo && printf "\e[37mℹ️  Creating $GENAI_CHAT_SERVICE_NAME and $GENAI_EMBEDDINGS_SERVICE_NAME GenAI services ...\e[m\n" && echo

@@ -249,6 +249,7 @@ minio:
   endpoint:
     host: ${MINIO_ENDPOINT_HOST:localhost}
     port: ${MINIO_ENDPOINT_PORT:9000}
+    isSecure: false
   accessKey: ${MINIO_ACCESS_KEY:minio}
   secretKey: ${MINIO_SECRET_KEY:g0dmini0}
   bucket:
