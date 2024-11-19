@@ -33,21 +33,6 @@ if  [[ -f ${HOME}/.minio/config ]]; then
     source $HOME/.minio/config
 fi
 
-if  [[ -f ${HOME}/.dell/ecs/config ]]; then
-    echo "Dell ECS configuration file found."
-
-# Source the $HOME/.dell/ecs/config file
-# This file should contain at a minimum the following key-value environment variable pairs:
-# export ECS_ENDPOINT_HOST=<dell-ecs-hostname>
-# export ECS_ENDPOINT_PORT=<dell-ecs-port>
-# export ECS_ACCESS_KEY=<dell-ecs-username>
-# export ECS_SECRET_KEY=<dell-ecs-password>
-# export ECS_BUCKET_NAME=<dell-ecs-bucket>
-
-    source $HOME/.dell/ecs/config
-fi
-
-
 case $COMMAND in
 
 setup)
@@ -61,11 +46,6 @@ setup)
   		sleep 5
 	done
 	echo "$PGVECTOR_SERVICE_NAME creation completed."
-
-    if [[ -n "$ECS_ENDPOINT_HOST" ]]; then
-        echo && printf "\e[37mℹ️  Creating $STORAGE_PROVIDER_SERVICE_NAME Dell ECS service configuration...\e[m\n" && echo
-        cf create-service credhub $STORAGE_PROVIDER_PLAN_NAME $STORAGE_PROVIDER_SERVICE_NAME -c "{\"ECS_ENDPOINT_HOST\":\"$ECS_ENDPOINT_HOST\",\"ECS_ENDPOINT_PORT\":\"$ECS_ENDPOINT_PORT\",\"ECS_ACCESS_KEY\":\"$ECS_ACCESS_KEY\",\"ECS_SECRET_KEY\":\"$ECS_SECRET_KEY\",\"ECS_BUCKET_NAME\":\"$ECS_BUCKET_NAME\"}"
-    fi
 
     if [[ -n "$MINIO_ENDPOINT_HOST" ]]; then
         echo && printf "\e[37mℹ️  Creating $MINIO_SERVICE_NAME MinIO service configuration...\e[m\n" && echo

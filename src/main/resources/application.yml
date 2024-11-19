@@ -259,22 +259,6 @@ minio:
 spring:
   config:
     activate:
-      on-profile: dell-ecs
-
-ecs:
-  endpoint:
-    host: ${ECS_ENDPOINT_HOST:localhost}
-    port: ${ECS_ENDPOINT_PORT:9020}
-  accessKey: ${ECS_ACCESS_KEY:admin}
-  secretKey: ${ECS_SECRET_KEY:g0dECS50}
-  bucket:
-    name: ${ECS_BUCKET_NAME:sanford}
-
----
-
-spring:
-  config:
-    activate:
       on-profile: dev
 
   ai:

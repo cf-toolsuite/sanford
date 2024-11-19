@@ -2,7 +2,6 @@
 
 * [How to Run with Gradle](#how-to-run-with-gradle)
   * [Sample startup with Docker Compose](#sample-startup-with-docker-compose)
-  * [with Storage Provider](#with-storage-provider)
   * [with OpenAI](#with-openai)
   * [with Groq Cloud](#with-groq-cloud)
   * [with Ollama](#with-ollama)
@@ -137,26 +136,6 @@ Note: Recompile with -Xlint:deprecation for details.
 08:23:15.143 [main] INFO  org.cftoolsuite.MinioInitializer - Checking if bucket sanford already exists
 08:23:15.169 [main] INFO  org.cftoolsuite.MinioInitializer - Bucket created successfully: sanford
 ```
-
-### with Storage Provider
-
-The default storage provider is MinIO.  You may override the default provider by specifying either a command-line startup argument or environment variable.
-
-E.g.,
-
-```bash
--Dstorage-provider=dell-ecs
-```
-
-or
-
-```bash
-export STORAGE_PROVIDER=dell-ecs
-```
-
-This has implications for how you configure the storage provider's connection credentials.
-
-Consult the `minio` and `dell-ecs` Spring profile stanzas inside [application.yml](../src/main/resources/application.yml) for which properties you will need to set.
 
 ### with OpenAI
 
