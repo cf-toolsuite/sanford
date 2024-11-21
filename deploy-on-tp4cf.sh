@@ -12,7 +12,7 @@ GENAI_EMBEDDINGS_SERVICE_NAME="sanford-embedding"
 GENAI_EMBEDDINGS_PLAN_NAME="nomic-embed-text" # plan must have Embeddings capabilty
 
 PGVECTOR_SERVICE_NAME="sanford-db"
-PGVECTOR_PLAN_NAME="on-demand-postgres-small"
+PGVECTOR_PLAN_NAME="on-demand-postgres-db"
 PGVECTOR_EXTERNAL_PORT=1025
 
 STORAGE_PROVIDER_SERVICE_NAME="sanford-filestore"
@@ -40,7 +40,7 @@ setup)
 
     echo && printf "\e[37mℹ️  Creating services ...\e[m\n" && echo
 
-    cf create-service postgres $PGVECTOR_PLAN_NAME $PGVECTOR_SERVICE_NAME -c "{\"svc_gw_enable\": true, \"router_group\": \"default-tcp\", \"external_port\": $PGVECTOR_EXTERNAL_PORT}" -w
+    cf create-service postgres $PGVECTOR_PLAN_NAME $PGVECTOR_SERVICE_NAME -c "{\"svc_gw_enable\": true, \"router_group\": \"default-tcp\"" -w
 	printf "Waiting for service $PGVECTOR_SERVICE_NAME to create."
 	while [ `cf services | grep 'in progress' | wc -l | sed 's/ //g'` != 0 ]; do
   		printf "."
@@ -50,7 +50,7 @@ setup)
 
     if [[ -n "$MINIO_ENDPOINT_HOST" ]]; then
         echo && printf "\e[37mℹ️  Creating $MINIO_SERVICE_NAME MinIO service configuration...\e[m\n" && echo
-        cf create-service credhub $STORAGE_PROVIDER_PLAN_NAME $STORAGE_PROVIDER_SERVICE_NAME -c "{\"MINIO_ENDPOINT_HOST\":\"$MINIO_ENDPOINT_HOST\",\"MINIO_ENDPOINT_PORT\":\"$MINIO_ENDPOINT_PORT\",\"MINIO_ENDPOINT_SECURE\":\"$MINIO_ENDPOINT_SECURE\",\"MINIO_ACCESS_KEY\":\"$MINIO_ACCESS_KEY\",\"MINIO_SECRET_KEY\":\"$MINIO_SECRET_KEY\"}"
+        cf create-service credhub $STORAGE_PROVIDER_PLAN_NAME $STORAGE_PROVIDER_SERVICE_NAME -c "{\"MINIO_ENDPOINT_HOST\":\"$MINIO_ENDPOINT_HOST\",\"MINIO_ENDPOINT_PORT\":\"$MINIO_ENDPOINT_PORT\",\"MINIO_ENDPOINT_IS_SECURE\":\"$MINIO_ENDPOINT_IS_SECURE\",\"MINIO_ACCESS_KEY\":\"$MINIO_ACCESS_KEY\",\"MINIO_SECRET_KEY\":\"$MINIO_SECRET_KEY\"}"
     fi
 
     echo && printf "\e[37mℹ️  Creating $GENAI_CHAT_SERVICE_NAME and $GENAI_EMBEDDINGS_SERVICE_NAME GenAI services ...\e[m\n" && echo
