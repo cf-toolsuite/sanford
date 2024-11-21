@@ -26,7 +26,7 @@ if  [[ -f ${HOME}/.minio/config ]]; then
 # This file should contain at a minimum the following key-value environment variable pairs:
 # export MINIO_ENDPOINT_HOST=<minio-hostname>
 # export MINIO_ENDPOINT_PORT=<minio-port>
-# export MINIO_ENDPOINT_IS_SECURE=<true|false>
+# export MINIO_ENDPOINT_SCHEME=<http|https>
 # export MINIO_ACCESS_KEY=<minio-username>
 # export MINIO_SECRET_KEY=<minio-password>
 # export MINIO_BUCKET_NAME=<minio-bucket>
@@ -38,19 +38,35 @@ case $COMMAND in
 
 setup)
 
-    echo && printf "\e[37mℹ️  Creating services ...\e[m\n" && echo
+  echo && printf "\e[37mℹ️  Creating services ...\e[m\n" && echo
 
-    cf create-service postgres $PGVECTOR_PLAN_NAME $PGVECTOR_SERVICE_NAME -c "{\"svc_gw_enable\": true, \"router_group\": \"default-tcp\"" -w
+  cf create-service postgres $PGVECTOR_PLAN_NAME $PGVECTOR_SERVICE_NAME -c "{\"svc_gw_enable\": true, \"router_group\": \"default-tcp\", \"external_port\": $PGVECTOR_EXTERNAL_PORT}" -w
 	printf "Waiting for service $PGVECTOR_SERVICE_NAME to create."
 	while [ `cf services | grep 'in progress' | wc -l | sed 's/ //g'` != 0 ]; do
-  		printf "."
-  		sleep 5
+  	printf "."
+  	sleep 5
 	done
 	echo "$PGVECTOR_SERVICE_NAME creation completed."
 
     if [[ -n "$MINIO_ENDPOINT_HOST" ]]; then
-        echo && printf "\e[37mℹ️  Creating $MINIO_SERVICE_NAME MinIO service configuration...\e[m\n" && echo
-        cf create-service credhub $STORAGE_PROVIDER_PLAN_NAME $STORAGE_PROVIDER_SERVICE_NAME -c "{\"MINIO_ENDPOINT_HOST\":\"$MINIO_ENDPOINT_HOST\",\"MINIO_ENDPOINT_PORT\":\"$MINIO_ENDPOINT_PORT\",\"MINIO_ENDPOINT_IS_SECURE\":\"$MINIO_ENDPOINT_IS_SECURE\",\"MINIO_ACCESS_KEY\":\"$MINIO_ACCESS_KEY\",\"MINIO_SECRET_KEY\":\"$MINIO_SECRET_KEY\"}"
+      # Use jq to safely create the JSON configuration
+      MINIO_CREDHUB_CONFIG=$(jq -n \
+          --arg host "$MINIO_ENDPOINT_HOST" \
+          --arg port "$MINIO_ENDPOINT_PORT" \
+          --arg scheme "$MINIO_ENDPOINT_SCHEME" \
+          --arg access_key "$MINIO_ACCESS_KEY" \
+          --arg secret_key "$MINIO_SECRET_KEY" \
+          '{
+              "MINIO_ENDPOINT_HOST": $host,
+              "MINIO_ENDPOINT_PORT": $port,
+              "MINIO_ENDPOINT_SCHEME": $scheme,
+              "MINIO_ACCESS_KEY": $access_key,
+              "MINIO_SECRET_KEY": $secret_key
+          }')
+
+      echo && printf "\e[37mℹ️  Creating $MINIO_SERVICE_NAME MinIO service configuration...\e[m\n" && echo
+
+      cf create-service credhub "$STORAGE_PROVIDER_PLAN_NAME" "$STORAGE_PROVIDER_SERVICE_NAME" -c "$MINIO_CREDHUB_CONFIG"
     fi
 
     echo && printf "\e[37mℹ️  Creating $GENAI_CHAT_SERVICE_NAME and $GENAI_EMBEDDINGS_SERVICE_NAME GenAI services ...\e[m\n" && echo
@@ -74,7 +90,6 @@ setup)
 
     echo && printf "\e[37mℹ️  Starting $APP_NAME application ...\e[m\n" && echo
     cf start $APP_NAME
-
     ;;
 
 teardown)
@@ -89,7 +104,6 @@ teardown)
     cf delete-service $GENAI_EMBEDDINGS_SERVICE_NAME -f
 
     cf delete $APP_NAME -f -r
-
     ;;
 
 *)

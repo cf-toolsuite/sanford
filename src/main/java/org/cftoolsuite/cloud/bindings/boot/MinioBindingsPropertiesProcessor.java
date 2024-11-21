@@ -25,7 +25,7 @@ public class MinioBindingsPropertiesProcessor implements BindingsPropertiesProce
 
             map.from("host").to("minio.endpoint.host");
             map.from("port").to("minio.endpoint.port");
-            map.from("is-secure").to("minio.endpoint.isSecure");
+            map.from("scheme").to("minio.endpoint.scheme");
             map.from("access-key").to("minio.accessKey");
             map.from("secret-key").to("minio.secretKey");
             map.from("bucket-name").to("minio.bucket.name");

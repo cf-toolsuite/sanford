@@ -371,7 +371,7 @@ Edit the above file and make sure it has the following environment variables exp
 ```python
 export MINIO_ENDPOINT_HOST=<minio-hostname>
 export MINIO_ENDPOINT_PORT=<minio-port>
-export MINIO_ENDPOINT_IS_SECURE<true|false>
+export MINIO_ENDPOINT_SCHEME<http|https>
 export MINIO_ACCESS_KEY=<minio-username>
 export MINIO_SECRET_KEY=<minio-password>
 ```
@@ -976,7 +976,7 @@ type: servicebinding.io/ai
 stringData:
   host: CHANGE_ME
   port: "443"
-  is-secure: "true"
+  scheme: "https"
   access-key: CHANGE_ME
   secret-key: CHANGE_ME
   bucket-name: sanford
@@ -997,7 +997,7 @@ spec:
       name: minio-creds
 ```
 
-> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `is-secure`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  If you're looking for an easy way to provision MinIO, visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.
+> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `scheme`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  If you're looking for an easy way to provision MinIO, visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.
 
 #### Open AI
 

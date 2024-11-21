@@ -23,13 +23,13 @@ public class Minio {
     public MinioClient minioClient(
             @Value("${minio.endpoint.host}") String host,
             @Value("${minio.endpoint.port}") int port,
-            @Value("${minio.endpoint.isSecure:false}") boolean isSecure,
+            @Value("${minio.endpoint.scheme}") String scheme,
             @Value("${minio.accessKey}") String accessKey,
             @Value("${minio.secretKey}") String secretKey) {
         MinioClient.Builder mcb = MinioClient.builder();
-        log.trace("MinIO client configured with [ host: {}, port: {}, isSecure: {}, accessKey: {}, secretKey: {} ]", host, port, isSecure, accessKey, secretKey);
+        log.trace("MinIO client configured with [ host: {}, port: {}, scheme: {}, accessKey: {}, secretKey: {} ]", host, port, scheme, accessKey, secretKey);
         return mcb
-                .endpoint(host, port, isSecure)
+                .endpoint(host, port, scheme.equalsIgnoreCase("https"))
                 .credentials(accessKey, secretKey)
                 .build();
     }
