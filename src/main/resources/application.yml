@@ -278,4 +278,5 @@ management:
 logging:
   level:
     org.cftoolsuite: TRACE
+    org.springframework.ai: DEBUG
     com.fasterxml.jackson: TRACE
