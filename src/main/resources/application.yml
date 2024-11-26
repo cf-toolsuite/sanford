@@ -8,9 +8,9 @@ spring:
       pool-concurrency-policy: LAX
     request-config:
       '[default]':
-        connect-timeout: 1000
-        connection-request-timeout: 1000
-        response-timeout: 3000
+        connect-timeout: 30000
+        connection-request-timeout: 30000
+        response-timeout: 60000
 
   mvc:
     async:
@@ -266,6 +266,10 @@ spring:
     vectorstore:
       pgvector:
         remove-existing-vector-store-table: true
+
+    ollama:
+      init:
+        timeout: PT30M
 
 debug: true
 

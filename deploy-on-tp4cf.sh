@@ -6,14 +6,13 @@ APP_VERSION="0.0.1-SNAPSHOT"
 COMMAND=$1
 
 GENAI_CHAT_SERVICE_NAME="sanford-llm"
-GENAI_CHAT_PLAN_NAME="llama3.1" # plan must have chat capabilty
+GENAI_CHAT_PLAN_NAME="llama3.1" # plan must have chat capability
 
 GENAI_EMBEDDINGS_SERVICE_NAME="sanford-embedding"
-GENAI_EMBEDDINGS_PLAN_NAME="nomic-embed-text" # plan must have Embeddings capabilty
+GENAI_EMBEDDINGS_PLAN_NAME=" aroxima/gte-qwen2-1.5b-instruct" # plan must have Embeddings capability
 
 PGVECTOR_SERVICE_NAME="sanford-db"
 PGVECTOR_PLAN_NAME="on-demand-postgres-db"
-PGVECTOR_EXTERNAL_PORT=1025
 
 STORAGE_PROVIDER_SERVICE_NAME="sanford-filestore"
 STORAGE_PROVIDER_PLAN_NAME="default"
@@ -40,7 +39,7 @@ setup)
 
   echo && printf "\e[37mℹ️  Creating services ...\e[m\n" && echo
 
-  cf create-service postgres $PGVECTOR_PLAN_NAME $PGVECTOR_SERVICE_NAME -c "{\"svc_gw_enable\": true, \"router_group\": \"default-tcp\", \"external_port\": $PGVECTOR_EXTERNAL_PORT}" -w
+  cf create-service postgres $PGVECTOR_PLAN_NAME $PGVECTOR_SERVICE_NAME -w
 	printf "Waiting for service $PGVECTOR_SERVICE_NAME to create."
 	while [ `cf services | grep 'in progress' | wc -l | sed 's/ //g'` != 0 ]; do
   	printf "."
