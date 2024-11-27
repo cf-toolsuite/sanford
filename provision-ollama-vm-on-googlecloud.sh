@@ -151,7 +151,7 @@ create_instance() {
     if check_instance_exists; then
         echo "Error: Instance '$INSTANCE_NAME' already exists. Use 'start' to start a stopped instance or 'destroy' to remove it first."
         exit 1
-    }
+    fi
 
     # Create startup script
     create_startup_script
@@ -212,7 +212,7 @@ start_instance() {
     if ! check_instance_exists; then
         echo "Error: Instance '$INSTANCE_NAME' does not exist. Use 'create' to create a new instance."
         exit 1
-    }
+    fi
 
     # Get current status
     local status=$(check_instance_status)
