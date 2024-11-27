@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 public class SanfordApplication {
 
 	private static final String DEFAULT_STORAGE_PROVIDER = "minio";
-	private static final Set<String> SUPPORTED_STORAGE_PROVIDERS = Set.of("minio", "dell-ecs");
+	private static final Set<String> SUPPORTED_STORAGE_PROVIDERS = Set.of("minio");
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(SanfordApplication.class);
         activateAdditionalProfiles(app);
@@ -34,8 +34,5 @@ public class SanfordApplication {
             app.setAdditionalProfiles("minio");
         }
 
-		if ("dell-ecs".equalsIgnoreCase(storageProvider)) {
-			app.setAdditionalProfiles("dell-ecs");
-		}
 	}
 }

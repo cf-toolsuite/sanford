@@ -8,9 +8,9 @@ spring:
       pool-concurrency-policy: LAX
     request-config:
       '[default]':
-        connect-timeout: 1000
-        connection-request-timeout: 1000
-        response-timeout: 3000
+        connect-timeout: 30000
+        connection-request-timeout: 30000
+        response-timeout: 60000
 
   mvc:
     async:
@@ -249,26 +249,11 @@ minio:
   endpoint:
     host: ${MINIO_ENDPOINT_HOST:localhost}
     port: ${MINIO_ENDPOINT_PORT:9000}
+    scheme: ${MINIO_ENDPOINT_SCHEME:http}
   accessKey: ${MINIO_ACCESS_KEY:minio}
   secretKey: ${MINIO_SECRET_KEY:g0dmini0}
   bucket:
     name: ${MINIO_BUCKET_NAME:sanford}
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: dell-ecs
-
-ecs:
-  endpoint:
-    host: ${ECS_ENDPOINT_HOST:localhost}
-    port: ${ECS_ENDPOINT_PORT:9020}
-  accessKey: ${ECS_ACCESS_KEY:admin}
-  secretKey: ${ECS_SECRET_KEY:g0dECS50}
-  bucket:
-    name: ${ECS_BUCKET_NAME:sanford}
 
 ---
 
@@ -293,4 +278,5 @@ management:
 logging:
   level:
     org.cftoolsuite: TRACE
+    org.springframework.ai: DEBUG
     com.fasterxml.jackson: TRACE

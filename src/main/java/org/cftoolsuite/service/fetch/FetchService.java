@@ -3,9 +3,6 @@ package org.cftoolsuite.service.fetch;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -20,18 +17,21 @@ import org.cftoolsuite.domain.AppProperties;
 import org.cftoolsuite.domain.fetch.FetchCompletedEvent;
 import org.cftoolsuite.domain.fetch.FetchResult;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec;
 
 @Service
 public class FetchService {
 
-    private final HttpClient httpClient;
+    private final RestClient restClient;
     private final AppProperties appProperties;
     private final ApplicationEventPublisher publisher;
 
     public FetchService(AppProperties appProperties, ApplicationEventPublisher publisher) {
-        this.httpClient = HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.NORMAL)
+        this.restClient = RestClient.builder()
+            .defaultHeaders(headers -> headers.setAccept(List.of(MediaType.ALL)))
             .build();
         this.appProperties = appProperties;
         this.publisher = publisher;
@@ -62,15 +62,13 @@ public class FetchService {
     }
 
     private FetchResult fetchAndSaveUrl(String url, Path baseDir) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .GET()
-            .build();
-
-        HttpResponse<byte[]> response = httpClient.send(request,
-            HttpResponse.BodyHandlers.ofByteArray());
-
-        String contentType = getBaseContentType(response);
+        ResponseSpec responseSpec = restClient.get()
+            .uri(url)
+            .retrieve();
+        
+        byte[] responseBody = responseSpec.body(byte[].class);
+        
+        String contentType = extractContentType(responseSpec);
         String extension = getExtensionForContentType(contentType)
             .orElseThrow(() -> new UnsupportedContentTypeException(
                 "Unsupported content type: " + contentType));
@@ -78,16 +76,14 @@ public class FetchService {
         String filename = createFilename(url, extension);
         Path filePath = baseDir.resolve(filename);
 
-        Files.write(filePath, response.body());
+        Files.write(filePath, responseBody);
         return FetchResult.success(url, filePath.toString());
     }
 
-    private String getBaseContentType(HttpResponse<?> response) {
-        String contentType = response.headers()
-            .firstValue("Content-Type")
+    private String extractContentType(ResponseSpec responseSpec) {
+        return Optional.ofNullable(responseSpec.toBodilessEntity().getHeaders().getContentType())
+            .map(mediaType -> mediaType.toString().split(";")[0].trim().toLowerCase())
             .orElse("application/octet-stream");
-        // Extract base content type without charset or other parameters
-        return contentType.split(";")[0].trim().toLowerCase();
     }
 
     private Optional<String> getExtensionForContentType(String contentType) {

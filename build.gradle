@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.cyclonedx.bom' version '1.10.0'
 	id 'com.gorylenko.gradle-git-properties' version '2.4.2'
-	id 'org.springframework.boot' version '3.4.0-M3'
+	id 'org.springframework.boot' version '3.4.0'
 	id 'io.spring.dependency-management' version '1.1.6'
 	id 'org.eclipse.jkube.kubernetes' version '1.17.0'
 }
@@ -24,7 +24,7 @@ repositories {
 }
 
 ext {
-	set('springAiVersion', "1.0.0-M3-PLATFORM")
+	set('springAiVersion', "1.0.0-M4")
 }
 
 dependencies {
@@ -52,7 +52,6 @@ dependencies {
 		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
 	}
 	implementation 'io.minio:minio:8.5.13'
-	implementation 'com.emc.ecs:object-client:3.4.10'
 	implementation 'io.pivotal.cfenv:java-cfenv:3.3.0'
 	implementation 'io.pivotal.cfenv:java-cfenv-boot:3.3.0'
 	implementation 'com.cedarsoftware:json-io:4.30.0'

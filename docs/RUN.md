@@ -2,7 +2,6 @@
 
 * [How to Run with Gradle](#how-to-run-with-gradle)
   * [Sample startup with Docker Compose](#sample-startup-with-docker-compose)
-  * [with Storage Provider](#with-storage-provider)
   * [with OpenAI](#with-openai)
   * [with Groq Cloud](#with-groq-cloud)
   * [with Ollama](#with-ollama)
@@ -137,26 +136,6 @@ Note: Recompile with -Xlint:deprecation for details.
 08:23:15.143 [main] INFO  org.cftoolsuite.MinioInitializer - Checking if bucket sanford already exists
 08:23:15.169 [main] INFO  org.cftoolsuite.MinioInitializer - Bucket created successfully: sanford
 ```
-
-### with Storage Provider
-
-The default storage provider is MinIO.  You may override the default provider by specifying either a command-line startup argument or environment variable.
-
-E.g.,
-
-```bash
--Dstorage-provider=dell-ecs
-```
-
-or
-
-```bash
-export STORAGE_PROVIDER=dell-ecs
-```
-
-This has implications for how you configure the storage provider's connection credentials.
-
-Consult the `minio` and `dell-ecs` Spring profile stanzas inside [application.yml](../src/main/resources/application.yml) for which properties you will need to set.
 
 ### with OpenAI
 
@@ -392,6 +371,7 @@ Edit the above file and make sure it has the following environment variables exp
 ```python
 export MINIO_ENDPOINT_HOST=<minio-hostname>
 export MINIO_ENDPOINT_PORT=<minio-port>
+export MINIO_ENDPOINT_SCHEME<http|https>
 export MINIO_ACCESS_KEY=<minio-username>
 export MINIO_SECRET_KEY=<minio-password>
 ```
@@ -996,6 +976,7 @@ type: servicebinding.io/ai
 stringData:
   host: CHANGE_ME
   port: "443"
+  scheme: "https"
   access-key: CHANGE_ME
   secret-key: CHANGE_ME
   bucket-name: sanford
@@ -1016,7 +997,7 @@ spec:
       name: minio-creds
 ```
 
-> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  If you're looking for an easy way to provision MinIO, visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.
+> You will need to replace occurrences of `CHANGE_ME` above with your own `host`, `port`, `scheme`, `access-key`, `secret-key`, and `bucket-name` values that will authenticate and authorize a connection to MinIO instance and bucket you are hosting.  If you're looking for an easy way to provision MinIO, visit [StackHero](https://www.stackhero.io/en/), create an account, a project, and launch an instance of MinIO.
 
 #### Open AI
 

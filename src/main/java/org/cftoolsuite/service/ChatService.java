@@ -1,13 +1,10 @@
 package org.cftoolsuite.service;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.client.advisor.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +14,6 @@ public class ChatService {
     private final ChatClient chatClient;
 
     public ChatService(ChatModel model, VectorStore vectorStore) {
-        ChatMemory chatMemory = new InMemoryChatMemory();
         this.chatClient = ChatClient.builder(model)
                 .defaultSystem("""
                     You are an AI assistant with access to a specific knowledge base
@@ -30,8 +26,8 @@ public class ChatService {
                     """
                 )
         		.defaultAdvisors(
-                        new MessageChatMemoryAdvisor(chatMemory),
-        				new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()),
+                        new VectorStoreChatMemoryAdvisor(vectorStore),
+        				new QuestionAnswerAdvisor(vectorStore),
         				new SimpleLoggerAdvisor())
         		.build();
     }

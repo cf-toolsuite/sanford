@@ -25,9 +25,9 @@ public class MinioBindingsPropertiesProcessor implements BindingsPropertiesProce
 
             map.from("host").to("minio.endpoint.host");
             map.from("port").to("minio.endpoint.port");
+            map.from("scheme").to("minio.endpoint.scheme");
             map.from("access-key").to("minio.accessKey");
             map.from("secret-key").to("minio.secretKey");
-            map.from("password").to("spring.data.mongodb.password");
             map.from("bucket-name").to("minio.bucket.name");
         });
 
