@@ -35,8 +35,9 @@ if [[ ${#missing_vars[@]} -gt 0 ]]; then
 fi
 
 usage() {
-    echo "Usage: $0 [start|stop|destroy|status]"
-    echo "  start   - Creates and starts a new Ollama VM instance"
+    echo "Usage: $0 [create|start|stop|destroy|status]"
+    echo "  create  - Creates and starts a new Ollama VM instance"
+    echo "  start   - Starts a stopped VM instance"
     echo "  stop    - Stops the running VM instance"
     echo "  destroy - Completely removes the VM instance"
     echo "  status  - Shows the current status of the VM instance"
@@ -135,8 +136,22 @@ wait_for_ollama() {
     return 1
 }
 
-start_instance() {
+check_instance_exists() {
+    gcloud compute instances describe "$INSTANCE_NAME" --zone="$ZONE" &>/dev/null
+}
+
+check_instance_status() {
+    gcloud compute instances describe "$INSTANCE_NAME" --zone="$ZONE" --format='get(status)'
+}
+
+create_instance() {
     echo "Creating VM instance..."
+
+    # Check if instance already exists
+    if check_instance_exists; then
+        echo "Error: Instance '$INSTANCE_NAME' already exists. Use 'start' to start a stopped instance or 'destroy' to remove it first."
+        exit 1
+    }
 
     # Create startup script
     create_startup_script
@@ -167,7 +182,7 @@ start_instance() {
 
     # Wait for instance to be ready
     echo "Waiting for instance to be ready..."
-    while [[ $(gcloud compute instances describe "$INSTANCE_NAME" --zone="$ZONE" --format='get(status)') != "RUNNING" ]]; do
+    while [[ $(check_instance_status) != "RUNNING" ]]; do
         sleep 5
     done
 
@@ -192,6 +207,42 @@ start_instance() {
     rm -f /tmp/startup-script.sh
 }
 
+start_instance() {
+    # Check if instance exists
+    if ! check_instance_exists; then
+        echo "Error: Instance '$INSTANCE_NAME' does not exist. Use 'create' to create a new instance."
+        exit 1
+    }
+
+    # Get current status
+    local status=$(check_instance_status)
+
+    # Check if already running
+    if [[ "$status" == "RUNNING" ]]; then
+        echo "Instance '$INSTANCE_NAME' is already running."
+        exit 0
+    fi
+
+    # Start the instance
+    echo "Starting VM instance..."
+    gcloud compute instances start "$INSTANCE_NAME" --zone="$ZONE"
+
+    # Wait for instance to be ready
+    echo "Waiting for instance to be ready..."
+    while [[ $(check_instance_status) != "RUNNING" ]]; do
+        sleep 5
+    done
+
+    # Get the external IP
+    EXTERNAL_IP=$(gcloud compute instances describe "$INSTANCE_NAME" --zone="$ZONE" --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+
+    echo "Instance is running at IP: $EXTERNAL_IP"
+    echo "Ollama will be available at: http://$EXTERNAL_IP:11434"
+    echo ""
+    echo "To connect to the VM:"
+    echo "gcloud command: gcloud compute ssh $INSTANCE_NAME --zone=$ZONE"
+}
+
 stop_instance() {
     echo "Stopping VM instance..."
     gcloud compute instances stop "$INSTANCE_NAME" --zone="$ZONE"
@@ -203,8 +254,8 @@ destroy_instance() {
 }
 
 get_status() {
-    if gcloud compute instances describe "$INSTANCE_NAME" --zone="$ZONE" &>/dev/null; then
-        STATUS=$(gcloud compute instances describe "$INSTANCE_NAME" --zone="$ZONE" --format='get(status)')
+    if check_instance_exists; then
+        STATUS=$(check_instance_status)
         EXTERNAL_IP=$(gcloud compute instances describe "$INSTANCE_NAME" --zone="$ZONE" --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
         echo "Instance status: $STATUS"
         if [[ $STATUS == "RUNNING" ]]; then
@@ -224,6 +275,9 @@ get_status() {
 
 # Main script logic
 case "$1" in
+    create)
+        create_instance
+        ;;
     start)
         start_instance
         ;;
