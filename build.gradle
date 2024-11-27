@@ -51,7 +51,7 @@ dependencies {
 		implementation 'io.micrometer:micrometer-tracing-bridge-otel'
 		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
 	}
-	implementation 'io.minio:minio:8.5.13'
+	implementation 'io.minio:minio:8.5.14'
 	implementation 'io.pivotal.cfenv:java-cfenv:3.3.0'
 	implementation 'io.pivotal.cfenv:java-cfenv-boot:3.3.0'
 	implementation 'com.cedarsoftware:json-io:4.30.0'
