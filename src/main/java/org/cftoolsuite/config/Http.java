@@ -14,8 +14,8 @@ public class Http {
     public RestClientCustomizer restClientCustomizer() {
         return restClientBuilder -> {
             SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-            factory.setConnectTimeout((int) Duration.ofMinutes(2).toMillis());
-            factory.setReadTimeout((int) Duration.ofMinutes(2).toMillis());
+            factory.setConnectTimeout((int) Duration.ofMinutes(5).toMillis());
+            factory.setReadTimeout((int) Duration.ofMinutes(5).toMillis());
             restClientBuilder.requestFactory(factory);
         };
     }
