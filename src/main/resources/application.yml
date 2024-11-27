@@ -267,10 +267,6 @@ spring:
       pgvector:
         remove-existing-vector-store-table: true
 
-    ollama:
-      init:
-        timeout: PT30M
-
 debug: true
 
 management:
