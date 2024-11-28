@@ -10,6 +10,7 @@
   * [Build](docs/BUILD.md)
   * [Run](docs/RUN.md)
   * [Consume endpoints](docs/ENDPOINTS.md)
+* [Addenda](docs/ADDENDA.md)
 * [Credits](docs/CREDITS.md)
 
 ![Tech stack, runtime targets, interfaces, and functions](docs/sanford-tech-targets-interfaces-and-functions.png)

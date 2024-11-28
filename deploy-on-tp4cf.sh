@@ -9,7 +9,7 @@ GENAI_CHAT_SERVICE_NAME="sanford-llm"
 GENAI_CHAT_PLAN_NAME="llama3.1" # plan must have chat capability
 
 GENAI_EMBEDDINGS_SERVICE_NAME="sanford-embedding"
-GENAI_EMBEDDINGS_PLAN_NAME=" aroxima/gte-qwen2-1.5b-instruct" # plan must have Embeddings capability
+GENAI_EMBEDDINGS_PLAN_NAME="nomic-emded-text" # plan must have Embeddings capability
 
 PGVECTOR_SERVICE_NAME="sanford-db"
 PGVECTOR_PLAN_NAME="on-demand-postgres-db"

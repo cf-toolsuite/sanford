@@ -263,6 +263,12 @@ spring:
       on-profile: dev
 
   ai:
+    ollama:
+      init:
+        pull-model-strategy: always
+        timeout: 15m
+        max-retries: 3
+        keep_alive: 10m
     vectorstore:
       pgvector:
         remove-existing-vector-store-table: true
