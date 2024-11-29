@@ -86,6 +86,25 @@ app:
 spring:
   config:
     activate:
+      on-profile: alting
+    import: "optional:file:./config/creds.yml"
+
+  ai:
+    openai:
+      base_url: ${OPENAI_BASE_URL:https://alting.ai/api/v1}
+      chat:
+        options:
+          model: ${CHAT_MODEL:google/gemini-pro-1.5}
+      embedding:
+        base-url: ${EMBEDDING_BASEURL:https://api.openai.com}
+        options:
+          model: ${EMBEDDING_MODEL:text-embedding-3-large}
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: groq-cloud
     import: "optional:file:./config/creds.yml"
 
@@ -96,6 +115,7 @@ spring:
         options:
           model: ${CHAT_MODEL:llama-3.1-70b-versatile}
       embedding:
+        base-url: ${EMBEDDING_BASEURL:https://api.openai.com}
         options:
           model: ${EMBEDDING_MODEL:text-embedding-3-large}
 
