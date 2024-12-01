@@ -39,21 +39,75 @@ export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=1536
 
 ### Recommended Ollama model combo
 
-When serving models from Ollama
+When serving models from Ollama, you're encouraged to consult then leverage one of the provisioning scripts targeting a public cloud infrastructure provider:
+
+* [AWS](../provision-ollama-vm-on-aws.sh)
+* [Azure](../provision-ollama-vm-on-azure.sh)
+* [Google Cloud](../provision-ollama-vm-on-googlecloud.sh)
 
 #### CPU-only configuration
 
-* Choose compute type that has a minimum of 32-vCPU, 128Gb RAM, and 80Gb disk
-  * when targeting an Ollama VM installation hosted on Google Cloud, choose [n2-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n2_machine_types)
+* Choose a compute type that has a minimum of 32-vCPU, 128Gb RAM, and 80Gb disk
+  * when targeting an Ollama VM installation hosted on
+    * AWS, choose [m6i.8xlarge](https://aws.amazon.com/ec2/instance-types/#general-purpose)
+    * Azure, choose [Standard_D32s_v4](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/general-purpose/dsv4-series?tabs=sizebasic#sizes-in-series)
+    * Google Cloud, choose [n2-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n2_machine_types)
 
-Here's how to get going running locally targeting models hosted on a VM in Google Cloud
+#### GPU assisted configuration
+
+* Choose a compute type that has a minimum of 16-vCPU, 64Gb RAM, and 80Gb disk
+
+Here's what you need to know about each cloud provider's GPU configuration:
+
+* AWS
+  * [GPU instances](https://aws.amazon.com/ec2/instance-types/) have specific instance types (`p3`, `g4dn`, `p4d` families)
+  * Requires NVIDIA drivers installation
+  * Example configuration:
+
+    ```bash
+    GPU_INSTANCE_TYPE="g4dn.4xlarge"
+    USE_GPU=true
+    ```
+
+* Azure
+  * [GPU VMs](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/overview?tabs=breakdownseries%2Cgeneralsizelist%2Ccomputesizelist%2Cmemorysizelist%2Cstoragesizelist%2Cgpusizelist%2Cfpgasizelist%2Chpcsizelist#gpu-accelerated) use specific VM sizes (`NC`, `ND` series)
+  * Requires NVIDIA drivers installation
+  * Example configuration:
+
+    ```bash
+    GPU_VM_SIZE="Standard_NC12s_v3"
+    USE_GPU=true
+    ```
+
+* Google Cloud
+  * Common [GPU types](https://cloud.google.com/compute/docs/gpus): `nvidia-tesla-t4`, `nvidia-tesla-p100`, `nvidia-tesla-v100`
+  * GPU-enabled zones may be limited
+  * Requires special image family for GPU support
+  * Example configuration:
+
+    ```bash
+    ACCELERATOR_TYPE="nvidia-tesla-t4"
+    ACCELERATOR_COUNT=1
+    ```
+
+Important considerations:
+
+* GPU instances are significantly more expensive than regular instances
+* Not all regions/zones support GPU instances
+* You may need to request quota increases for GPU instances
+* Some GPU types require specific machine types/sizes
+* Driver installation may take several minutes during instance startup
+
+#### Getting started
+
+Here's how to get going running locally targeting models hosted on a VM in a public cloud
 
 ```bash
 # Checkout source
 gh repo clone cf-toolsuite/sanford
 cd sanford
-# Run provisioning script to create and start a VM with Ollama
-./provision-ollama-vm-on-googlecloud.sh create
+# Run provisioning script to create and start a VM with Ollama hosted in [ aws|azure|googlecloud ]
+./provision-ollama-vm-on-{replace_with_available_public_cloud_variant}.sh create
 # Set environment variables (override defaults)
 export CHAT_MODEL=gemma2
 export EMBEDDING_MODEL=aroxima/gte-qwen2-1.5b-instruct

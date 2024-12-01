@@ -9,6 +9,8 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "ZONE"
     echo "INSTANCE_NAME"
     echo "MACHINE_TYPE"
+    echo "ACCELERATOR_TYPE"
+    echo "ACCELERATOR_COUNT"
     echo "DISK_SIZE"
     echo "MAX_RUN_DURATION"
     echo "SERVICE_ACCOUNT"
@@ -159,10 +161,21 @@ create_instance() {
     # Create firewall rule if it doesn't exist
     create_firewall_rule
 
+    # Build GPU configuration if specified
+    GPU_FLAGS=""
+    METADATA_FROM="--metadata-from-file=startup-script=/tmp/startup-script.sh"
+    if [[ -n "$ACCELERATOR_TYPE" && "$ACCELERATOR_COUNT" -gt 0 ]]; then
+        GPU_FLAGS="--accelerator=type=$ACCELERATOR_TYPE,count=$ACCELERATOR_COUNT \
+                  --image-family=ubuntu-2004-lts-gpu \
+                  --image-project=ubuntu-os-cloud"
+        METADATA_FROM="--metadata-from-file=startup-script=/tmp/startup-script.sh,install-nvidia-driver=true"
+    fi
+
     gcloud compute instances create "$INSTANCE_NAME" \
         --project="$PROJECT" \
         --zone="$ZONE" \
         --machine-type="$MACHINE_TYPE" \
+        $GPU_FLAGS \
         --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
         --no-restart-on-failure \
         --maintenance-policy=TERMINATE \
@@ -177,7 +190,7 @@ create_instance() {
         --shielded-integrity-monitoring \
         --tags=ollama-server \
         --labels=goog-ec-src=vm_add-gcloud \
-        --metadata-from-file=startup-script=/tmp/startup-script.sh \
+        $METADATA_FROM \
         --reservation-affinity=any
 
     # Wait for instance to be ready
