@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source configuration file
-CONFIG_FILE="$HOME/.google/vm-config"
+CONFIG_FILE="$HOME/.ollama/googlecloud/config"
 if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "Error: Configuration file not found: $CONFIG_FILE"
     echo "Please create the configuration file with the following required variables:"

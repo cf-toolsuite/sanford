@@ -13,7 +13,7 @@
 
 ## Endpoints
 
-All endpoints with exception to `/crawl` below are to be prefixed with `/api/files`.
+All endpoints with exception to `/crawl`, `fetch`, and `chat` below are to be prefixed with `/api/files`.
 
 ### Upload
 
@@ -69,7 +69,7 @@ POST /crawl
 **Sample interaction**
 
 ```bash
-❯ http POST :8080/crawl rootDomain="https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/" seeds:='["https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/"]' maxDepthOfCrawling=5
+❯ http POST :8080/api/crawl rootDomain="https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/" seeds:='["https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/"]' maxDepthOfCrawling=5
 HTTP/1.1 202
 Connection: keep-alive
 Content-Type: application/json
@@ -129,7 +129,7 @@ GET /chat
 **Sample interaction**
 
 ```bash
-❯ http :8080/api/files/chat q=="Tell me something about the character Hermia from A Midsummer Night's Dream"
+❯ http :8080/api/chat q=="Tell me something about the character Hermia from A Midsummer Night's Dream"
 HTTP/1.1 200
 Connection: keep-alive
 Content-Length: 795

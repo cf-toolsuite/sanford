@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.cftoolsuite.domain.FileMetadata;
-import org.cftoolsuite.service.ChatService;
 import org.cftoolsuite.service.DocumentIngestionService;
 import org.cftoolsuite.service.DocumentSearchService;
 import org.cftoolsuite.service.DocumentSummarizationService;
@@ -25,17 +24,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/files")
 public class DocumentController {
 
-    private final ChatService chatService;
     private final FileService fileService;
     private final DocumentIngestionService documentIngestionService;
     private final DocumentSearchService documentSearchService;
     private final DocumentSummarizationService documentSummarizationService;
 
     public DocumentController(
-        ChatService chatService,
         FileService fileService, DocumentIngestionService documentIngestionService,
         DocumentSearchService documentSearchService, DocumentSummarizationService documentSummarizationService) {
-        this.chatService = chatService;
         this.fileService = fileService;
         this.documentIngestionService = documentIngestionService;
         this.documentSearchService = documentSearchService;
@@ -47,12 +43,6 @@ public class DocumentController {
         FileMetadata fileMetadata = fileService.uploadFile(file);
         documentIngestionService.ingest(file, fileMetadata, true);
         return ResponseEntity.ok(fileMetadata);
-    }
-
-    @GetMapping("/chat")
-    public ResponseEntity<String> chat(@RequestParam("q") String message) {
-        String response = chatService.askQuestion(message);
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping

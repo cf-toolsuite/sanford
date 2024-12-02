@@ -9,11 +9,9 @@ import org.cftoolsuite.service.fetch.FetchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/fetch")
 public class FetchController {
     private final FetchService fetchService;
 
@@ -21,7 +19,7 @@ public class FetchController {
         this.fetchService = fetchService;
     }
 
-    @PostMapping
+    @PostMapping("/api/fetch")
     public ResponseEntity<FetchResponse> fetchUrls(@RequestBody FetchRequest request) {
         List<FetchResult> results = fetchService.fetchAndSave(request.urls());
         return ResponseEntity.ok(FetchResponse.from(results));
