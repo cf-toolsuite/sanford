@@ -125,6 +125,32 @@ management:
 spring:
   config:
     activate:
+      on-profile: gemini
+
+  ai:
+    vertex:
+      ai:
+        gemini:
+          projectId: ${PROJECT_ID}
+          location: ${REGION:us-west1}
+          apiEndpoint: ${VERTEX_API_ENDPOINT:""}
+          chat:
+            options:
+              model: ${CHAT_MODEL:gemini-1.5-flash-002}
+              googleSearchRetrieval: true
+        embedding:
+          projectId: ${PROJECT_ID}
+          location: ${REGION:us-west1}
+          apiEndpoint: ${VERTEX_EMBEDDING_API_ENDPOINT:""}
+          text:
+            options:
+              model: ${EMBEDDING_MODEL:text-embedding-005}
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: groq-cloud
     import: "optional:file:./config/creds.yml"
 

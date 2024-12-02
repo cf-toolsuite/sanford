@@ -31,11 +31,15 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'ollama') {
-		implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
-	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'chroma') {
 		implementation 'org.springframework.ai:spring-ai-chroma-store-spring-boot-starter'
+	}
+	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'gemini') {
+		implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-vertex-ai-embedding-spring-boot-starter'
+	}
+	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'ollama') {
+		implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'pgvector') {
 		implementation 'org.springframework.ai:spring-ai-pgvector-store-spring-boot-starter'
