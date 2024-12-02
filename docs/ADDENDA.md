@@ -125,7 +125,7 @@ Activate the `arize-phoenix` Spring profile in addition to the `docker` Spring p
 You may do that by adding it as a profile in the comma-separated list of profiles using
 
 * a command-line runtime argument, `-Dspring.profiles.active=` 
-* an environment variable, export `SPRING_PROFILES_ACTIVE=`
+* an environment variable, `export SPRING_PROFILES_ACTIVE=`
 
 After launching the application and making a request, visit http://localhost:6006.
 
