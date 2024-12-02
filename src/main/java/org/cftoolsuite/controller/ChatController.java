@@ -1,6 +1,6 @@
 package org.cftoolsuite.controller;
 
-import org.cftoolsuite.service.*;
+import org.cftoolsuite.service.chat.ChatService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

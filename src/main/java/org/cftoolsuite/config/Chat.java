@@ -14,7 +14,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Profile({"groq-cloud","openai"})
+@Profile({"alting", "groq-cloud","openai"})
 @Configuration
 // @see https://github.com/spring-projects/spring-ai/issues/372#issuecomment-2242650500
 public class Chat {

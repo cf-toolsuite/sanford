@@ -1,4 +1,4 @@
-package org.cftoolsuite.service;
+package org.cftoolsuite.service.chat;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
