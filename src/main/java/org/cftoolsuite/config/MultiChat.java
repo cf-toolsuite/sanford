@@ -64,7 +64,7 @@ public class MultiChat {
                 Collectors.toMap(
                     model -> model,
                     model -> {
-                        OpenAiChatOptions chatOptions = chatProperties.getOptions();
+                        OpenAiChatOptions chatOptions = OpenAiChatOptions.fromOptions(chatProperties.getOptions());
                         chatOptions.setModel(model);
                         OpenAiChatModel openAiChatModel = new OpenAiChatModel(
                                 openAiApi,
