@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export BACKUP_LOC=/tmp/sanford/$(date +"%Y.%m.%d.%N" | cut -b1-14)
 mkdir -p $BACKUP_LOC

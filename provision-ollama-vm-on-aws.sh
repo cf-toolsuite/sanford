@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Source configuration file
 CONFIG_FILE="$HOME/.ollama/aws/config"
