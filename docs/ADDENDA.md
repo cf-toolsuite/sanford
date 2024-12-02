@@ -117,3 +117,16 @@ gradle clean build bootRun -Pvector-db-provider=pgvector -Pmodel-api-provider=ol
 time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'  
 time http --verify=no :8080/api/files/chat q=="Tell me who the senators are from Washington state" 
 ```
+
+### Activate Arize Phoenix for tracing and evaluation
+
+Activate the `arize-phoenix` Spring profile in addition to the `docker` Spring profile.
+
+You may do that by adding it as a profile in the comma-separated list of profiles using
+
+* a command-line runtime argument, `-Dspring.profiles.active=` 
+* an environment variable, export `SPRING_PROFILES_ACTIVE=`
+
+After launching the application and making a request, visit http://localhost:6006.
+
+> The runtime configuration may be adapted to work without the `docker` Spring profile activated.  Consult Arize Phoenix's [self-hosting](https://docs.arize.com/phoenix/deployment) deployment documentation and the `ARIZE_PHOENIX_BASE_URL` environment variable in [application.yml](../src/main/resources/application.yml).
