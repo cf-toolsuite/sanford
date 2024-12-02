@@ -105,6 +105,26 @@ spring:
 spring:
   config:
     activate:
+      on-profile: arize-phoenix
+
+arize:
+  phoenix:
+    base_url: ${ARIZE_PHOENIX_BASE_URL:http://localhost:4317}/v1
+
+management:
+  otlp:
+    metrics:
+      export:
+        url: ${arize.phoenix.base_url}/metrics
+        step: 10s
+    tracing:
+      endpoint: ${arize.phoenix.base_url}/traces
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: groq-cloud
     import: "optional:file:./config/creds.yml"
 

@@ -50,6 +50,7 @@ dependencies {
 	if (project.hasProperty('vector-db-provider') || project.hasProperty('model-api-provider')) {
 		implementation 'io.micrometer:micrometer-tracing-bridge-otel'
 		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+		implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 	}
 	implementation 'io.minio:minio:8.5.14'
 	implementation 'io.pivotal.cfenv:java-cfenv:3.3.0'
