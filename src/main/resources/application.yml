@@ -161,7 +161,7 @@ spring:
         options:
           model: ${CHAT_MODEL:llama-3.1-70b-versatile}
       embedding:
-        base-url: ${EMBEDDING_BASEURL:https://api.openai.com}
+        base_url: ${EMBEDDING_BASEURL:https://api.openai.com}
         options:
           model: ${EMBEDDING_MODEL:text-embedding-3-large}
 
