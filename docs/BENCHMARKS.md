@@ -126,7 +126,8 @@ http --verify=no :8080/api/chat   0.27s user 0.05s system 7% cpu 4.110 total
 
 ### Ollama on Google Cloud, CPU-only
 
-Tested with [n2-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n2-high-mem)
+Tested with [n2-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n2-high-mem).
+Performance profile: [Cascade Lake](https://www.intel.com/content/www/us/en/products/platforms/details/cascade-lake.html).
 
 ```commandline
 export CHAT_MODEL=gemma2:9b
