@@ -130,3 +130,7 @@ You may do that by adding it as a profile in the comma-separated list of profile
 After launching the application and making a request, visit http://localhost:6006.
 
 > The runtime configuration may be adapted to work without the `docker` Spring profile activated.  Consult Arize Phoenix's [self-hosting](https://docs.arize.com/phoenix/deployment) deployment documentation and the `ARIZE_PHOENIX_BASE_URL` environment variable in [application.yml](../src/main/resources/application.yml).
+
+### Serving models on Kubernetes clusters
+
+* Take a look at [Kserve](https://kserve.github.io/kserve/).  Then consult this quick-start [guide](KSERVE.md) to host models on your workstation or laptop.
