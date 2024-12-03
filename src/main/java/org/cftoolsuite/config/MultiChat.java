@@ -5,12 +5,12 @@ import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.client.advisor.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.model.function.FunctionCallbackContext;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,22 +22,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Profile({"alting"})
 @Configuration
 public class MultiChat {
 
-    private final static List<String> ALTING_AI_MODELS =
-            List.of(
-                    "openai/gpt-4o",
-                    "anthropic/claude-3.5-sonnet-20240620:beta",
-                    "mistralai/mixtral-8x7b-instruct",
-                    "meta-llama/llama-3.2-11b-vision-instruct",
-                    "google/gemini-flash-1.5-8b",
-                    "qwen/qwen-2.5-7b-instruct",
-                    "gryphe/mythomax-l2-13b"
-            );
+    @Value("${spring.ai.alting.chat.options.models}")
+    private Set<String> altingAiModels;
 
     @Bean
     public Map<String, ChatClient> chatClients(
@@ -60,7 +53,7 @@ public class MultiChat {
                 responseErrorHandler
         );
 
-        return ALTING_AI_MODELS.stream().collect(
+        return altingAiModels.stream().collect(
                 Collectors.toMap(
                     model -> model,
                     model -> {
@@ -85,7 +78,6 @@ public class MultiChat {
                                 """
                                 )
                                 .defaultAdvisors(
-                                        new VectorStoreChatMemoryAdvisor(vectorStore),
                                         new QuestionAnswerAdvisor(vectorStore),
                                         new SimpleLoggerAdvisor()
                                 )

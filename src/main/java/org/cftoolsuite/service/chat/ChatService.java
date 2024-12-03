@@ -3,7 +3,6 @@ package org.cftoolsuite.service.chat;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.client.advisor.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ public class ChatService {
                     """
                 )
         		.defaultAdvisors(
-                        new VectorStoreChatMemoryAdvisor(vectorStore),
         				new QuestionAnswerAdvisor(vectorStore),
         				new SimpleLoggerAdvisor())
         		.build();

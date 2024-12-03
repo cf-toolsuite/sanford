@@ -90,13 +90,24 @@ spring:
     import: "optional:file:./config/creds.yml"
 
   ai:
+    alting:
+      chat:
+        options:
+          models:
+            - openai/gpt-4o
+            - anthropic/claude-3.5-sonnet-20240620:beta
+            - mistralai/mixtral-8x7b-instruct
+            - meta-llama/llama-3.2-11b-vision-instruct
+            - google/gemini-flash-1.5-8b
+            - qwen/qwen-2.5-7b-instruct
+            - gryphe/mythomax-l2-13b
     openai:
-      base_url: ${OPENAI_BASE_URL:https://alting.ai/api/v1}
+      base_url: ${OPENAI_BASE_URL:https://alting.ai/api}
       chat:
         options:
           model: ${CHAT_MODEL:google/gemini-pro-1.5}
       embedding:
-        base-url: ${EMBEDDING_BASEURL:https://api.openai.com}
+        base_url: ${EMBEDDING_BASEURL:https://api.openai.com}
         options:
           model: ${EMBEDDING_MODEL:text-embedding-3-large}
 

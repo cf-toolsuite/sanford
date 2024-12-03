@@ -1,5 +1,7 @@
 # Sanford
 
+WIP - to be validated
+
 ## Benchmarks
 
 ### Groq
@@ -121,16 +123,41 @@ http --verify=no :8080/api/chat   0.27s user 0.05s system 7% cpu 4.110 total
 ### Alting
 
 ```commandline
+❯ time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Tue, 03 Dec 2024 21:31:52 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.12.03.13.31.47/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST :8080/api/fetch   0.26s user 0.04s system 5% cpu 5.808 total
+
 
 ```
 
 ### Ollama on Google Cloud, CPU-only
 
-Tested with [n2-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n2-high-mem).
+Tested with [n2-highmem-16](https://cloud.google.com/compute/docs/general-purpose-machines#n2-high-mem).
 Performance profile: [Cascade Lake](https://www.intel.com/content/www/us/en/products/platforms/details/cascade-lake.html).
 
 ```commandline
-export CHAT_MODEL=gemma2:9b
+export CHAT_MODEL=gemma2:27b
 export EMBEDDING_MODEL=aroxima/gte-qwen2-1.5b-instruct
 export OLLAMA_BASE_URL=http://34.169.103.239:11434
 export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=1536 
@@ -179,4 +206,6 @@ The senators from Washington state are Patty Murray and Maria Cantwell.
 http --verify=no :8080/api/chat   0.24s user 0.04s system 0% cpu 3:47.98 total
 
 # Results [ Ingest (~5m), Chat (~3m50s) ]
+# Embedding model consumption peaked at 2.65Gb of RAM
+# Chat model consumption peaked at 64.6Gb of RAM
 ```
