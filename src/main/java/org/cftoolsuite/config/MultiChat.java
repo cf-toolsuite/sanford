@@ -5,12 +5,11 @@ import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.model.function.FunctionCallbackContext;
+import org.springframework.ai.model.function.FunctionCallbackResolver;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -36,7 +35,7 @@ public class MultiChat {
             OpenAiChatProperties chatProperties,
             WebClient.Builder webClientBuilder,
             RetryTemplate retryTemplate,
-            FunctionCallbackContext functionCallbackContext,
+            FunctionCallbackResolver functionCallbackResolver,
             ResponseErrorHandler responseErrorHandler,
             AltingAiChatProperties altChatProperties
     ) {
@@ -60,7 +59,7 @@ public class MultiChat {
                         OpenAiChatModel openAiChatModel = new OpenAiChatModel(
                                 openAiApi,
                                 chatOptions,
-                                functionCallbackContext,
+                                functionCallbackResolver,
                                 retryTemplate
                         );
                         // Create ChatClient with similar configuration to original service

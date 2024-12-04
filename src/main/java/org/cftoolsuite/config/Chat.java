@@ -2,7 +2,7 @@ package org.cftoolsuite.config;
 
 import org.springframework.ai.autoconfigure.openai.OpenAiChatProperties;
 import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
-import org.springframework.ai.model.function.FunctionCallbackContext;
+import org.springframework.ai.model.function.FunctionCallbackResolver;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +25,7 @@ public class Chat {
             OpenAiChatProperties chatProperties,
             WebClient.Builder webClientBuilder,
             RetryTemplate retryTemplate,
-            FunctionCallbackContext functionCallbackContext,
+            FunctionCallbackResolver functionCallbackResolver,
             ResponseErrorHandler responseErrorHandler
     ) {
         RestClient.Builder restClientBuilder = RestClient.builder()
@@ -42,7 +42,7 @@ public class Chat {
         return new OpenAiChatModel(
                 openAiApi,
                 chatProperties.getOptions(),
-                functionCallbackContext,
+                functionCallbackResolver,
                 retryTemplate
         );
     }

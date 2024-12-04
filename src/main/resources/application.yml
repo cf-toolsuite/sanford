@@ -346,14 +346,14 @@ spring:
         pull-model-strategy: always
         timeout: 15m
         max-retries: 3
-        keep_alive: 10m
+        keep_alive: 15m
     vectorstore:
       pgvector:
         remove-existing-vector-store-table: true
 
 debug: true
 
-management:
+management:env
   endpoints:
     web:
       exposure:
