@@ -29,9 +29,6 @@ import java.util.stream.Collectors;
 @Configuration
 public class MultiChat {
 
-    @Value("${spring.ai.alting.chat.options.models}")
-    private Set<String> altingAiModels;
-
     @Bean
     public Map<String, ChatClient> chatClients(
             VectorStore vectorStore,
@@ -40,7 +37,8 @@ public class MultiChat {
             WebClient.Builder webClientBuilder,
             RetryTemplate retryTemplate,
             FunctionCallbackContext functionCallbackContext,
-            ResponseErrorHandler responseErrorHandler
+            ResponseErrorHandler responseErrorHandler,
+            AltingAiChatProperties altChatProperties
     ) {
         RestClient.Builder restClientBuilder = RestClient.builder()
                 .defaultHeaders(headers -> headers.set(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate"));
@@ -53,7 +51,7 @@ public class MultiChat {
                 responseErrorHandler
         );
 
-        return altingAiModels.stream().collect(
+        return altChatProperties.getOptions().getModels().stream().collect(
                 Collectors.toMap(
                     model -> model,
                     model -> {

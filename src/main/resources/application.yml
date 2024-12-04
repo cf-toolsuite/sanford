@@ -101,6 +101,7 @@ spring:
             - google/gemini-flash-1.5-8b
             - qwen/qwen-2.5-7b-instruct
             - gryphe/mythomax-l2-13b
+
     openai:
       base_url: ${OPENAI_BASE_URL:https://alting.ai/api}
       chat:
