@@ -353,7 +353,7 @@ spring:
 
 debug: true
 
-management:env
+management:
   endpoints:
     web:
       exposure:
