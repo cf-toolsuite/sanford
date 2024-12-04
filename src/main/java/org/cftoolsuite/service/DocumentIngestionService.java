@@ -1,13 +1,13 @@
 package org.cftoolsuite.service;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.cftoolsuite.domain.FileMetadata;
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
-import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
@@ -31,9 +30,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.yaml.snakeyaml.Yaml;
 
 @Service
 public class DocumentIngestionService {
@@ -44,12 +43,14 @@ public class DocumentIngestionService {
     private final VectorStore store;
     private final ObjectMapper objectMapper;
     private final XmlMapper xmlMapper;
+    private final Yaml yamlDumper;
 
     public DocumentIngestionService(ChatModel chatModel, VectorStore store, ObjectMapper objectMapper) {
         this.chatModel = chatModel;
         this.store = store;
         this.objectMapper = objectMapper;
         this.xmlMapper = new XmlMapper();
+        this.yamlDumper = new Yaml();
     }
 
     public void ingest(Path filePath, FileMetadata metadata, boolean keywordsEnabled) {
@@ -85,10 +86,10 @@ public class DocumentIngestionService {
                 documents = loadText(fileName, resource);
                 break;
             case "json":
-                documents = loadJson(resource);
+                documents = loadJson(fileName, resource);
                 break;
             case "xml":
-                documents = loadXml(resource);
+                documents = loadXml(fileName, resource);
                 break;
             case "html":
                 documents = loadTika(resource);
@@ -122,13 +123,15 @@ public class DocumentIngestionService {
         }
     }
 
-    private List<Document> loadXml(Resource resource) {
+    private List<Document> loadXml(String fileName, Resource resource) {
         try {
-            JsonNode node = xmlMapper.readTree(resource.getInputStream());
-            byte[] jsonBytes = objectMapper.writeValueAsBytes(node);
-            return loadJson(new ByteArrayResource(jsonBytes));
+            Object xmlObject = xmlMapper.readValue(resource.getInputStream(), Object.class);
+            StringWriter writer = new StringWriter();
+            yamlDumper.dump(xmlObject, writer);
+            String content = writer.toString();
+            return loadText(fileName, new ByteArrayResource(content.getBytes(StandardCharsets.UTF_8)));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to either read XML or write XML content as JSON", e);
+            throw new RuntimeException("Failed to either read XML or write XML content as YAML", e);
         }
     }
 
@@ -143,53 +146,28 @@ public class DocumentIngestionService {
             customMetadata.putAll(document.getMetadata());
             enrichedDocuments.add(new Document(document.getContent(), customMetadata));
         }
+        log.trace("{}", enrichedDocuments);
         return enrichedDocuments;
     }
 
-    protected List<Document> loadJson(Resource resource) {
-        JsonReader jsonReader;
+    protected List<Document> loadJson(String fileName, Resource resource) {
         try {
-            jsonReader = new JsonReader(resource, extractUniqueKeys(resource));
+            Object jsonObject = objectMapper.readValue(resource.getInputStream(), Object.class);
+            StringWriter writer = new StringWriter();
+            yamlDumper.dump(jsonObject, writer);
+            String content = writer.toString();
+            return loadText(fileName, new ByteArrayResource(content.getBytes(StandardCharsets.UTF_8)));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read JSON file", e);
-        }
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("file_name", resource.getFilename());
-        List<Document> documents = jsonReader.get();
-        List<Document> enrichedDocuments = new ArrayList<>();
-        for (Document document : documents) {
-            Map<String, Object> customMetadata = new HashMap<>(metadata);
-            customMetadata.putAll(document.getMetadata());
-            enrichedDocuments.add(new Document(document.getContent(), customMetadata));
-        }
-        return enrichedDocuments;
-    }
-
-    private String[] extractUniqueKeys(Resource resource) throws IOException {
-        JsonNode rootNode = objectMapper.readTree(resource.getInputStream());
-        Set<String> uniqueKeys = new HashSet<>();
-        extractKeys(rootNode, "", uniqueKeys);
-        return uniqueKeys.toArray(new String[0]);
-    }
-
-    private void extractKeys(JsonNode jsonNode, String currentPath, Set<String> keys) {
-        if (jsonNode.isObject()) {
-            jsonNode.fields().forEachRemaining(entry -> {
-                String newPath = currentPath.isEmpty() ? entry.getKey() : currentPath + "." + entry.getKey();
-                keys.add(newPath);
-                extractKeys(entry.getValue(), newPath, keys);
-            });
-        } else if (jsonNode.isArray()) {
-            for (int i = 0; i < jsonNode.size(); i++) {
-                extractKeys(jsonNode.get(i), currentPath + "[" + i + "]", keys);
-            }
+            throw new RuntimeException("Failed to either read JSON or write JSON content as YAML", e);
         }
     }
 
     protected List<Document> loadText(String fileName, Resource resource) {
         TextReader textReader = new TextReader(resource);
 		textReader.getCustomMetadata().put("file_name", fileName);
-		return textReader.read();
+		List<Document> result = textReader.read();
+        log.trace("{}", result);
+        return result;
     }
 
     protected List<Document> loadPdf(Resource resource) {
@@ -201,7 +179,9 @@ public class DocumentIngestionService {
                         .build())
                     .withPagesPerDocument(1)
                     .build());
-	    return pdfReader.read();
+        List<Document> result = pdfReader.read();
+        log.trace("{}", result);
+	    return result;
     }
 
     protected List<Document> loadMarkdown(String fileName, Resource resource) {
@@ -210,6 +190,8 @@ public class DocumentIngestionService {
             .withAdditionalMetadata("file_name", fileName)
             .build();
         MarkdownDocumentReader reader = new MarkdownDocumentReader(resource, config);
-        return reader.get();
+        List<Document> result = reader.read();
+        log.trace("{}", result);
+        return result;
     }
 }
