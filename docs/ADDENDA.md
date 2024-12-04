@@ -1,7 +1,5 @@
 # Sanford
 
-WIP - To be validated
-
 ## Addenda
 
 ### Development profile
@@ -14,11 +12,26 @@ To activate development mode include `dev` in comma-separated list of Spring pro
 
 See [spring.config.activate.on-profile=dev in application.yml](../src/main/resources/application.yml).
 
+### Choosing models from Huggingface to run on Ollama
+
+Models must be stored in GPT-Generated Unified Format (GGUF)
+
+* Chat (4-bit precision) - [most downloads](https://huggingface.co/models?other=4-bit&sort=downloads), [recently updated](https://huggingface.co/models?other=4-bit&sort=modified&search=GGUF)
+* Text Embedding (4-bit precision) - [most downloads](https://huggingface.co/models?other=text-embeddings-inference&sort=downloads&search=GGUF), [recently updated](https://huggingface.co/models?other=text-embeddings-inference&sort=modified&search=GGUF)
+
+Prefix all models you pull with...
+
+```commandline
+ollama pull hf.co/
+```
+
 ### Recommended on-platform model combo
 
 When serving models from Cloud Foundry with the GenAI tile
 
 #### CPU-only configuration
+
+To be redone
 
 * Choose compute type that has a minimum of 32-vCPU, 208Gb RAM, and 80Gb disk
   * when targeting CF environment provisioned on Google Cloud, choose [n1-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n1_machine_types)
@@ -49,6 +62,8 @@ When serving models from Ollama, you're encouraged to consult then leverage one 
 
 #### CPU-only configuration
 
+To be redone
+
 * Choose a compute type that has a minimum of 32-vCPU, 128Gb RAM, and 80Gb disk
   * when targeting an Ollama VM installation hosted on
     * AWS, choose [m6i.8xlarge](https://aws.amazon.com/ec2/instance-types/#general-purpose)
@@ -56,6 +71,8 @@ When serving models from Ollama, you're encouraged to consult then leverage one 
     * Google Cloud, choose [n2-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n2_machine_types)
 
 #### GPU assisted configuration
+
+To be redone
 
 * Choose a compute type that has a minimum of 16-vCPU, 64Gb RAM, and 80Gb disk
 
