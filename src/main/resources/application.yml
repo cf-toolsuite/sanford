@@ -4,13 +4,8 @@ spring:
 
   httpclient5:
     pool:
-      max-connper-route: 50
-      pool-concurrency-policy: LAX
-    request-config:
-      '[default]':
-        connect-timeout: 30000
-        connection-request-timeout: 30000
-        response-timeout: 60000
+      default-connection-config:
+        socket-timeout: PT10M
 
   mvc:
     async:
@@ -94,13 +89,18 @@ spring:
       chat:
         options:
           models:
-            - openai/gpt-4o
+            - anthracite-org/magnum-v4-72b
             - anthropic/claude-3.5-sonnet-20240620:beta
-            - mistralai/mixtral-8x7b-instruct
-            - meta-llama/llama-3.2-11b-vision-instruct
-            - google/gemini-flash-1.5-8b
-            - qwen/qwen-2.5-7b-instruct
+            - google/gemini-pro-1.5
             - gryphe/mythomax-l2-13b
+            - mistralai/mixtral-8x7b-instruct
+            - neversleep/llama-3.1-lumimaid-70b
+            - nousresearch/hermes-3-llama-3.1-405b
+            - openai/gpt-4o-mini
+            - perplexity/llama-3.1-sonar-huge-128k-online
+            - pygmalionai/mythalion-13b
+            - qwen/qwen-2.5-7b-instruct
+            - x-ai/grok-beta
 
     openai:
       base_url: ${OPENAI_BASE_URL:https://alting.ai/api}
