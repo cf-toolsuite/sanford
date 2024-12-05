@@ -62,7 +62,7 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-resilience4j:1.0.6'
-	implementation ('de.hs-heilbronn.mi:crawler4j-with-hsqldb:5.1.0') {
+	implementation ('de.hs-heilbronn.mi:crawler4j-with-hsqldb:5.1.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
     }
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
