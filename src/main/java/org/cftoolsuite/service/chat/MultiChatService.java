@@ -2,9 +2,12 @@ package org.cftoolsuite.service.chat;
 
 import org.cftoolsuite.domain.chat.MultiChatResponse;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.metadata.DefaultUsage;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +22,18 @@ import java.util.stream.Collectors;
 public class MultiChatService {
 
     private final Map<String, ChatClient> chatClients;
+    private final VectorStore vectorStore;
 
-    public MultiChatService(Map<String, ChatClient> chatClients) {
+    public MultiChatService(Map<String, ChatClient> chatClients, VectorStore vectorStore) {
         this.chatClients = chatClients;
+        this.vectorStore = vectorStore;
     }
 
     public List<MultiChatResponse> askQuestion(String question) {
+        return askQuestion(question, null);
+    }
+
+    public List<MultiChatResponse> askQuestion(String question, Map<String, Object> filterMetadata) {
         return chatClients.entrySet().stream()
                 .map(entry -> {
                     String modelName = entry.getKey();
@@ -37,6 +46,14 @@ public class MultiChatService {
                         // Call the chat client and get the full response
                         ChatResponse chatResponse = chatClient
                                 .prompt()
+                                .advisors(
+                                        RetrievalAugmentationAdvisor
+                                                .builder()
+                                                .documentRetriever(
+                                                        ChatServiceHelper.constructDocumentRetriever(vectorStore, filterMetadata).build()
+                                                )
+                                                .build()
+                                )
                                 .user(question)
                                 .call()
                                 .chatResponse();

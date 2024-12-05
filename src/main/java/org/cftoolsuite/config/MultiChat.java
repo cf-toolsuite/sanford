@@ -3,14 +3,11 @@ package org.cftoolsuite.config;
 import org.springframework.ai.autoconfigure.openai.OpenAiChatProperties;
 import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.model.function.FunctionCallbackResolver;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -20,9 +17,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Profile({"alting"})
@@ -31,7 +26,6 @@ public class MultiChat {
 
     @Bean
     public Map<String, ChatClient> chatClients(
-            VectorStore vectorStore,
             OpenAiConnectionProperties connectionProperties,
             OpenAiChatProperties chatProperties,
             WebClient.Builder webClientBuilder,
@@ -66,15 +60,6 @@ public class MultiChat {
                         // Create ChatClient with similar configuration to original service
                         return ChatClient.builder(openAiChatModel)
                                 .defaultAdvisors(
-                                        RetrievalAugmentationAdvisor
-                                                .builder()
-                                                .documentRetriever(
-                                                        VectorStoreDocumentRetriever
-                                                                .builder()
-                                                                .vectorStore(vectorStore)
-                                                                .build()
-                                                )
-                                                .build(),
                                         new SimpleLoggerAdvisor())
                                 .build();
                     }
