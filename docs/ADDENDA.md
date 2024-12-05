@@ -12,6 +12,21 @@ To activate development mode include `dev` in comma-separated list of Spring pro
 
 See [spring.config.activate.on-profile=dev in application.yml](../src/main/resources/application.yml).
 
+### Disable tracing
+
+To disable tracing, set an environment variable before starting the application.
+
+```commandline
+export MANAGEMENT_TRACING_ENABLED=false
+```
+
+On Cloud Foundry, you would
+
+```commandline
+cf set-env sanford MANAGEMENT_TRACING_ENABLED false
+cf restage sanford
+```
+
 ### Choosing models from Huggingface to run on Ollama
 
 Models must be stored in GPT-Generated Unified Format ([GGUF](https://gguf.io/))
