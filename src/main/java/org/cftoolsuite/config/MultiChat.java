@@ -3,12 +3,13 @@ package org.cftoolsuite.config;
 import org.springframework.ai.autoconfigure.openai.OpenAiChatProperties;
 import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.model.function.FunctionCallbackResolver;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,20 +65,17 @@ public class MultiChat {
                         );
                         // Create ChatClient with similar configuration to original service
                         return ChatClient.builder(openAiChatModel)
-                                .defaultSystem("""
-                                You are an AI assistant with access to a specific knowledge base
-                                Follow these guidelines:
-                                    Only use information from the provided context.
-                                    If the answer is not in the context, state that you don't have sufficient information.
-                                    Do not use any external knowledge or make assumptions beyond the given data.
-                                    Cite the relevant parts of the context in your responses including the source and origin.
-                                    Respond in a clear, concise manner without editorializing.
-                                """
-                                )
                                 .defaultAdvisors(
-                                        new QuestionAnswerAdvisor(vectorStore),
-                                        new SimpleLoggerAdvisor()
-                                )
+                                        RetrievalAugmentationAdvisor
+                                                .builder()
+                                                .documentRetriever(
+                                                        VectorStoreDocumentRetriever
+                                                                .builder()
+                                                                .vectorStore(vectorStore)
+                                                                .build()
+                                                )
+                                                .build(),
+                                        new SimpleLoggerAdvisor())
                                 .build();
                     }
                 )
