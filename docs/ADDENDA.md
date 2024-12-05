@@ -14,7 +14,7 @@ See [spring.config.activate.on-profile=dev in application.yml](../src/main/resou
 
 ### Choosing models from Huggingface to run on Ollama
 
-Models must be stored in GPT-Generated Unified Format (GGUF)
+Models must be stored in GPT-Generated Unified Format ([GGUF](https://gguf.io/))
 
 * Chat (4-bit precision) - [most downloads](https://huggingface.co/models?other=4-bit&sort=downloads), [recently updated](https://huggingface.co/models?other=4-bit&sort=modified&search=GGUF)
 * Text Embedding (4-bit precision) - [most downloads](https://huggingface.co/models?other=text-embeddings-inference&sort=downloads&search=GGUF), [recently updated](https://huggingface.co/models?other=text-embeddings-inference&sort=modified&search=GGUF)
@@ -33,16 +33,16 @@ When serving models from Cloud Foundry with the GenAI tile
 
 To be redone
 
-* Choose compute type that has a minimum of 32-vCPU, 208Gb RAM, and 80Gb disk
-  * when targeting CF environment provisioned on Google Cloud, choose [n1-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n1_machine_types)
-* Choose `gemma2` for the chat model
+* Choose compute type that has a minimum of 8-vCPU, 64Gb RAM, and 80Gb disk
+  * when targeting CF environment provisioned on Google Cloud, choose [c2d-highmem-8](https://cloud.google.com/compute/docs/compute-optimized-machines#c2d-high-mem)
+* Choose `qwen2.5:3b` for the chat model
 * Choose `aroxima/gte-qwen2-1.5b-instruct` for the embedding model
 * Choose Postgres for the vector store provider
 
 If you're employing the [deploy-on-tp4cf.sh](../deploy-on-tp4cf.sh) script, edit the following variables to be
 
 ```bash
-GENAI_CHAT_PLAN_NAME=gemma2
+GENAI_CHAT_PLAN_NAME=qwen2.5:3b
 GENAI_EMBEDDINGS_PLAN_NAME=aroxima/gte-qwen2-1.5b-instruct
 ```
 
@@ -64,11 +64,11 @@ When serving models from Ollama, you're encouraged to consult then leverage one 
 
 To be redone
 
-* Choose a compute type that has a minimum of 32-vCPU, 128Gb RAM, and 80Gb disk
+* Choose a compute type that has a minimum of 8-vCPU, 64Gb RAM, and 80Gb disk
   * when targeting an Ollama VM installation hosted on
-    * AWS, choose [m6i.8xlarge](https://aws.amazon.com/ec2/instance-types/#general-purpose)
-    * Azure, choose [Standard_D32s_v4](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/general-purpose/dsv4-series?tabs=sizebasic#sizes-in-series)
-    * Google Cloud, choose [n2-highmem-32](https://cloud.google.com/compute/docs/general-purpose-machines#n2_machine_types)
+    * AWS, choose [m6i.4xlarge](https://aws.amazon.com/ec2/instance-types/#general-purpose)
+    * Azure, choose [Standard_D16s_v4](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/general-purpose/dsv4-series?tabs=sizebasic#sizes-in-series)
+    * Google Cloud, choose [c2d-highmem-8](https://cloud.google.com/compute/docs/compute-optimized-machines#c2d-high-mem)
 
 #### GPU assisted configuration
 
@@ -128,13 +128,13 @@ cd sanford
 # Run provisioning script to create and start a VM with Ollama hosted in [ aws|azure|googlecloud ]
 ./provision-ollama-vm-on-{replace_with_available_public_cloud_variant}.sh create
 # Set environment variables (override defaults)
-export CHAT_MODEL=gemma2
+export CHAT_MODEL=qwen2.5:3b
 export EMBEDDING_MODEL=aroxima/gte-qwen2-1.5b-instruct
 export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=1536
 export OLLAMA_BASE_URL=http://{replace_with_ip_address_of_ollama_instance}:11434
 gradle clean build bootRun -Pvector-db-provider=pgvector -Pmodel-api-provider=ollama -Dspring.profiles.active=docker,ollama,pgvector,dev
 time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'  
-time http --verify=no :8080/api/files/chat q=="Tell me who the senators are from Washington state" 
+time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
 ```
 
 ### Activate Arize Phoenix for tracing and evaluation

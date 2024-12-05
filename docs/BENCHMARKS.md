@@ -291,17 +291,19 @@ http --verify=no :8080/api/multichat   0.25s user 0.05s system 0% cpu 1:55.64 to
 # Results [ Ingest (~6s), MultiChat (~2m) returning 8 accurate responses, 1 partial response, and 3 errors due to deserialization issues ]
 ```
 
-### Ollama on Google Cloud, CPU-only
+### Ollama on workstation
 
-To be redone
+Specs:
 
-Tested with [n2-highmem-16](https://cloud.google.com/compute/docs/general-purpose-machines#n2-high-mem).
-Performance profile: [Cascade Lake](https://www.intel.com/content/www/us/en/products/platforms/details/cascade-lake.html).
+* OS - Ubuntu 24.04.1 LTS
+* Hardware Model - System76 Meerkat
+* Processor - Intel Core i7-10710U x 12
+* Memory - 64.0 GiB
+* Disk Capacity - 2.5 TB
 
 ```commandline
-export CHAT_MODEL=gemma2:27b
+export CHAT_MODEL=qwen2.5:3b
 export EMBEDDING_MODEL=aroxima/gte-qwen2-1.5b-instruct
-export OLLAMA_BASE_URL=http://34.169.103.239:11434
 export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=1536 
 gradle clean build bootRun -Pmodel-api-provider=ollama -Pvector-db-provider=pgvector -Dspring.profiles.active=docker,ollama,arize-phoenix,pgvector,dev
 
@@ -311,7 +313,7 @@ gradle clean build bootRun -Pmodel-api-provider=ollama -Pvector-db-provider=pgve
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Type: application/json
-Date: Tue, 03 Dec 2024 01:38:00 GMT
+Date: Thu, 05 Dec 2024 19:32:25 GMT
 Keep-Alive: timeout=60
 Transfer-Encoding: chunked
 
@@ -320,7 +322,7 @@ Transfer-Encoding: chunked
     "results": [
         {
             "error": null,
-            "savedPath": "/tmp/fetch/2024.12.02.17.32.48/www.govtrack.us-api-v2-role.json",
+            "savedPath": "/tmp/fetch/2024.12.05.11.09.32/www.govtrack.us-api-v2-role.json",
             "success": true,
             "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
         }
@@ -330,24 +332,25 @@ Transfer-Encoding: chunked
 }
 
 
-http --verify=no POST :8080/api/fetch   0.23s user 0.03s system 0% cpu 5:12.76 total
+http --verify=no POST :8080/api/fetch   0.27s user 0.03s system 0% cpu 22:53.42 total
 
 # Search for US senators in a particular state via /api/chat
 
-❯ time http --verify=no :8080/api/chat q=="Tell me who the senators are from Washington state"
+❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
 HTTP/1.1 200 
 Connection: keep-alive
-Content-Length: 75
+Content-Length: 45
 Content-Type: text/plain;charset=UTF-8
-Date: Tue, 03 Dec 2024 01:43:50 GMT
+Date: Thu, 05 Dec 2024 19:37:50 GMT
 Keep-Alive: timeout=60
 
-The senators from Washington state are Patty Murray and Maria Cantwell. 
+Patty Murray is a US senator from Washington.
 
 
-http --verify=no :8080/api/chat   0.24s user 0.04s system 0% cpu 3:47.98 total
+http GET   0.29s user 0.05s system 0% cpu 3:53.99 total
 
-# Results [ Ingest (~5m), Chat (~3m50s) ]
+
+# Results [ Ingest (~23m), Chat (~4m) ]
 # Embedding model consumption peaked at 2.65Gb of RAM
-# Chat model consumption peaked at 64.6Gb of RAM
+# Chat model consumption peaked at 22.7Gb of RAM
 ```
