@@ -2,11 +2,14 @@
 
 ## Considerations
 
-Machine Learning and Artificial Intelligence applications have unique computing demands.
+* Machine Learning and Artificial Intelligence applications have unique computing demands.
+* Start with [foundation models](https://cset.georgetown.edu/article/what-are-generative-ai-large-language-models-and-foundation-models/).
+* Use cases will drive model selection.  Not all models are created equally.  Experimentation is strongly encouraged.  
+* Does your organization have the "will and skill" to procure, operate, scale, and maintain compute or will you rely on commercially hosted options? 
+* Enterprises have sunk cost in heritage compute infrastructure (e.g., [pre-Skylake](https://en.wikipedia.org/wiki/List_of_Intel_Xeon_processors) Xeon release).  While it's possible to run GenAI workloads on this compute it's not recommended for production (innovation will be hampered based on slow response times).
+  * No "one size fits all" approach to specification and investment exists.
 
-Enterprises have sunk cost in heritage compute infrastructure (e.g., [pre-Skylake](https://en.wikipedia.org/wiki/List_of_Intel_Xeon_processors) Xeon release).  While it's possible to run GenAI workloads on this compute it's not recommended for production - performance is abysmal.
-
-No "one size fits all" approach to specification and investment exists.
+## Compute
 
 Rules of thumb (*Q4 2024):
 
@@ -24,7 +27,6 @@ Rules of thumb (*Q4 2024):
 
     > Both Intel Xeon W-3500 and AMD Threadripper PRO 7000 Series support enough PCIe lanes for three or four GPUs (depending on motherboard layout, chassis space, and power draw). This class of processors also supports 8 memory channels, which can have a significant impact on performance for CPU-bound workloads.
   
-
 ## Suggested Reading
 
 This curated collection of articles stands to influence your specification and investment decision criteria.
@@ -44,3 +46,4 @@ This curated collection of articles stands to influence your specification and i
 * [Generative AI on the Edge: Architecture and Performance Evaluation](https://arxiv.org/html/2411.17712v1)
 * [LLM-Inference-Bench: Inference Benchmarking of Large Language Models on AI Accelerators](https://arxiv.org/pdf/2411.00136)
 * [A Comprehensive Guide to Understanding AI Inference on the CPU](https://armkeil.blob.core.windows.net/developer/Files/pdf/ebook/arm-guide-to-ai-inference-on-cpus-2024.pdf)
+* [10 Key Decision Points for Generative AI Success](https://www2.deloitte.com/content/dam/Deloitte/uk/Documents/consultancy/deloitte-uk-genai-ido-pov-final-new.pdf)
