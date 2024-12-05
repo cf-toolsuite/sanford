@@ -2,6 +2,12 @@
 
 ## Tools
 
+* [aws](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 2.13.38 or better
+* [az](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) 2.67.0 or better
+* [gcloud](https://cloud.google.com/sdk/docs/install) 498.0.0 or better
+* [gsutil](https://cloud.google.com/storage/docs/gsutil_install) 5.31 or better
+
+
 * [cf](https://github.com/cloudfoundry/cli/releases) 8.8.0 or better
 * docker [desktop](https://docs.docker.com/desktop/)
 * [sdkman](https://sdkman.io) 5.8.12 or better

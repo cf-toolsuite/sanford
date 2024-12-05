@@ -7,6 +7,15 @@ One or multiple of:
 * An LLM from [Ollama](https://ollama.com) downloaded and running
 * An [Open AI](https://platform.openai.com/docs/overview) account and API Key
 * A [Groq Cloud](https://console.groq.com/docs/overview) account and API Key
+* An [Alting AI](https://alting.ai) account and API key
+
+### Public cloud 
+
+If you wish to launch compute in one or more public clouds, here's what you'll need:
+
+* an account on Microsoft Azure and the az CLI
+* an account on Amazon Web Services and the aws CLI
+* an account on Google Cloud and the gcloud and gsutil CLIs
 
 ### Tanzu Platform for Cloud Foundry
 

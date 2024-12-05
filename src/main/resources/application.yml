@@ -4,13 +4,8 @@ spring:
 
   httpclient5:
     pool:
-      max-connper-route: 50
-      pool-concurrency-policy: LAX
-    request-config:
-      '[default]':
-        connect-timeout: 30000
-        connection-request-timeout: 30000
-        response-timeout: 60000
+      default-connection-config:
+        socket-timeout: PT10M
 
   mvc:
     async:
@@ -90,15 +85,78 @@ spring:
     import: "optional:file:./config/creds.yml"
 
   ai:
+    alting:
+      chat:
+        options:
+          models:
+            - anthracite-org/magnum-v4-72b
+            - anthropic/claude-3.5-sonnet-20240620:beta
+            - google/gemini-pro-1.5
+            - gryphe/mythomax-l2-13b
+            - mistralai/mixtral-8x7b-instruct
+            - neversleep/llama-3.1-lumimaid-70b
+            - nousresearch/hermes-3-llama-3.1-405b
+            - openai/gpt-4o-mini
+            - perplexity/llama-3.1-sonar-huge-128k-online
+            - pygmalionai/mythalion-13b
+            - qwen/qwen-2.5-7b-instruct
+            - x-ai/grok-beta
+
     openai:
-      base_url: ${OPENAI_BASE_URL:https://alting.ai/api/v1}
+      base_url: ${OPENAI_BASE_URL:https://alting.ai/api}
       chat:
         options:
           model: ${CHAT_MODEL:google/gemini-pro-1.5}
       embedding:
-        base-url: ${EMBEDDING_BASEURL:https://api.openai.com}
+        base_url: ${EMBEDDING_BASEURL:https://api.openai.com}
         options:
           model: ${EMBEDDING_MODEL:text-embedding-3-large}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: arize-phoenix
+
+arize:
+  phoenix:
+    base_url: ${ARIZE_PHOENIX_BASE_URL:http://localhost:6006}/v1
+
+management:
+  otlp:
+    metrics:
+      export:
+        url: ${arize.phoenix.base_url}/metrics
+        step: 10s
+    tracing:
+      endpoint: ${arize.phoenix.base_url}/traces
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: gemini
+
+  ai:
+    vertex:
+      ai:
+        gemini:
+          projectId: ${PROJECT_ID}
+          location: ${REGION:us-west1}
+          apiEndpoint: ${VERTEX_API_ENDPOINT:""}
+          chat:
+            options:
+              model: ${CHAT_MODEL:gemini-1.5-flash-002}
+              googleSearchRetrieval: true
+        embedding:
+          projectId: ${PROJECT_ID}
+          location: ${REGION:us-west1}
+          apiEndpoint: ${VERTEX_EMBEDDING_API_ENDPOINT:""}
+          text:
+            options:
+              model: ${EMBEDDING_MODEL:text-embedding-005}
 
 ---
 
@@ -115,7 +173,7 @@ spring:
         options:
           model: ${CHAT_MODEL:llama-3.1-70b-versatile}
       embedding:
-        base-url: ${EMBEDDING_BASEURL:https://api.openai.com}
+        base_url: ${EMBEDDING_BASEURL:https://api.openai.com}
         options:
           model: ${EMBEDDING_MODEL:text-embedding-3-large}
 
@@ -201,7 +259,7 @@ spring:
 
   datasource:
     driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/pgvector}
     username: ${SPRING_DATASOURCE_USER:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
 
@@ -288,7 +346,7 @@ spring:
         pull-model-strategy: always
         timeout: 15m
         max-retries: 3
-        keep_alive: 10m
+        keep_alive: 15m
     vectorstore:
       pgvector:
         remove-existing-vector-store-table: true

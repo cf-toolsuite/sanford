@@ -24,18 +24,22 @@ repositories {
 }
 
 ext {
-	set('springAiVersion', "1.0.0-M4")
+	set('springAiVersion', "1.0.0-SNAPSHOT")
 }
 
 dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'ollama') {
-		implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
-	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'chroma') {
 		implementation 'org.springframework.ai:spring-ai-chroma-store-spring-boot-starter'
+	}
+	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'gemini') {
+		implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-vertex-ai-embedding-spring-boot-starter'
+	}
+	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'ollama') {
+		implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'pgvector') {
 		implementation 'org.springframework.ai:spring-ai-pgvector-store-spring-boot-starter'
@@ -50,6 +54,7 @@ dependencies {
 	if (project.hasProperty('vector-db-provider') || project.hasProperty('model-api-provider')) {
 		implementation 'io.micrometer:micrometer-tracing-bridge-otel'
 		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+		implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 	}
 	implementation 'io.minio:minio:8.5.14'
 	implementation 'io.pivotal.cfenv:java-cfenv:3.3.0'
@@ -60,11 +65,11 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-markdown-document-reader'
 	implementation 'org.springframework.ai:spring-ai-tika-document-reader'
 	implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-actuator:1.0.6'
 	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-resilience4j:1.0.6'
 	implementation ('de.hs-heilbronn.mi:crawler4j-with-hsqldb:5.1.1') {
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
-    }
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+  }
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -84,7 +89,7 @@ tasks.named('test') {
 
 bootJar {
 	archiveBaseName = project.findProperty('jarBaseName') ?: project.name
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 bootRun {
@@ -97,7 +102,7 @@ tasks.named('bootBuildImage') {
 }
 
 jar {
-    archiveBaseName = project.findProperty('jarBaseName') ?: project.name
+  archiveBaseName = project.findProperty('jarBaseName') ?: project.name
 }
 
 kubernetes {

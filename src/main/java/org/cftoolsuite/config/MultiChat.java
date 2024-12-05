@@ -2,8 +2,11 @@ package org.cftoolsuite.config;
 
 import org.springframework.ai.autoconfigure.openai.OpenAiChatProperties;
 import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.model.function.FunctionCallbackResolver;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,19 +17,22 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Profile({"alting", "groq-cloud","openai"})
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Profile({"alting"})
 @Configuration
-// @see https://github.com/spring-projects/spring-ai/issues/372#issuecomment-2242650500
-public class Chat {
+public class MultiChat {
 
     @Bean
-    public OpenAiChatModel chatModel(
+    public Map<String, ChatClient> chatClients(
             OpenAiConnectionProperties connectionProperties,
             OpenAiChatProperties chatProperties,
             WebClient.Builder webClientBuilder,
             RetryTemplate retryTemplate,
             FunctionCallbackResolver functionCallbackResolver,
-            ResponseErrorHandler responseErrorHandler
+            ResponseErrorHandler responseErrorHandler,
+            AltingAiChatProperties altChatProperties
     ) {
         RestClient.Builder restClientBuilder = RestClient.builder()
                 .defaultHeaders(headers -> headers.set(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate"));
@@ -39,11 +45,25 @@ public class Chat {
                 responseErrorHandler
         );
 
-        return new OpenAiChatModel(
-                openAiApi,
-                chatProperties.getOptions(),
-                functionCallbackResolver,
-                retryTemplate
+        return altChatProperties.getOptions().getModels().stream().collect(
+                Collectors.toMap(
+                    model -> model,
+                    model -> {
+                        OpenAiChatOptions chatOptions = OpenAiChatOptions.fromOptions(chatProperties.getOptions());
+                        chatOptions.setModel(model);
+                        OpenAiChatModel openAiChatModel = new OpenAiChatModel(
+                                openAiApi,
+                                chatOptions,
+                                functionCallbackResolver,
+                                retryTemplate
+                        );
+                        // Create ChatClient with similar configuration to original service
+                        return ChatClient.builder(openAiChatModel)
+                                .defaultAdvisors(
+                                        new SimpleLoggerAdvisor())
+                                .build();
+                    }
+                )
         );
     }
 

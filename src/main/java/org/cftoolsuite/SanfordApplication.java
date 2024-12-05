@@ -12,6 +12,7 @@ public class SanfordApplication {
 
 	private static final String DEFAULT_STORAGE_PROVIDER = "minio";
 	private static final Set<String> SUPPORTED_STORAGE_PROVIDERS = Set.of("minio");
+
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(SanfordApplication.class);
         activateAdditionalProfiles(app);

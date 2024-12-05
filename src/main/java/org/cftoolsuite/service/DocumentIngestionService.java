@@ -188,27 +188,27 @@ public class DocumentIngestionService {
 
     protected List<Document> loadText(String fileName, Resource resource) {
         TextReader textReader = new TextReader(resource);
-		textReader.getCustomMetadata().put("file_name", fileName);
-		return textReader.read();
+        textReader.getCustomMetadata().put("file_name", fileName);
+        return textReader.read();
     }
 
     protected List<Document> loadPdf(Resource resource) {
         PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource,
                 PdfDocumentReaderConfig.builder()
-                    .withPageTopMargin(0)
-                    .withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
-                        .withNumberOfTopTextLinesToDelete(0)
-                        .build())
-                    .withPagesPerDocument(1)
-                    .build());
-	    return pdfReader.read();
+                        .withPageTopMargin(0)
+                        .withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
+                                .withNumberOfTopTextLinesToDelete(0)
+                                .build())
+                        .withPagesPerDocument(1)
+                        .build());
+        return pdfReader.read();
     }
 
     protected List<Document> loadMarkdown(String fileName, Resource resource) {
         MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
-            .withHorizontalRuleCreateDocument(true)
-            .withAdditionalMetadata("file_name", fileName)
-            .build();
+                .withHorizontalRuleCreateDocument(true)
+                .withAdditionalMetadata("file_name", fileName)
+                .build();
         MarkdownDocumentReader reader = new MarkdownDocumentReader(resource, config);
         return reader.get();
     }
