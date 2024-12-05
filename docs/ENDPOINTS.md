@@ -5,6 +5,7 @@
   * [Crawl](#crawl)
   * [Fetch](#fetch)
   * [Chat](#chat)
+  * [Multichat](#multichat)
   * [Get Metadata](#get-metadata)
   * [Search](#search)
   * [Summarize](#summarize)
@@ -140,6 +141,159 @@ Keep-Alive: timeout=60
 Hermia is a key character in "A Midsummer Night's Dream," portrayed as the daughter of Egeus. She is in love with Lysander, but her father wishes her to marry Demetrius, which creates conflict in the story. Hermia is depicted as strong-willed and defiant; she boldly asserts her feelings and desires, expressing her wish that her father could see things from her perspective (Act I).
 
 She passionately defends her love for Lysander and is determined to be with him despite the obstacles posed by her father and societal expectations. Hermia's character embodies themes of love, rebellion, and the struggle for autonomy within the constraints of Athenian law. Her determination to follow her heart leads her to plan an escape with Lysander, showcasing her bravery and commitment to love (Act I).
+```
+
+You may also optionally specify filter metadata in your request, e.g.
+
+```bash
+❯ http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+```
+
+### Multichat
+
+Converse with an AI chatbot who is aware of all uploaded content.  Ask a question, get multiple responses from various pre-configured models.
+(This endpoint is only available when the `alting` Spring profile is activated).  Consult `spring.ai.alting.chat.options.models` in [application.yml](../src/main/resources/application.yml) for models participating in each request.
+
+
+```python
+GET /multichat
+```
+
+**Sample interaction**
+
+As with chat, multichat allows you to optionally supply filter metadata...
+
+```bash
+❯ http GET 'http://localhost:8080/api/multichat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Thu, 05 Dec 2024 17:44:04 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+[
+    {
+        "content": "The US senators from Washington are Patty Murray and Maria Cantwell.",
+        "errorMessage": null,
+        "generationTokens": 14,
+        "modelName": "neversleep/llama-3.1-lumimaid-70b",
+        "promptTokens": 3230,
+        "responseTime": "8s19ms",
+        "success": true,
+        "totalTokens": 3244
+    },
+    {
+        "content": " The two US senators from Washington are Patty Murray and Maria Cantwell.",
+        "errorMessage": null,
+        "generationTokens": 16,
+        "modelName": "gryphe/mythomax-l2-13b",
+        "promptTokens": 2989,
+        "responseTime": "4s47ms",
+        "success": true,
+        "totalTokens": 3005
+    },
+    {
+        "content": " The US senators from Washington are Sen. Patty Murray and Sen. Maria Cantwell.",
+        "errorMessage": null,
+        "generationTokens": 19,
+        "modelName": "mistralai/mixtral-8x7b-instruct",
+        "promptTokens": 4592,
+        "responseTime": "2s833ms",
+        "success": true,
+        "totalTokens": 4611
+    },
+    {
+        "content": null,
+        "errorMessage": "Error while extracting response for type [org.springframework.ai.openai.api.OpenAiApi$ChatCompletion] and content type [application/json]",
+        "generationTokens": null,
+        "modelName": "qwen/qwen-2.5-7b-instruct",
+        "promptTokens": null,
+        "responseTime": null,
+        "success": false,
+        "totalTokens": null
+    },
+    {
+        "content": "The US senators from Washington are:\n- Senior Senator: Patty Murray (Democrat)\n- Junior Senator: Not mentioned in the provided context, but according to external knowledge, it is Maria Cantwell. However, following the rules: I don't know who the junior senator is based on the given context.",
+        "errorMessage": null,
+        "generationTokens": 61,
+        "modelName": "perplexity/llama-3.1-sonar-huge-128k-online",
+        "promptTokens": 3219,
+        "responseTime": "11s634ms",
+        "success": true,
+        "totalTokens": 3280
+    },
+    {
+        "content": "The U.S. senators from Washington are:\n\nPatty Murray (D-WA) - Senior Senator \nCory Booker (D-NJ) - Junior Senator\n\nHowever, there seems to be an error in the provided information. Cory Booker is not a senator from Washington, he is the senior senator from New Jersey. Patty Murray is indeed the senior senator from Washington. The junior senator from Washington is not mentioned in the given context.",
+        "errorMessage": null,
+        "generationTokens": 88,
+        "modelName": "anthracite-org/magnum-v4-72b",
+        "promptTokens": 3739,
+        "responseTime": "11s623ms",
+        "success": true,
+        "totalTokens": 3827
+    },
+    {
+        "content": "The US senators from Washington are Sen. Patty Murray [D-WA] and Sen. Maria Cantwell [D-WA].",
+        "errorMessage": null,
+        "generationTokens": 26,
+        "modelName": "openai/gpt-4o-mini",
+        "promptTokens": 3293,
+        "responseTime": "3s9ms",
+        "success": true,
+        "totalTokens": 3319
+    },
+    {
+        "content": null,
+        "errorMessage": "Error while extracting response for type [org.springframework.ai.openai.api.OpenAiApi$ChatCompletion] and content type [application/json]",
+        "generationTokens": null,
+        "modelName": "anthropic/claude-3.5-sonnet-20240620:beta",
+        "promptTokens": null,
+        "responseTime": null,
+        "success": false,
+        "totalTokens": null
+    },
+    {
+        "content": null,
+        "errorMessage": "Error while extracting response for type [org.springframework.ai.openai.api.OpenAiApi$ChatCompletion] and content type [application/json]",
+        "generationTokens": null,
+        "modelName": "google/gemini-pro-1.5",
+        "promptTokens": null,
+        "responseTime": null,
+        "success": false,
+        "totalTokens": null
+    },
+    {
+        "content": "The US senators from Washington are:\n1. Senior Senator Patty Murray (Democrat)\n2. Junior Senator Maria Cantwell (Democrat)",
+        "errorMessage": null,
+        "generationTokens": 0,
+        "modelName": "nousresearch/hermes-3-llama-3.1-405b",
+        "promptTokens": 0,
+        "responseTime": "3s575ms",
+        "success": true,
+        "totalTokens": 0
+    },
+    {
+        "content": "Patty Murray (D) and Marco Rubio (R) are the US senators from Washington.",
+        "errorMessage": null,
+        "generationTokens": 22,
+        "modelName": "pygmalionai/mythalion-13b",
+        "promptTokens": 4628,
+        "responseTime": "4s900ms",
+        "success": true,
+        "totalTokens": 4650
+    },
+    {
+        "content": "The US senators from Washington are:\n- **Patty Murray** [D-WA], who is the Senior Senator and holds the leadership title of President Pro Tempore of the Senate.\n- **The Junior Senator's information is not provided in the given context.**",
+        "errorMessage": null,
+        "generationTokens": 53,
+        "modelName": "x-ai/grok-beta",
+        "promptTokens": 3787,
+        "responseTime": "4s7ms",
+        "success": true,
+        "totalTokens": 3840
+    }
+]
 ```
 
 ### Get Metadata
