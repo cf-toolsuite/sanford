@@ -406,7 +406,7 @@ The U.S. Senators from Washington (state) as of the context information provided
 http GET   0.24s user 0.03s system 0% cpu 8:15.35 total
 ```
 
-### Tanzu Platform for Cloud Foundry with GenAI tile
+### Tanzu Application Service 6.0 with GenAI 10 tile
 
 Operating environment: [VMware vCenter Server 8.0 Update 3](https://docs.vmware.com/en/VMware-vSphere/8.0/rn/vsphere-vcenter-server-803-release-notes/index.html)
 
@@ -419,4 +419,115 @@ Infrastructure configuration for model hosting via the [GenAI tile](https://tech
 
 CPU-only!
 
-![A screenshot from workstation where tests against sanford hosted on Tanzu Platform for Cloud Foundry were run](tp4cf-benchmarks-on-vsphere-2024-12-06.png)
+```commandline
+# Before deploying sanford the aforementioned script was edited to have:
+# GENAI_CHAT_PLAN_NAME="phi3.5"
+# GENAI_EMBEDDINGS_PLAN_NAME="all-minilm:33m"
+# These models were sourced then provisioned to run on Tanzu Application Service 6 via the GenAI 10 tile
+
+# Ingest US senators via /api/fetch
+
+➜  ~ time http --verify=no POST https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Fri, 06 Dec 2024 18:18:21 GMT
+Transfer-Encoding: chunked
+X-Vcap-Request-Id: fce95946-1577-4753-6d2f-1bc115986294
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/home/vcap/tmp/fetch/2024.12.06.18.18.12/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST    0.33s user 0.16s system 4% cpu 10.468 total
+
+# Search for US senators in a particular state via /api/chat
+
+➜  ~ time http GET 'https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+
+HTTP/1.1 200 OK
+Content-Length: 54
+Content-Type: text/plain;charset=UTF-8
+Date: Fri, 06 Dec 2024 18:20:03 GMT
+X-Vcap-Request-Id: b5d0ce0b-4e95-49db-6dee-cbf3b41ac36e
+
+John McCain (Republican) and Maria Cantwell (Democrat)
+
+
+http GET   0.33s user 0.13s system 0% cpu 1:20.22 total
+
+# Results [ Ingest (~10.5s), Chat (~1m20s), partially correct response ]
+```
+
+And with an alternate model combination...
+
+```commandline
+# Before deploying sanford the aforementioned script was edited to have:
+# GENAI_CHAT_PLAN_NAME="wizardlm2"
+# GENAI_EMBEDDINGS_PLAN_NAME="all-minilm:33m"
+# These models were sourced then provisioned to run on Tanzu Application Service 6 via the GenAI 10 tile
+
+➜  ~ time http --verify=no POST https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Fri, 06 Dec 2024 20:58:51 GMT
+Transfer-Encoding: chunked
+X-Vcap-Request-Id: 9ec10539-e410-4044-58a9-80e1029b5bc4
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/home/vcap/tmp/fetch/2024.12.06.20.58.39/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST    0.33s user 0.17s system 3% cpu 12.727 total
+➜  ~ time http GET 'https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: text/plain;charset=UTF-8
+Date: Fri, 06 Dec 2024 21:01:45 GMT
+X-Vcap-Request-Id: a12f4738-5f92-4697-6c0b-21363a9272d8
+
+ The US senators from Washington are Patty Murray and Maria Cantwell. They are both Democrats representing Washington in the United States Senate as of my knowledge cutoff date in 2023.
+
+
+http GET   0.31s user 0.12s system 0% cpu 2:35.66 total
+➜  ~ time http GET 'https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+
+HTTP/1.1 200 OK
+Content-Length: 227
+Content-Type: text/plain;charset=UTF-8
+Date: Fri, 06 Dec 2024 21:06:00 GMT
+X-Vcap-Request-Id: 37daee3a-f369-4b82-4e8a-584a5a9e6255
+
+ The US senators from Washington (state) are Patty Murray and Maria Cantwell. They have been representing Washington in the U.S. Senate since 1993 and 2001, respectively. Their terms are not set to expire until January 3, 2027.
+
+
+http GET   0.33s user 0.13s system 0% cpu 2:44.90 total
+
+# Results [ Ingest (~12m7s), Chat (~2m45s), partially correct response ]
+# Embedding model consumption peaked at 517m of RAM
+# Chat model consumption peaked at 5.7Gb of RAM
+```
