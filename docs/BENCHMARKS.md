@@ -296,7 +296,7 @@ http --verify=no :8080/api/multichat   0.25s user 0.05s system 0% cpu 1:55.64 to
 Specs:
 
 * OS - Ubuntu 24.04.1 LTS
-* Hardware Model - System76 Meerkat
+* Hardware Model - System76 [Meerkat](https://system76.com/desktops/meerkat/)
 * Processor - Intel Core i7-10710U x 12
 * Memory - 64.0 GiB
 * Disk Capacity - 2.5 TB
@@ -350,7 +350,56 @@ Patty Murray is a US senator from Washington.
 http GET   0.29s user 0.05s system 0% cpu 3:53.99 total
 
 
-# Results [ Ingest (~23m), Chat (~4m) ]
+# Results [ Ingest (~23m), Chat (~4m), partially correct response ]
 # Embedding model consumption peaked at 2.65Gb of RAM
 # Chat model consumption peaked at 22.7Gb of RAM
+```
+
+Another model combination that works well if you're concerned about origins of Qwen models...
+
+```commandline
+export CHAT_MODEL=wizardlm2
+export EMBEDDING_MODEL=all-minilm:33m
+export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=384
+gradle clean build bootRun -Pvector-db-provider=pgvector -Pmodel-api-provider=ollama -Dspring.profiles.active=docker,ollama,pgvector,dev
+
+❯ time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Fri, 06 Dec 2024 01:47:38 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.12.05.17.47.27/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST :8080/api/fetch   0.24s user 0.03s system 2% cpu 11.328 total
+❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Length: 134
+Content-Type: text/plain;charset=UTF-8
+Date: Fri, 06 Dec 2024 01:56:09 GMT
+Keep-Alive: timeout=60
+
+The U.S. Senators from Washington (state) as of the context information provided are:
+
+1. Maria Cantwell (D-WA)
+2. Patty Murray (D-WA)
+
+
+http GET   0.24s user 0.03s system 0% cpu 8:15.35 total
 ```
