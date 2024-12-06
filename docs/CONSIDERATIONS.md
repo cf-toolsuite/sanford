@@ -26,7 +26,14 @@ Rules of thumb (*Q4 2024):
 * PCIe lanes for up to four GPUs
 
     > Both Intel Xeon W-3500 and AMD Threadripper PRO 7000 Series support enough PCIe lanes for three or four GPUs (depending on motherboard layout, chassis space, and power draw). This class of processors also supports 8 memory channels, which can have a significant impact on performance for CPU-bound workloads.
-  
+
+## LLMs and Vector Databases
+
+* [Models leaderboard](https://artificialanalysis.ai/leaderboards/models)
+* [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
+* Chat model comparison - [Spring AI](https://docs.spring.io/spring-ai/reference/api/chat/comparison.html), [Artificial Analysis AI Insights](https://artificialanalysis.ai/insights/chatbots-comparison)
+* [Vector database comparison](https://superlinked.com/vector-db-comparison)
+
 ## Suggested Reading
 
 This curated collection of articles stands to influence your specification and investment decision criteria.

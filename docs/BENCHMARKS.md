@@ -301,6 +301,8 @@ Specs:
 * Memory - 64.0 GiB
 * Disk Capacity - 2.5 TB
 
+CPU-only!
+
 ```commandline
 export CHAT_MODEL=qwen2.5:3b
 export EMBEDDING_MODEL=aroxima/gte-qwen2-1.5b-instruct
@@ -403,3 +405,18 @@ The U.S. Senators from Washington (state) as of the context information provided
 
 http GET   0.24s user 0.03s system 0% cpu 8:15.35 total
 ```
+
+### Tanzu Platform for Cloud Foundry with GenAI tile
+
+Operating environment: [VMware vCenter Server 8.0 Update 3](https://docs.vmware.com/en/VMware-vSphere/8.0/rn/vsphere-vcenter-server-803-release-notes/index.html)
+
+Sanford was deployed using [deploy-on-tp4cf.sh](../deploy-on-tp4cf.sh) script.
+
+Infrastructure configuration for model hosting via the [GenAI tile](https://techdocs.broadcom.com/us/en/vmware-tanzu/platform-services/genai-on-tanzu-platform-for-cloud-foundry/10-0/ai-cf/how-to-guides-how-to-guides.html)
+
+* 14 vCPU ([Intel Xeon E5v4](https://www.intel.com/content/www/us/en/products/sku/91770/intel-xeon-processor-e52690-v4-35m-cache-2-60-ghz/specifications.html))
+* 32Gb RAM
+
+CPU-only!
+
+![A screenshot from workstation where tests against sanford hosted on Tanzu Platform for Cloud Foundry were run](tp4cf-benchmarks-on-vsphere-2024-12-06.png)
