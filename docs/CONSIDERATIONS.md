@@ -48,6 +48,7 @@ This curated collection of articles stands to influence your specification and i
 * [Do we need GPUs/NPUs for local AI?](https://medium.com/@andreask_75652/do-we-need-gpus-npus-for-local-ai-b6cd9b60f00c)
 * [Buying a PC for Local AI? These are the specs taht actually matter](https://www.theregister.com/2024/08/25/ai_pc_buying_guide/)
 * [How to run LLMs with less GPU and CPU memory](https://medium.com/data-science-in-your-pocket/how-to-run-llms-in-less-gpu-and-cpu-memory-6989e6ec5621)
+* [LLM Inference – Consumer GPU performance](https://www.pugetsystems.com/labs/articles/llm-inference-consumer-gpu-performance/)
 * [The Hidden Bottleneck: How GPU Memory Hierarchy Affects Your Computing Experience](https://www.digitalocean.com/community/tutorials/the-hidden-bottleneck-how-gpu-memory-hierarchy-affects-your-computing-experience)
 * [AI and Memory Wall](https://arxiv.org/abs/2403.14123)
 * [Generative AI on the Edge: Architecture and Performance Evaluation](https://arxiv.org/html/2411.17712v1)
