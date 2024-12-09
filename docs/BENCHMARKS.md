@@ -361,6 +361,8 @@ Specs:
 
 CPU-only!
 
+Test 1
+
 ```commandline
 export CHAT_MODEL=qwen2.5:3b
 export EMBEDDING_MODEL=aroxima/gte-qwen2-1.5b-instruct
@@ -415,7 +417,7 @@ http GET   0.29s user 0.05s system 0% cpu 3:53.99 total
 # Chat model consumption peaked at 22.7Gb of RAM
 ```
 
-Another model combination that works well if you're concerned about origins of Qwen models...
+Test 2
 
 ```commandline
 export CHAT_MODEL=wizardlm2
