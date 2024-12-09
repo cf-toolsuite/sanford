@@ -46,11 +46,9 @@ When serving models from Cloud Foundry with the GenAI tile
 
 #### CPU-only configuration
 
-To be redone
-
 * Choose compute type that has a minimum of 8-vCPU, 64Gb RAM, and 80Gb disk
   * when targeting CF environment provisioned on Google Cloud, choose [c2d-highmem-8](https://cloud.google.com/compute/docs/compute-optimized-machines#c2d-high-mem)
-* Choose `qwen2.5:3b` for the chat model
+* Choose either `qwen2.5:3b` for the chat model
 * Choose `aroxima/gte-qwen2-1.5b-instruct` for the embedding model
 * Choose Postgres for the vector store provider
 
@@ -80,8 +78,6 @@ When serving models from Ollama, you're encouraged to consult then leverage one 
 
 #### CPU-only configuration
 
-To be redone
-
 * Choose a compute type that has a minimum of 8-vCPU, 64Gb RAM, and 80Gb disk
   * when targeting an Ollama VM installation hosted on
     * AWS, choose [m6i.4xlarge](https://aws.amazon.com/ec2/instance-types/#general-purpose)
@@ -89,8 +85,6 @@ To be redone
     * Google Cloud, choose [c2d-highmem-8](https://cloud.google.com/compute/docs/compute-optimized-machines#c2d-high-mem)
 
 #### GPU assisted configuration
-
-To be redone
 
 * Choose a compute type that has a minimum of 16-vCPU, 64Gb RAM, and 80Gb disk
 
