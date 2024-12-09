@@ -4,6 +4,8 @@
 
 ### Groq
 
+Test 1
+
 ```commandline
 export CHAT_MODEL=mixtral-8x7b-32768
 export EMBEDDING_MODEL=text-embedding-ada-002
@@ -63,6 +65,58 @@ These details can be found in the provided context within the LONG_TERM_MEMORY s
 http --verify=no :8080/api/chat   0.25s user 0.04s system 10% cpu 2.770 total
 
 # Results [ Ingest (~4.5s), Chat (~2.8s) ]
+```
+
+Test 2
+
+```commandline
+export CHAT_MODEL=llama-3.3-70b-versatile
+export EMBEDDING_MODEL=text-embedding-3-large
+gradle clean build bootRun -Pvector-db-provider=chroma -Dspring.profiles.active=docker,groq-cloud,arize-phoenix,chroma,dev
+
+# Ingest US senators via /api/fetch
+
+❯ time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Mon, 09 Dec 2024 18:09:09 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.12.09.10.09.03/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST :8080/api/fetch   0.24s user 0.04s system 4% cpu 6.313 total
+
+# Search for US senators in a particular state via /api/chat
+
+❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Length: 68
+Content-Type: text/plain;charset=UTF-8
+Date: Mon, 09 Dec 2024 18:09:20 GMT
+Keep-Alive: timeout=60
+
+The US senators from Washington are Patty Murray and Maria Cantwell.
+
+
+http GET   0.22s user 0.03s system 15% cpu 1.567 total
+
+# Results [ Ingest (~6.3s), Chat (~1.6s) ]
 ```
 
 ### OpenAI

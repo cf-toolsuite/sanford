@@ -171,7 +171,7 @@ spring:
       base_url: ${OPENAI_BASE_URL:https://api.groq.com/openai}
       chat:
         options:
-          model: ${CHAT_MODEL:llama-3.1-70b-versatile}
+          model: ${CHAT_MODEL:llama-3.3-70b-versatile}
       embedding:
         base_url: ${EMBEDDING_BASEURL:https://api.openai.com}
         options:
