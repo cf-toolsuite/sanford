@@ -27,7 +27,7 @@ resource "google_compute_firewall" "ollama_firewall" {
 
 # Service account
 data "google_service_account" "ollama_sa" {
-  account_id   = var.service_account
+  account_id = var.service_account
 }
 
 # Compute Instance
