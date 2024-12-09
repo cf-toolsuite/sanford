@@ -419,7 +419,7 @@ gradle build -Pvector-db-provider=pgvector
 Take a look at the deployment script
 
 ```bash
-cat deploy-on-tp4cf.sh
+cat scripts/deploy-on-tp4cf.sh
 ```
 
 > Make any required edits to the environment variables for the services and plans.
@@ -427,13 +427,13 @@ cat deploy-on-tp4cf.sh
 Execute the deployment script
 
 ```bash
-./deploy-on-tp4cf.sh setup
+./scripts/deploy-on-tp4cf.sh setup
 ```
 
 To teardown, execute
 
 ```bash
-./deploy-on-tp4cf.sh teardown
+./scripts/deploy-on-tp4cf.sh teardown
 ```
 
 ### Inspect and/or update the PgVector store database instance
@@ -838,7 +838,7 @@ We'll also need to remove any large files or sensitive configuration files.
 
 ```
 du -sh * -c
-./prune.sh
+./scripts/prune.sh
 ```
 
 Edit the file `.tanzu/config/sanford.yml`.

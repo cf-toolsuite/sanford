@@ -247,8 +247,8 @@ spring:
   docker:
     compose:
       file:
-        - ./docker-compose.chroma.yml
-        - ./docker-compose.${storage.provider}.yml
+        - ./docker/docker-compose.chroma.yml
+        - ./docker/docker-compose.${storage.provider}.yml
 
 ---
 
@@ -274,8 +274,8 @@ spring:
   docker:
     compose:
       file:
-        - ./docker-compose.pgvector.yml
-        - ./docker-compose.${storage.provider}.yml
+        - ./docker/docker-compose.pgvector.yml
+        - ./docker/docker-compose.${storage.provider}.yml
 
 ---
 
@@ -293,8 +293,8 @@ spring:
   docker:
     compose:
       file:
-        - ./docker-compose.redis.yml
-        - ./docker-compose.${storage.provider}.yml
+        - ./docker/docker-compose.redis.yml
+        - ./docker/docker-compose.${storage.provider}.yml
 
 ---
 
@@ -313,8 +313,8 @@ spring:
   docker:
     compose:
       file:
-        - ./docker-compose.weaviate.yml
-        - ./docker-compose.${storage.provider}.yml
+        - ./docker/docker-compose.weaviate.yml
+        - ./docker/docker-compose.${storage.provider}.yml
 
 ---
 

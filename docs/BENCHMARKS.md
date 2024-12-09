@@ -291,6 +291,10 @@ http --verify=no :8080/api/multichat   0.25s user 0.05s system 0% cpu 1:55.64 to
 # Results [ Ingest (~6s), MultiChat (~2m) returning 8 accurate responses, 1 partial response, and 3 errors due to deserialization issues ]
 ```
 
+### Nova
+
+
+
 ### Ollama on workstation
 
 Specs:
@@ -410,7 +414,7 @@ http GET   0.24s user 0.03s system 0% cpu 8:15.35 total
 
 Operating environment: [VMware vCenter Server 8.0 Update 3](https://docs.vmware.com/en/VMware-vSphere/8.0/rn/vsphere-vcenter-server-803-release-notes/index.html)
 
-Sanford was deployed using [deploy-on-tp4cf.sh](../deploy-on-tp4cf.sh) script.
+Sanford was deployed using [deploy-on-tp4cf.sh](../scripts/deploy-on-tp4cf.sh) script.
 
 Infrastructure configuration for model hosting via the [GenAI tile](https://techdocs.broadcom.com/us/en/vmware-tanzu/platform-services/genai-on-tanzu-platform-for-cloud-foundry/10-0/ai-cf/how-to-guides-how-to-guides.html)
 
@@ -527,7 +531,14 @@ X-Vcap-Request-Id: 37daee3a-f369-4b82-4e8a-584a5a9e6255
 
 http GET   0.33s user 0.13s system 0% cpu 2:44.90 total
 
-# Results [ Ingest (~12m7s), Chat (~2m45s), partially correct response ]
+# Results [ Ingest (~12m7s), Chat (~2m45s), correct response ]
 # Embedding model consumption peaked at 517m of RAM
 # Chat model consumption peaked at 5.7Gb of RAM
 ```
+
+### Ollama on Google Cloud
+
+
+### Ollama on AWS
+
+

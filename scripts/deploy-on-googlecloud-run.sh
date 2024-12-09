@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get the parent (root) directory
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Change to the root directory
+cd "$ROOT_DIR" || exit 1
+
 # Default path to environment configuration
 ENV_FILE="${ENV_FILE:-.env}"
 
@@ -81,7 +89,7 @@ deploy_from_jar() {
     gcloud builds submit \
         --project "$PROJECT_ID" \
         --tag "gcr.io/$PROJECT_ID/$APP_NAME:$APP_VERSION" \
-        --file Dockerfile
+        --file docker/Dockerfile
 
     # Deploy to Cloud Run
     gcloud run deploy "$APP_NAME" \

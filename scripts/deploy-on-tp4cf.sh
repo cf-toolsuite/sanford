@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get the parent (root) directory
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Change to the root directory
+cd "$ROOT_DIR" || exit 1
+
 APP_NAME="sanford"
 APP_VERSION="0.0.1-SNAPSHOT"
 
@@ -16,6 +24,14 @@ PGVECTOR_PLAN_NAME="on-demand-postgres-db"
 
 STORAGE_PROVIDER_SERVICE_NAME="sanford-filestore"
 STORAGE_PROVIDER_PLAN_NAME="default"
+
+# Verify the JAR exists before proceeding
+JAR_PATH="build/libs/$APP_NAME-$APP_VERSION.jar"
+if [ ! -f "$JAR_PATH" ]; then
+    echo "Error: JAR file not found at $JAR_PATH"
+    echo "Current directory: $(pwd)"
+    exit 1
+fi
 
 # Easiest thing to do for demo purposes in the absence of having the MinIO tile installed is to spin up an instance of MinIO on StackHero (https://www.stackhero.io/en/)
 if  [[ -f ${HOME}/.minio/config ]]; then
@@ -73,7 +89,7 @@ setup)
     cf create-service genai $GENAI_EMBEDDINGS_PLAN_NAME $GENAI_EMBEDDINGS_SERVICE_NAME
 
     echo && printf "\e[37mℹ️  Deploying $APP_NAME application ...\e[m\n" && echo
-    cf push $APP_NAME -k 1GB -m 2GB -p build/libs/$APP_NAME-$APP_VERSION.jar --no-start --random-route
+    cf push $APP_NAME -k 1GB -m 2GB -p $JAR_PATH --no-start --random-route
 
     echo && printf "\e[37mℹ️  Binding services ...\e[m\n" && echo
     cf bind-service $APP_NAME $PGVECTOR_SERVICE_NAME

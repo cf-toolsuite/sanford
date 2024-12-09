@@ -54,7 +54,7 @@ To be redone
 * Choose `aroxima/gte-qwen2-1.5b-instruct` for the embedding model
 * Choose Postgres for the vector store provider
 
-If you're employing the [deploy-on-tp4cf.sh](../deploy-on-tp4cf.sh) script, edit the following variables to be
+If you're employing the [deploy-on-tp4cf.sh](../scripts/deploy-on-tp4cf.sh) script, edit the following variables to be
 
 ```bash
 GENAI_CHAT_PLAN_NAME=qwen2.5:3b
@@ -71,9 +71,12 @@ export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=1536
 
 When serving models from Ollama, you're encouraged to consult then leverage one of the provisioning scripts targeting a public cloud infrastructure provider:
 
-* [AWS](../provision-ollama-vm-on-aws.sh)
-* [Azure](../provision-ollama-vm-on-azure.sh)
-* [Google Cloud](../provision-ollama-vm-on-googlecloud.sh)
+* [AWS](../scripts/provision-ollama-vm-on-aws.sh)
+  * Before executing this script you'll need to export `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.  If you authenticate via a secure token service, then you'll also need to export `AWS_SESSION_TOKEN`.
+* [Azure](../scripts/provision-ollama-vm-on-azure.sh)
+  * Before executing this script you'll need to export `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID`, and `ARM_CLIENT_SECRET`.
+* [Google Cloud](../scripts/provision-ollama-vm-on-googlecloud.sh)
+  * Before executing this script you'll need to execute `gcloud auth application-default login`.
 
 #### CPU-only configuration
 
@@ -120,8 +123,8 @@ Here's what you need to know about each cloud provider's GPU configuration:
   * Example configuration:
 
     ```bash
-    ACCELERATOR_TYPE="nvidia-tesla-t4"
-    ACCELERATOR_COUNT=1
+    GPU_TYPE="nvidia-tesla-t4"
+    GPU_COUNT=1
     ```
 
 Important considerations:
