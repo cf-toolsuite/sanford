@@ -149,32 +149,37 @@ spring:
         secret-key: ${AWS_SECRET_ACCESS_KEY}
         session-token: ${AWS_SESSION_TOKEN:}
         region: ${AWS_REGION:us-west-2}
+      converse:
+        chat:
+          enabled: ${BEDROCK_CONVERSE_CHAT_ENABLED:true}
+          options:
+            model: ${CHAT_MODEL:amazon.nova-lite-v1:0}
       llama:
         chat:
           enabled: ${BEDROCK_LLAMA_CHAT_ENABLED:false}
-          model: ${BEDROCK_LLAMA_CHAT_MODEL:meta.llama3-70b-instruct-v1:0}
+          model: ${CHAT_MODEL:meta.llama3-70b-instruct-v1:0}
       anthropic3:
         chat:
-          enabled: ${BEDROCK_ANTHROPIC3_CHAT_ENABLED:true}
-          model: ${BEDROCK_ANTHROPIC3_CHAT_MODEL:anthropic.claude-3-sonnet-20240229-v1:0}
+          enabled: ${BEDROCK_ANTHROPIC3_CHAT_ENABLED:false}
+          model: ${CHAT_MODEL:anthropic.claude-3-sonnet-20240229-v1:0}
       cohere:
         chat:
           enabled: ${BEDROCK_COHERE_CHAT_ENABLED:false}
-          model: ${BEDROCK_COHERE_CHAT_MODEL:cohere.command-text-v14}
+          model: ${CHAT_MODEL:cohere.command-text-v14}
         embedding:
           enabled: ${BEDROCK_COHERE_EMBEDDING_ENABLED:true}
-          model: ${BEDROCK_COHERE_EMBEDDING_MODEL:cohere.embed-english-v3}
+          model: ${EMBEDDING_MODEL:cohere.embed-english-v3}
       jurassic2:
         chat:
           enabled: ${BEDROCK_JURASSIC2_CHAT_ENABLED:false}
-          model: ${BEDROCK_JURASSIC2_CHAT_MODEL:ai21.j2-ultra-v1}
+          model: ${CHAT_MODEL:ai21.j2-ultra-v1}
       titan:
         chat:
           enabled: ${BEDROCK_TITAN_CHAT_ENABLED:false}
-          model: ${BEDROCK_TITAN_CHAT_MODEL:amazon.titan-text-lite-v1}
+          model: ${CHAT_MODEL:amazon.titan-text-lite-v1}
         embedding:
           enabled: ${BEDROCK_TITAN_EMBEDDING_ENABLED:false}
-          model: ${BEDROCK_TITAN_EMBEDDING_MODEL:amazon.titan-embed-image-v1}
+          model: ${EMBEDDING_MODEL:amazon.titan-embed-image-v1}
 
 ---
 

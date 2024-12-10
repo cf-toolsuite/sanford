@@ -34,6 +34,7 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
 	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'bedrock') {
 		implementation 'org.springframework.ai:spring-ai-bedrock-ai-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-bedrock-converse-spring-boot-starter'
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'chroma') {
 		implementation 'org.springframework.ai:spring-ai-chroma-store-spring-boot-starter'

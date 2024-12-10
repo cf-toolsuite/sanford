@@ -347,11 +347,13 @@ http --verify=no :8080/api/multichat   0.25s user 0.05s system 0% cpu 1:55.64 to
 
 ### Amazon Bedrock
 
+Anthropic3 + Cohere
 ```commandline
+export BEDROCK_CONVERSE_CHAT_ENABLED=false
 export BEDROCK_ANTHROPIC3_CHAT_ENABLED=true
-export BEDROCK_ANTHROPIC3_CHAT_MODEL=anthropic.claude-3-sonnet-20240229-v1:0
+export CHAT_MODEL=anthropic.claude-3-sonnet-20240229-v1:0
 export BEDROCK_COHERE_EMBEDDING_ENABLED=true
-export BEDROCK_COHERE_EMBEDDING_MODEL=cohere.embed-english-v3
+export EMBEDDING_MODEL=cohere.embed-english-v3
 gradle build bootRun -Dspring.profiles.active=docker,bedrock,chroma,dev -Pmodel-api-provider=bedrock -Pvector-db-provider=chroma
 
 # Ingest US senators via /api/fetch
@@ -403,11 +405,11 @@ http GET   0.24s user 0.04s system 12% cpu 2.294 total
 ### Google Cloud Vertex AI
 
 ```commandline
-export BEDROCK_ANTHROPIC3_CHAT_ENABLED=true
-export BEDROCK_ANTHROPIC3_CHAT_MODEL=anthropic.claude-3-sonnet-20240229-v1:0
-export BEDROCK_COHERE_EMBEDDING_ENABLED=true
-export BEDROCK_COHERE_EMBEDDING_MODEL=cohere.embed-english-v3
-gradle build bootRun -Dspring.profiles.active=docker,bedrock,chroma,dev -Pmodel-api-provider=bedrock -Pvector-db-provider=chroma
+export PROJECT=pa-dpatel
+export REGION=us-west-2
+export CHAT_MODEL=gemini-1.5-flash-002
+export EMBEDDING_MODEL=text-embedding-005
+gradle build bootRun -Dspring.profiles.active=docker,gemini,chroma,dev -Pmodel-api-provider=gemini -Pvector-db-provider=chroma
 
 # Ingest US senators via /api/fetch
 
