@@ -4,6 +4,8 @@
 
 ### Groq
 
+Test 1
+
 ```commandline
 export CHAT_MODEL=mixtral-8x7b-32768
 export EMBEDDING_MODEL=text-embedding-ada-002
@@ -63,6 +65,58 @@ These details can be found in the provided context within the LONG_TERM_MEMORY s
 http --verify=no :8080/api/chat   0.25s user 0.04s system 10% cpu 2.770 total
 
 # Results [ Ingest (~4.5s), Chat (~2.8s) ]
+```
+
+Test 2
+
+```commandline
+export CHAT_MODEL=llama-3.3-70b-versatile
+export EMBEDDING_MODEL=text-embedding-3-large
+gradle clean build bootRun -Pvector-db-provider=chroma -Dspring.profiles.active=docker,groq-cloud,arize-phoenix,chroma,dev
+
+# Ingest US senators via /api/fetch
+
+❯ time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Mon, 09 Dec 2024 18:09:09 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.12.09.10.09.03/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST :8080/api/fetch   0.24s user 0.04s system 4% cpu 6.313 total
+
+# Search for US senators in a particular state via /api/chat
+
+❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Length: 68
+Content-Type: text/plain;charset=UTF-8
+Date: Mon, 09 Dec 2024 18:09:20 GMT
+Keep-Alive: timeout=60
+
+The US senators from Washington are Patty Murray and Maria Cantwell.
+
+
+http GET   0.22s user 0.03s system 15% cpu 1.567 total
+
+# Results [ Ingest (~6.3s), Chat (~1.6s) ]
 ```
 
 ### OpenAI
@@ -291,6 +345,116 @@ http --verify=no :8080/api/multichat   0.25s user 0.05s system 0% cpu 1:55.64 to
 # Results [ Ingest (~6s), MultiChat (~2m) returning 8 accurate responses, 1 partial response, and 3 errors due to deserialization issues ]
 ```
 
+### Amazon Bedrock
+
+```commandline
+export BEDROCK_ANTHROPIC3_CHAT_ENABLED=true
+export BEDROCK_ANTHROPIC3_CHAT_MODEL=anthropic.claude-3-sonnet-20240229-v1:0
+export BEDROCK_COHERE_EMBEDDING_ENABLED=true
+export BEDROCK_COHERE_EMBEDDING_MODEL=cohere.embed-english-v3
+gradle build bootRun -Dspring.profiles.active=docker,bedrock,chroma,dev -Pmodel-api-provider=bedrock -Pvector-db-provider=chroma
+
+# Ingest US senators via /api/fetch
+
+❯ time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Tue, 10 Dec 2024 04:49:55 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.12.09.20.49.52/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST :8080/api/fetch   0.23s user 0.05s system 7% cpu 3.651 total
+
+
+# Search for US senators in a particular state via /api/chat
+
+❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Length: 162
+Content-Type: text/plain;charset=UTF-8
+Date: Tue, 10 Dec 2024 04:50:11 GMT
+Keep-Alive: timeout=60
+
+The US senators from Washington are Maria Cantwell (Democrat, Junior Senator) and Patty Murray (Democrat, Senior Senator and President Pro Tempore of the Senate).
+
+
+http GET   0.24s user 0.04s system 12% cpu 2.294 total
+
+# Results [ Ingest (~3.7s), Chat (~2.3s) ]
+```
+
+### Google Cloud Vertex AI
+
+```commandline
+export BEDROCK_ANTHROPIC3_CHAT_ENABLED=true
+export BEDROCK_ANTHROPIC3_CHAT_MODEL=anthropic.claude-3-sonnet-20240229-v1:0
+export BEDROCK_COHERE_EMBEDDING_ENABLED=true
+export BEDROCK_COHERE_EMBEDDING_MODEL=cohere.embed-english-v3
+gradle build bootRun -Dspring.profiles.active=docker,bedrock,chroma,dev -Pmodel-api-provider=bedrock -Pvector-db-provider=chroma
+
+# Ingest US senators via /api/fetch
+
+❯ time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Tue, 10 Dec 2024 06:19:12 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.12.09.22.19.07/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST :8080/api/fetch   0.26s user 0.04s system 5% cpu 5.240 total
+
+
+# Search for US senators in a particular state via /api/chat
+
+❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Length: 69
+Content-Type: text/plain;charset=UTF-8
+Date: Tue, 10 Dec 2024 06:19:23 GMT
+Keep-Alive: timeout=60
+
+The US Senators from Washington are Patty Murray and Maria Cantwell.
+
+
+http GET   0.25s user 0.03s system 7% cpu 3.791 total
+
+# Results [ Ingest (~5.2s), Chat (~3.8s) ]
+```
+
 ### Ollama on workstation
 
 Specs:
@@ -302,6 +466,8 @@ Specs:
 * Disk Capacity - 2.5 TB
 
 CPU-only!
+
+Test 1
 
 ```commandline
 export CHAT_MODEL=qwen2.5:3b
@@ -357,7 +523,7 @@ http GET   0.29s user 0.05s system 0% cpu 3:53.99 total
 # Chat model consumption peaked at 22.7Gb of RAM
 ```
 
-Another model combination that works well if you're concerned about origins of Qwen models...
+Test 2
 
 ```commandline
 export CHAT_MODEL=wizardlm2
@@ -410,7 +576,7 @@ http GET   0.24s user 0.03s system 0% cpu 8:15.35 total
 
 Operating environment: [VMware vCenter Server 8.0 Update 3](https://docs.vmware.com/en/VMware-vSphere/8.0/rn/vsphere-vcenter-server-803-release-notes/index.html)
 
-Sanford was deployed using [deploy-on-tp4cf.sh](../deploy-on-tp4cf.sh) script.
+Sanford was deployed using [deploy-on-tp4cf.sh](../scripts/deploy-on-tp4cf.sh) script.
 
 Infrastructure configuration for model hosting via the [GenAI tile](https://techdocs.broadcom.com/us/en/vmware-tanzu/platform-services/genai-on-tanzu-platform-for-cloud-foundry/10-0/ai-cf/how-to-guides-how-to-guides.html)
 
@@ -527,7 +693,10 @@ X-Vcap-Request-Id: 37daee3a-f369-4b82-4e8a-584a5a9e6255
 
 http GET   0.33s user 0.13s system 0% cpu 2:44.90 total
 
-# Results [ Ingest (~12m7s), Chat (~2m45s), partially correct response ]
+# Results [ Ingest (~12m7s), Chat (~2m45s), correct response ]
 # Embedding model consumption peaked at 517m of RAM
 # Chat model consumption peaked at 5.7Gb of RAM
 ```
+
+
+

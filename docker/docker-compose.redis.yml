@@ -1,5 +1,5 @@
 include:
-  - ./docker-compose.observability.yml
+  - docker-compose.observability.yml
 
 services:
   redis:

@@ -2,6 +2,8 @@
 
 * [How to Run with Gradle](#how-to-run-with-gradle)
   * [Sample startup with Docker Compose](#sample-startup-with-docker-compose)
+  * [with Amazon Bedrock](#with-amazon-bedrock)
+  * [with Google Cloud Vertex AI](#with-google-cloud-vertex-ai)
   * [with OpenAI](#with-openai)
   * [with Groq Cloud](#with-groq-cloud)
   * [with Alting](#with-alting)
@@ -137,6 +139,65 @@ Note: Recompile with -Xlint:deprecation for details.
 08:23:15.143 [main] INFO  org.cftoolsuite.MinioInitializer - Checking if bucket sanford already exists
 08:23:15.169 [main] INFO  org.cftoolsuite.MinioInitializer - Bucket created successfully: sanford
 ```
+
+### with Amazon Bedrock
+
+Build and run a version of the utility that is compatible for use with [Amazon Bedrock](https://aws.amazon.com/bedrock/) models. 
+
+You will need to set the following environment variables!
+
+```commandline
+export AWS_REGION=
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+
+# optionally set the session token for environments where an additional time-bound authentication credential constraint is applied
+export AWS_SESSION_TOKEN=
+```
+
+You have the ability to override models and exactly what chat and embedding models from the catalog are enabled.
+
+See `BEDROCK_` prefixed environment variables in [application.yml](../src/main/resources/application.yml).
+
+Lastly, before you can access models you need to either: [request role access to one or more models](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html#getting-started-model-access) or [attach an IAM policy](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-permissions.html) to your account.
+
+Open a terminal shell and execute
+
+```bash
+./gradlew build bootRun -Dspring.profiles.active=docker,bedrock,{vector_db_provider} -Pmodel-api-provider=bedrock -Pvector-db-provider={vector_db_provider}
+```
+
+> Replace `{vector_db_provider}` with one of [ `chroma`, `pgvector`, `redis`, `weaviate` ]
+
+### with Google Cloud Vertex AI
+
+Build and run a version of the utility that is compatible for use with [Google Cloud Vertex AI](https://cloud.google.com/vertex-ai?hl=en#innovate-faster-with-enterprise-ready-ai-enhanced-by-gemini-models).
+
+Before attempting to run, you'll need to authenticate
+
+```commandline
+gcloud config set project <PROJECT_ID> \
+  && gcloud auth application-default login
+```
+
+> Replace `<PROJECT_ID>` above with a valid identifier of a Google project
+
+You'll need to [Enable the API](https://cloud.google.com/vertex-ai/docs/featurestore/setup) if you haven't already done so.
+
+Lastly, you'll need to set some environment variables
+
+```bash
+export PROJECT_ID=
+export REGION=
+```
+
+Open a terminal shell and execute
+
+```bash
+./gradlew build bootRun -Dspring.profiles.active=docker,gemini,{vector_db_provider} -Pmodel-api-provider=gemini -Pvector-db-provider={vector_db_provider}
+```
+
+> Replace `{vector_db_provider}` with one of [ `chroma`, `pgvector`, `redis`, `weaviate` ]
 
 ### with OpenAI
 
@@ -419,7 +480,7 @@ gradle build -Pvector-db-provider=pgvector
 Take a look at the deployment script
 
 ```bash
-cat deploy-on-tp4cf.sh
+cat scripts/deploy-on-tp4cf.sh
 ```
 
 > Make any required edits to the environment variables for the services and plans.
@@ -427,13 +488,13 @@ cat deploy-on-tp4cf.sh
 Execute the deployment script
 
 ```bash
-./deploy-on-tp4cf.sh setup
+./scripts/deploy-on-tp4cf.sh setup
 ```
 
 To teardown, execute
 
 ```bash
-./deploy-on-tp4cf.sh teardown
+./scripts/deploy-on-tp4cf.sh teardown
 ```
 
 ### Inspect and/or update the PgVector store database instance
@@ -838,7 +899,7 @@ We'll also need to remove any large files or sensitive configuration files.
 
 ```
 du -sh * -c
-./prune.sh
+./scripts/prune.sh
 ```
 
 Edit the file `.tanzu/config/sanford.yml`.

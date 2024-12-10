@@ -5,7 +5,7 @@ FROM bellsoft/liberica-openjdk-debian:21.0.5-cds
 WORKDIR /app
 
 # Copy the JAR file into the container
-COPY build/libs/sanford-0.0.1-SNAPSHOT.jar app.jar
+COPY ../build/libs/sanford-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port your app runs on
 EXPOSE 8080

@@ -46,15 +46,14 @@ When serving models from Cloud Foundry with the GenAI tile
 
 #### CPU-only configuration
 
-To be redone
-
 * Choose compute type that has a minimum of 8-vCPU, 64Gb RAM, and 80Gb disk
   * when targeting CF environment provisioned on Google Cloud, choose [c2d-highmem-8](https://cloud.google.com/compute/docs/compute-optimized-machines#c2d-high-mem)
-* Choose `qwen2.5:3b` for the chat model
-* Choose `aroxima/gte-qwen2-1.5b-instruct` for the embedding model
+* Choose among [ `wizardlm2`, `qwen2.5:3b`, `mistral`, `gemma2` ] for the chat model
+* Choose among [ `all-minilm:33m`, `nomic-embed-text`, `aroxima/gte-qwen2-1.5b-instruct` ] for the embedding model
+  * the above-mentioned embedding models have dimensions set respectively to: `384`, `768`, `1536`
 * Choose Postgres for the vector store provider
 
-If you're employing the [deploy-on-tp4cf.sh](../deploy-on-tp4cf.sh) script, edit the following variables to be
+E.g., if you're employing the [deploy-on-tp4cf.sh](../scripts/deploy-on-tp4cf.sh) script, edit the following variables to be
 
 ```bash
 GENAI_CHAT_PLAN_NAME=qwen2.5:3b
@@ -71,13 +70,14 @@ export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=1536
 
 When serving models from Ollama, you're encouraged to consult then leverage one of the provisioning scripts targeting a public cloud infrastructure provider:
 
-* [AWS](../provision-ollama-vm-on-aws.sh)
-* [Azure](../provision-ollama-vm-on-azure.sh)
-* [Google Cloud](../provision-ollama-vm-on-googlecloud.sh)
+* [AWS](../scripts/provision-ollama-vm-on-aws.sh)
+  * Before executing this script you'll need to export `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.  If you authenticate via a secure token service, then you'll also need to export `AWS_SESSION_TOKEN`.
+* [Azure](../scripts/provision-ollama-vm-on-azure.sh)
+  * Before executing this script you'll need to export `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID`, and `ARM_CLIENT_SECRET`.
+* [Google Cloud](../scripts/provision-ollama-vm-on-googlecloud.sh)
+  * Before executing this script you'll need to execute `gcloud auth application-default login`.
 
 #### CPU-only configuration
-
-To be redone
 
 * Choose a compute type that has a minimum of 8-vCPU, 64Gb RAM, and 80Gb disk
   * when targeting an Ollama VM installation hosted on
@@ -86,8 +86,6 @@ To be redone
     * Google Cloud, choose [c2d-highmem-8](https://cloud.google.com/compute/docs/compute-optimized-machines#c2d-high-mem)
 
 #### GPU assisted configuration
-
-To be redone
 
 * Choose a compute type that has a minimum of 16-vCPU, 64Gb RAM, and 80Gb disk
 
@@ -120,8 +118,8 @@ Here's what you need to know about each cloud provider's GPU configuration:
   * Example configuration:
 
     ```bash
-    ACCELERATOR_TYPE="nvidia-tesla-t4"
-    ACCELERATOR_COUNT=1
+    GPU_TYPE="nvidia-tesla-t4"
+    GPU_COUNT=1
     ```
 
 Important considerations:
@@ -143,9 +141,9 @@ cd sanford
 # Run provisioning script to create and start a VM with Ollama hosted in [ aws|azure|googlecloud ]
 ./provision-ollama-vm-on-{replace_with_available_public_cloud_variant}.sh create
 # Set environment variables (override defaults)
-export CHAT_MODEL=qwen2.5:3b
-export EMBEDDING_MODEL=aroxima/gte-qwen2-1.5b-instruct
-export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=1536
+export CHAT_MODEL=wizardlm2
+export EMBEDDING_MODEL=all-minilm:33m
+export SPRING_AI_VECTORSTORE_PGVECTOR_DIMENSIONS=384
 export OLLAMA_BASE_URL=http://{replace_with_ip_address_of_ollama_instance}:11434
 gradle clean build bootRun -Pvector-db-provider=pgvector -Pmodel-api-provider=ollama -Dspring.profiles.active=docker,ollama,pgvector,dev
 time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'  
