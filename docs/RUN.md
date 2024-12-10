@@ -159,7 +159,10 @@ You have the ability to override models and exactly what chat and embedding mode
 
 See `BEDROCK_` prefixed environment variables in [application.yml](../src/main/resources/application.yml).
 
-Lastly, before you can access models you need to either: [request role access to one or more models](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html#getting-started-model-access) or [attach an IAM policy](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-permissions.html) to your account.
+Lastly, before you can access models you need to: 
+
+* [Request role access to one or more models](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html#getting-started-model-access) or [attach an IAM policy](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-permissions.html) to your account
+* [Review and set quotas for Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/quotas.html) per region
 
 Open a terminal shell and execute
 
