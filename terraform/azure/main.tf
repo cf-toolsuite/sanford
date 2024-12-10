@@ -1,13 +1,18 @@
+resource "azurerm_resource_group" "ollamarg" {
+  name = var.resource_group
+  location = var.location
+}
+
 resource "azurerm_virtual_network" "main" {
   name                = "${var.vm_name}-vnet"
   address_space       = ["10.0.0.0/16"]
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = azurerm_resource_group.ollamarg.name
 }
 
 resource "azurerm_subnet" "main" {
   name                 = "${var.vm_name}-subnet"
-  resource_group_name  = var.resource_group
+  resource_group_name  = azurerm_resource_group.ollamarg.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.1.0/24"]
 }
@@ -15,7 +20,7 @@ resource "azurerm_subnet" "main" {
 resource "azurerm_public_ip" "main" {
   name                = "${var.vm_name}-ip"
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = azurerm_resource_group.ollamarg.name
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -23,7 +28,7 @@ resource "azurerm_public_ip" "main" {
 resource "azurerm_network_interface" "main" {
   name                = "${var.vm_name}-nic"
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = azurerm_resource_group.ollamarg.name
 
   ip_configuration {
     name                          = "internal"
@@ -36,7 +41,7 @@ resource "azurerm_network_interface" "main" {
 resource "azurerm_network_security_group" "main" {
   name                = "${var.vm_name}-nsg"
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = azurerm_resource_group.ollamarg.name
 
   security_rule {
     name                       = "AllowOllama"
@@ -70,12 +75,14 @@ resource "azurerm_network_interface_security_group_association" "main" {
 
 resource "azurerm_linux_virtual_machine" "main" {
   name                = var.vm_name
-  resource_group_name = var.resource_group
+  resource_group_name = azurerm_resource_group.ollamarg.name
   location            = var.location
   size                = var.use_gpu ? var.gpu_vm_size : var.vm_size
   admin_username      = var.admin_username
 
-  custom_data = base64encode(templatefile("${path.module}/../user_data.tpl", {}))
+  custom_data = base64encode(templatefile("${path.module}/user_data.tpl", {
+    use_gpu = var.use_gpu
+  }))
 
   network_interface_ids = [
     azurerm_network_interface.main.id,
@@ -94,8 +101,8 @@ resource "azurerm_linux_virtual_machine" "main" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-noble"
-    sku       = "24_04-lts-gen2"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
     version   = "latest"
   }
 }
