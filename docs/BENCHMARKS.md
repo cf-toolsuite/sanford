@@ -345,9 +345,64 @@ http --verify=no :8080/api/multichat   0.25s user 0.05s system 0% cpu 1:55.64 to
 # Results [ Ingest (~6s), MultiChat (~2m) returning 8 accurate responses, 1 partial response, and 3 errors due to deserialization issues ]
 ```
 
-### Nova
+### Amazon Bedrock
+
+```commandline
+export BEDROCK_ANTHROPIC3_CHAT_ENABLED=true
+export BEDROCK_ANTHROPIC3_CHAT_MODEL=anthropic.claude-3-sonnet-20240229-v1:0
+export BEDROCK_COHERE_EMBEDDING_ENABLED=true
+export BEDROCK_COHERE_EMBEDDING_MODEL=cohere.embed-english-v3
+gradle build bootRun -Dspring.profiles.active=docker,bedrock,chroma,dev -Pmodel-api-provider=bedrock -Pvector-db-provider=chroma
+
+# Ingest US senators via /api/fetch
+
+❯ time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Tue, 10 Dec 2024 04:49:55 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.12.09.20.49.52/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
 
 
+http --verify=no POST :8080/api/fetch   0.23s user 0.05s system 7% cpu 3.651 total
+
+
+# Search for US senators in a particular state via /api/chat
+
+❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Length: 162
+Content-Type: text/plain;charset=UTF-8
+Date: Tue, 10 Dec 2024 04:50:11 GMT
+Keep-Alive: timeout=60
+
+The US senators from Washington are Maria Cantwell (Democrat, Junior Senator) and Patty Murray (Democrat, Senior Senator and President Pro Tempore of the Senate).
+
+
+http GET   0.24s user 0.04s system 12% cpu 2.294 total
+
+# Results [ Ingest (~3.7s), Chat (~2.3s) ]
+```
+
+### Google Cloud Vertex AI
+
+To be done
 
 ### Ollama on workstation
 
@@ -592,9 +647,5 @@ http GET   0.33s user 0.13s system 0% cpu 2:44.90 total
 # Chat model consumption peaked at 5.7Gb of RAM
 ```
 
-### Ollama on Google Cloud
-
-
-### Ollama on AWS
 
 
