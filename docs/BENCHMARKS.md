@@ -402,7 +402,58 @@ http GET   0.24s user 0.04s system 12% cpu 2.294 total
 
 ### Google Cloud Vertex AI
 
-To be done
+```commandline
+export BEDROCK_ANTHROPIC3_CHAT_ENABLED=true
+export BEDROCK_ANTHROPIC3_CHAT_MODEL=anthropic.claude-3-sonnet-20240229-v1:0
+export BEDROCK_COHERE_EMBEDDING_ENABLED=true
+export BEDROCK_COHERE_EMBEDDING_MODEL=cohere.embed-english-v3
+gradle build bootRun -Dspring.profiles.active=docker,bedrock,chroma,dev -Pmodel-api-provider=bedrock -Pvector-db-provider=chroma
+
+# Ingest US senators via /api/fetch
+
+❯ time http --verify=no POST :8080/api/fetch urls:='["https://www.govtrack.us/api/v2/role?current=true&role_type=senator"]'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Type: application/json
+Date: Tue, 10 Dec 2024 06:19:12 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "failureCount": 0,
+    "results": [
+        {
+            "error": null,
+            "savedPath": "/tmp/fetch/2024.12.09.22.19.07/www.govtrack.us-api-v2-role.json",
+            "success": true,
+            "url": "https://www.govtrack.us/api/v2/role?current=true&role_type=senator"
+        }
+    ],
+    "successCount": 1,
+    "totalUrls": 1
+}
+
+
+http --verify=no POST :8080/api/fetch   0.26s user 0.04s system 5% cpu 5.240 total
+
+
+# Search for US senators in a particular state via /api/chat
+
+❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+HTTP/1.1 200 
+Connection: keep-alive
+Content-Length: 69
+Content-Type: text/plain;charset=UTF-8
+Date: Tue, 10 Dec 2024 06:19:23 GMT
+Keep-Alive: timeout=60
+
+The US Senators from Washington are Patty Murray and Maria Cantwell.
+
+
+http GET   0.25s user 0.03s system 7% cpu 3.791 total
+
+# Results [ Ingest (~5.2s), Chat (~3.8s) ]
+```
 
 ### Ollama on workstation
 
