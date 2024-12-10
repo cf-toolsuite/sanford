@@ -32,10 +32,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
+	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'bedrock') {
+		implementation 'org.springframework.ai:spring-ai-bedrock-ai-spring-boot-starter'
+	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'chroma') {
 		implementation 'org.springframework.ai:spring-ai-chroma-store-spring-boot-starter'
 	}
-	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'gemini') {
+	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'gemini') {
 		implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter'
 		implementation 'org.springframework.ai:spring-ai-vertex-ai-embedding-spring-boot-starter'
 	}

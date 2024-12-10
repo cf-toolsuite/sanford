@@ -145,7 +145,6 @@ spring:
         gemini:
           projectId: ${PROJECT_ID}
           location: ${REGION:us-west1}
-          apiEndpoint: ${VERTEX_API_ENDPOINT:""}
           chat:
             options:
               model: ${CHAT_MODEL:gemini-1.5-flash-002}
@@ -153,7 +152,6 @@ spring:
         embedding:
           projectId: ${PROJECT_ID}
           location: ${REGION:us-west1}
-          apiEndpoint: ${VERTEX_EMBEDDING_API_ENDPOINT:""}
           text:
             options:
               model: ${EMBEDDING_MODEL:text-embedding-005}
@@ -176,6 +174,50 @@ spring:
         base_url: ${EMBEDDING_BASEURL:https://api.openai.com}
         options:
           model: ${EMBEDDING_MODEL:text-embedding-3-large}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: bedrock
+
+  autoconfigure:
+    exclude: org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration
+
+  ai:
+    bedrock:
+      aws:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+        session-token: ${AWS_SESSION_TOKEN:""}
+        region: ${AWS_REGION:us-west-2}
+      llama:
+        chat:
+          enabled: ${BEDROCK_LLAMA_CHAT_ENABLED:false}
+          model: ${BEDROCK_LLAMA_CHAT_MODEL:"meta.llama3-70b-instruct-v1:0"}
+      anthropic3:
+        chat:
+          enabled: ${BEDROCK_ANTHROPIC3_CHAT_ENABLED:true}
+          model: ${BEDROCK_ANTHROPIC3_CHAT_MODEL:"anthropic.claude-3-sonnet-20240229-v1:0"}
+      cohere:
+        chat:
+          enabled: ${BEDROCK_COHERE_CHAT_ENABLED:false}
+          model: ${BEDROCK_COHERE_CHAT_MODEL:"cohere.command-text-v14"}
+        embedding:
+          enabled: ${BEDROCK_COHERE_EMBEDDING_ENABLED:true}
+          model: ${BEDROCK_COHERE_EMBEDDING_MODEL:"cohere.embed-multilingual-v3"}
+      jurassic2:
+        chat:
+          enabled: ${BEDROCK_JURASSIC2_CHAT_ENABLED:false}
+          model: ${BEDROCK_JURASSIC2_CHAT_MODEL:"ai21.j2-ultra-v1"}
+      titan:
+        chat:
+          enabled: ${BEDROCK_TITAN_CHAT_ENABLED:false}
+          model: ${BEDROCK_TITAN_CHAT_MODEL:"amazon.titan-text-lite-v1"}
+        embedding:
+          enabled: ${BEDROCK_TITAN_EMBEDDING_ENABLED:false}
+          model: ${BEDROCK_TITAN_EMBEDDING_MODEL:"amazon.titan-embed-image-v1"}
 
 ---
 
