@@ -55,3 +55,19 @@ This curated collection of articles stands to influence your specification and i
 * [LLM-Inference-Bench: Inference Benchmarking of Large Language Models on AI Accelerators](https://arxiv.org/pdf/2411.00136)
 * [A Comprehensive Guide to Understanding AI Inference on the CPU](https://armkeil.blob.core.windows.net/developer/Files/pdf/ebook/arm-guide-to-ai-inference-on-cpus-2024.pdf)
 * [10 Key Decision Points for Generative AI Success](https://www2.deloitte.com/content/dam/Deloitte/uk/Documents/consultancy/deloitte-uk-genai-ido-pov-final-new.pdf)
+
+## Datasets 
+
+* [Awesome JSON Datasets](https://github.com/jdorfman/awesome-json-datasets?tab=readme-ov-file)
+* [CORGIS JSON Datasets](https://corgis-edu.github.io/corgis/json/)
+* [Kaggle JSON Datasets](https://www.kaggle.com/datasets?fileType=json)
+* [data.nasa.gov](https://data.nasa.gov/)
+
+## on Agents and Frameworks
+
+* [What are AI Agents](https://spectrum.ieee.org/ai-agents)
+* [Demystifying the Concept of Agentic AI Frameworks](https://medium.com/@soumava.dey.aig/demystifying-the-concept-of-agentic-ai-frameworks-6f86d1963039)
+* [Discover the Hidden Potential of AI Agents in Everyday Life](https://www.geeky-gadgets.com/ai-agents-tools-and-frameworks/)
+* [The AI Agents Stack](https://www.letta.com/blog/ai-agents-stack)
+* [How AI agents are revolutionizing digital marketing](https://searchengineland.com/ai-agents-digital-marketing-448342)
+* [Microsoft’s Agentic AI Frameworks: AutoGen and Semantic Kernel](https://devblogs.microsoft.com/semantic-kernel/microsofts-agentic-ai-frameworks-autogen-and-semantic-kernel/)

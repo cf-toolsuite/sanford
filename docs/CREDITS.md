@@ -18,6 +18,7 @@
 * [Craig Walls](https://www.linkedin.com/in/habuma/)
 * [Christian Tzolov](https://www.linkedin.com/in/tzolov/)
 * [Adib Saikali](https://www.linkedin.com/in/adibsaikali/)
+* [Dan Vega](https://www.youtube.com/@DanVega/videos)
 
 ## Blog articles
 
@@ -27,8 +28,9 @@
   
 * November 2024
   * [Spring AI Framework Overview – Introduction to AI World for Java Developers](https://grapeup.com/blog/spring-ai-overview-introduction-to-ai-world-for-java-developers/#)
-  * [Spring AI With ChromaDB Vector Store](https://www.baeldung.com/spring-ai-chromadb-vector-store)
+  * [Building a ChatGPT-like Interface with Spring AI and Vaadin](https://blog.stackademic.com/building-a-chatgpt-like-interface-with-spring-ai-and-vaadin-ed62c702f094)
   * [RAG made easy with Spring AI + Elasticsearch](https://www.elastic.co/search-labs/blog/java-rag-spring-ai-es)
+  * [Spring AI With ChromaDB Vector Store](https://www.baeldung.com/spring-ai-chromadb-vector-store)
   * [Spring AI MongoDB RAG Example](https://www.javacodegeeks.com/spring-ai-mongodb-rag-example.html)
   * [Demystifying AI Integration with Cloud Foundry: A Spring AI Deep Dive](https://blogs.vmware.com/tanzu/demystifying-ai-integration-with-cloud-foundry-a-spring-ai-deep-dive/)
   
