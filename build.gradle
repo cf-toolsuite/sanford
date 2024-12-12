@@ -73,8 +73,8 @@ dependencies {
 	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-actuator:1.0.7'
 	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-resilience4j:1.0.7'
 	implementation ('de.hs-heilbronn.mi:crawler4j-with-hsqldb:5.1.1') {
-    exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
-  }
+		exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+  	}
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -41,3 +41,5 @@
   * [Audio Multimodality: Expanding AI Interaction with Spring AI and OpenAI](https://spring.io/blog/2024/12/05/spring-ai-audio-modality)
   * [Building AI Assistance Using Spring AI's Function Calling API](https://www.kodesastra.com/2024/12/building-ai-assistance-using-spring-ai-function-calling.html)
   * [Announcing Azure Cosmos DB Integration with Spring AI and Langchain4J!](https://devblogs.microsoft.com/cosmosdb/announcing-azure-cosmos-db-integration-with-spring-ai-and-langchain4j/)
+  * [Claude’s Model Context Protocol (MCP): A Developer’s Guide](https://www.unite.ai/claudes-model-context-protocol-mcp-a-developers-guide/)
+  * [Announcing Spring AI MCP: A Java SDK for the Model Context Protocol](https://spring.io/blog/2024/12/11/spring-ai-mcp-announcement)
