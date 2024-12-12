@@ -6,6 +6,7 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.Map;
 
@@ -23,11 +24,31 @@ public class ChatService {
         this.vectorStore = vectorStore;
     }
 
-    public String askQuestion(String question) {
-        return askQuestion(question, null);
+    public String respondToQuestion(String question) {
+        return constructRequest(question, null)
+                .call()
+                .content();
     }
 
-    public String askQuestion(String question, Map<String, Object> filterMetadata) {
+    public String respondToQuestion(String question, Map<String, Object> filterMetadata) {
+        return constructRequest(question, filterMetadata)
+                .call()
+                .content();
+    }
+
+    public Flux<String> streamResponseToQuestion(String question) {
+        return constructRequest(question, null)
+                .stream()
+                .content();
+    }
+
+    public Flux<String> streamResponseToQuestion(String question, Map<String, Object> filterMetadata) {
+        return constructRequest(question, filterMetadata)
+                .stream()
+                .content();
+    }
+
+    private ChatClient.ChatClientRequestSpec constructRequest(String question, Map<String, Object> filterMetadata) {
         return chatClient
                 .prompt()
                 .advisors(RetrievalAugmentationAdvisor
@@ -36,8 +57,6 @@ public class ChatService {
                                 ChatServiceHelper.constructDocumentRetriever(vectorStore, filterMetadata).build()
                         )
                         .build())
-                .user(question)
-                .call()
-                .content();
+                .user(question);
     }
 }
