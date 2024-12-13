@@ -82,7 +82,7 @@ spring:
   config:
     activate:
       on-profile: alting
-    import: "optional:file:./config/creds.yml"
+    import: "${SPRING_CONFIG_IMPORT:optional:file:./config/creds.yml}"
 
   ai:
     alting:
@@ -214,7 +214,7 @@ spring:
   config:
     activate:
       on-profile: groq-cloud
-    import: "optional:file:./config/creds.yml"
+    import: "${SPRING_CONFIG_IMPORT:optional:file:./config/creds.yml}"
 
   ai:
     openai:
@@ -233,7 +233,7 @@ spring:
   config:
     activate:
       on-profile: openai
-    import: "optional:file:./config/creds.yml"
+    import: "${SPRING_CONFIG_IMPORT:optional:file:./config/creds.yml}"
 
   ai:
     openai:
