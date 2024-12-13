@@ -33,6 +33,7 @@
   * [Spring AI With ChromaDB Vector Store](https://www.baeldung.com/spring-ai-chromadb-vector-store)
   * [Spring AI MongoDB RAG Example](https://www.javacodegeeks.com/spring-ai-mongodb-rag-example.html)
   * [Demystifying AI Integration with Cloud Foundry: A Spring AI Deep Dive](https://blogs.vmware.com/tanzu/demystifying-ai-integration-with-cloud-foundry-a-spring-ai-deep-dive/)
+  * [2024: The State of Generative AI in the Enterprise](https://menlovc.com/2024-the-state-of-generative-ai-in-the-enterprise/)
   
 * December 2024
   * [Paris JUG: Spring AI vs LangChain4J](https://speakerdeck.com/michaelisvy/2024)
