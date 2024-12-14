@@ -20,6 +20,10 @@
 * [Adib Saikali](https://www.linkedin.com/in/adibsaikali/)
 * [Dan Vega](https://www.youtube.com/@DanVega/videos)
 
+## Helps
+
+* [Marcus Hellberg](https://www.linkedin.com/in/marcushellberg/) - advice on Vaadin
+
 ## Blog articles
 
 * October 2024
