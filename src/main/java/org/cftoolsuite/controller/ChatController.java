@@ -1,12 +1,12 @@
 package org.cftoolsuite.controller;
 
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.cftoolsuite.domain.chat.Inquiry;
 import org.cftoolsuite.service.chat.ChatService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
-import java.util.Map;
 
 @RestController
 public class ChatController {
@@ -17,27 +17,21 @@ public class ChatController {
         this.chatService = chatService;
     }
 
-    @GetMapping("/api/chat")
-    public ResponseEntity<String> chat(
-            @RequestParam("q") String message,
-            @RequestParam(value = "f", required = false) Map<String, Object> filterMetadata
-    ) {
-        if (MapUtils.isNotEmpty(filterMetadata)) {
-            return ResponseEntity.ok(chatService.respondToQuestion(message, filterMetadata));
+    @PostMapping("/api/chat")
+    public ResponseEntity<String> chat(@RequestBody Inquiry inquiry) {
+        if (CollectionUtils.isNotEmpty(inquiry.filter())) {
+            return ResponseEntity.ok(chatService.respondToQuestion(inquiry.question(), inquiry.filter()));
         } else {
-            return ResponseEntity.ok(chatService.respondToQuestion(message));
+            return ResponseEntity.ok(chatService.respondToQuestion(inquiry.question()));
         }
     }
 
-    @GetMapping("/api/stream/chat")
-    public ResponseEntity<Flux<String>> streamChat(
-            @RequestParam("q") String message,
-            @RequestParam(value = "f", required = false) Map<String, Object> filterMetadata
-    ) {
-        if (MapUtils.isNotEmpty(filterMetadata)) {
-            return ResponseEntity.ok(chatService.streamResponseToQuestion(message, filterMetadata));
+    @PostMapping("/api/stream/chat")
+    public ResponseEntity<Flux<String>> streamChat(@RequestBody Inquiry inquiry) {
+        if (CollectionUtils.isNotEmpty(inquiry.filter())) {
+            return ResponseEntity.ok(chatService.streamResponseToQuestion(inquiry.question(), inquiry.filter()));
         } else {
-            return ResponseEntity.ok(chatService.streamResponseToQuestion(message));
+            return ResponseEntity.ok(chatService.streamResponseToQuestion(inquiry.question()));
         }
     }
 }

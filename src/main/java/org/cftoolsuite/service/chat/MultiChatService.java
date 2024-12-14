@@ -1,12 +1,12 @@
 package org.cftoolsuite.service.chat;
 
+import org.cftoolsuite.domain.chat.FilterMetadata;
 import org.cftoolsuite.domain.chat.MultiChatResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.metadata.DefaultUsage;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class MultiChatService {
         return askQuestion(question, null);
     }
 
-    public List<MultiChatResponse> askQuestion(String question, Map<String, Object> filterMetadata) {
+    public List<MultiChatResponse> askQuestion(String question, List<FilterMetadata> filterMetadata) {
         return chatClients.entrySet().stream()
                 .map(entry -> {
                     String modelName = entry.getKey();

@@ -1,27 +1,28 @@
 package org.cftoolsuite.service.chat;
 
-import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.cftoolsuite.domain.chat.FilterMetadata;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 class ChatServiceHelper {
 
-    static VectorStoreDocumentRetriever.Builder constructDocumentRetriever(VectorStore vectorStore, Map<String, Object> filterMetadata) {
+    static VectorStoreDocumentRetriever.Builder constructDocumentRetriever(VectorStore vectorStore, List<FilterMetadata> filterMetadata) {
         FilterExpressionBuilder b = new FilterExpressionBuilder();
         FilterExpressionBuilder.Op filterExpression = null;
 
-        if (MapUtils.isNotEmpty(filterMetadata)) {
-            for (Map.Entry<String, Object> entry : filterMetadata.entrySet()) {
+        if (CollectionUtils.isNotEmpty(filterMetadata)) {
+            for (FilterMetadata entry : filterMetadata) {
                 FilterExpressionBuilder.Op currentCondition;
 
-                if (entry.getValue() instanceof Collection) {
-                    currentCondition = b.in(entry.getKey(), (Collection<?>) entry.getValue());
+                if (entry.value() instanceof Collection) {
+                    currentCondition = b.in(entry.key(), (Collection<?>) entry.value());
                 } else {
-                    currentCondition = b.eq(entry.getKey(), entry.getValue());
+                    currentCondition = b.eq(entry.key(), entry.value());
                 }
 
                 if (filterExpression == null) {

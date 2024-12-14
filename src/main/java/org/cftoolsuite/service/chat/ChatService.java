@@ -1,5 +1,6 @@
 package org.cftoolsuite.service.chat;
 
+import org.cftoolsuite.domain.chat.FilterMetadata;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -8,7 +9,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.util.Map;
+import java.util.List;
 
 @Service
 public class ChatService {
@@ -30,7 +31,7 @@ public class ChatService {
                 .content();
     }
 
-    public String respondToQuestion(String question, Map<String, Object> filterMetadata) {
+    public String respondToQuestion(String question, List<FilterMetadata> filterMetadata) {
         return constructRequest(question, filterMetadata)
                 .call()
                 .content();
@@ -42,13 +43,13 @@ public class ChatService {
                 .content();
     }
 
-    public Flux<String> streamResponseToQuestion(String question, Map<String, Object> filterMetadata) {
+    public Flux<String> streamResponseToQuestion(String question, List<FilterMetadata> filterMetadata) {
         return constructRequest(question, filterMetadata)
                 .stream()
                 .content();
     }
 
-    private ChatClient.ChatClientRequestSpec constructRequest(String question, Map<String, Object> filterMetadata) {
+    private ChatClient.ChatClientRequestSpec constructRequest(String question, List<FilterMetadata> filterMetadata) {
         return chatClient
                 .prompt()
                 .advisors(RetrievalAugmentationAdvisor
