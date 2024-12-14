@@ -14,17 +14,14 @@
 
 ## Endpoints
 
-All endpoints with exception to `/crawl`, `fetch`, and `chat` below are to be prefixed with `/api/files`.
-
 ### Upload
 
 Upload a file to an S3-compliant object store's bucket; in addition the contents of the file will be vectorized and persisted into a [Vector Database](https://docs.spring.io/spring-ai/reference/api/vectordbs.html) provider.
 
 ```python
-POST /upload
+POST /api/files/upload
 ```
-
-Sample interaction
+**Sample interaction**
 
 ```bash
 ❯ http -f POST :8080/api/files/upload fileName@./samples/United_States_Constitution.pdf
@@ -64,7 +61,7 @@ You will need to adjust startup arguments, e.g., you could add the following to 
 Facilitate web-crawling (i.e., fetch HTML pages and any hyperlinks to HTML pages within them).  Users may issue a [CrawlRequest](../src/main/java/org/cftoolsuite/domain/crawl/CrawlRequest.java) and each document found will be (a) uploaded to S3-compliant object store and (b) contents will be vectorized and persisted into a Vector Database provider.
 
 ```python
-POST /crawl
+POST /api/crawl
 ```
 
 **Sample interaction**
@@ -90,7 +87,7 @@ Transfer-Encoding: chunked
 Facilitate fetching content from one or more URLs.  Users may issue a [FetchRequest](../src/main/java/org/cftoolsuite/domain/fetch/FetchRequest.java) and each document found will be (a) uploaded to S3-compliant object store and (b) contents will be vectorized and persisted into a Vector Database provider.
 
 ```python
-POST /fetch
+POST /api/fetch
 ```
 
 **Sample interaction**
@@ -124,13 +121,15 @@ Transfer-Encoding: chunked
 Converse with an AI chatbot who is aware of all uploaded content.  Ask a question, get a response.
 
 ```python
-GET /chat
+POST /api/chat
 ```
 
 **Sample interaction**
 
 ```bash
-❯ http :8080/api/chat q=="Tell me something about the character Hermia from A Midsummer Night's Dream"
+❯ http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Tell me something about the character Hermia from A Midsummer Night's Dream"
 HTTP/1.1 200
 Connection: keep-alive
 Content-Length: 795
@@ -146,7 +145,13 @@ She passionately defends her love for Lysander and is determined to be with him 
 You may also optionally specify filter metadata in your request, e.g.
 
 ```bash
-❯ http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+❯ http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Who are the senators from Minnesota" \
+  filter:='[
+    {"key": "gender", "value": "male"},
+    {"key": "state", "value": "MN"}
+  ]'
 ```
 
 ### Multichat
@@ -154,17 +159,21 @@ You may also optionally specify filter metadata in your request, e.g.
 Converse with an AI chatbot who is aware of all uploaded content.  Ask a question, get multiple responses from various pre-configured models.
 (This endpoint is only available when the `alting` Spring profile is activated).  Consult `spring.ai.alting.chat.options.models` in [application.yml](../src/main/resources/application.yml) for models participating in each request.
 
-
 ```python
-GET /multichat
+POST /api/multichat
 ```
-
 **Sample interaction**
 
 As with chat, multichat allows you to optionally supply filter metadata...
 
 ```bash
-❯ http GET 'http://localhost:8080/api/multichat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+❯ http POST http://localhost:8080/api/multichat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington?" \
+  filter:='[
+    {"key": "gender", "value": "female"},
+    {"key": "state", "value": "WA"}
+  ]'
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Type: application/json
@@ -301,10 +310,10 @@ Transfer-Encoding: chunked
 Retrieve metadata for all files in an S3-compliant object store's bucket
 
 ```python
-GET
+GET /api/files
 ```
 
-Sample interaction
+**Sample interaction**
 
 ```bash
 ❯ http :8080/api/files
@@ -328,12 +337,12 @@ Transfer-Encoding: chunked
 Retrieve the metadata for a single file
 
 ```python
-GET /?fileName={fileName}
+GET /api/files?filename={unique_filename}
 ```
 
-> Replace `{fileName}` above with the name of a file already stored in an S3-compliant object store's bucket
+> Replace `{unique_filename}` above with the name of a file already stored in an S3-compliant object store's bucket
 
-Sample interaction
+**Sample interaction**
 
 ```bash
 ❯ http :8080/api/files fileName==United_States_Constitution.pdf
@@ -359,12 +368,12 @@ Transfer-Encoding: chunked
 Similarity search for file metadata matching your query constraints.  (A maximum of up to 10 matching results will be returned).
 
 ```python
-GET /search/?q={your_query}
+GET /api/files/search?q="{your_inquiry}"
 ```
 
-> Replace `{your_query}` above with your query constraint
+> Replace `{unique_filename}` above with any topic, concern, or criteria you desire to perform a similarity search 
 
-Sample interaction
+**Sample interaction**
 
 ```bash
 ❯ http :8080/api/files/search q=="Where can I find information about the 24th amendment of the US Constitution"
@@ -390,7 +399,7 @@ Transfer-Encoding: chunked
 Summarize the file content
 
 ```python
-GET /summarize/{fileName}
+GET /api/files/summarize/{fileName}
 ```
 
 > Replace `{fileName}` above with the name of a file already stored in an S3-compliant object store's bucket
@@ -425,7 +434,7 @@ This summary captures the central plot, themes, and characters without delving i
 Download the file content from an S3-compliant object store's bucket
 
 ```python
-GET /download/{fileName}
+GET /api/files/download/{fileName}
 ```
 
 > Replace `{fileName}` above with the name of a file already stored in an S3-compliant object store's bucket
@@ -455,7 +464,7 @@ Done. 627.4 kB in 00:0.08617 (7.3 MB/s)
 Delete a file in an S3-compliant object store's bucket. As well, prune file metadata from Vector store.
 
 ```python
-DELETE /{fileName}
+DELETE /api/files/{fileName}
 ```
 
 > Replace `{fileName}` above with the name of a file already stored in an S3-compliant object store's bucket

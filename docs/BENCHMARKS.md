@@ -41,7 +41,9 @@ http --verify=no POST :8080/api/fetch   0.27s user 0.03s system 6% cpu 4.493 tot
 
 # Search for US senators in a particular state via /api/chat
 
-❯ time http --verify=no :8080/api/chat q=="Tell me who the senators are from Washington state"
+❯ time http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington state"
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Length: 356
@@ -62,7 +64,7 @@ The senators from Washington state are:
 These details can be found in the provided context within the LONG_TERM_MEMORY section.
 
 
-http --verify=no :8080/api/chat   0.25s user 0.04s system 10% cpu 2.770 total
+http POST :8080/api/chat   0.25s user 0.04s system 10% cpu 2.770 total
 
 # Results [ Ingest (~4.5s), Chat (~2.8s) ]
 ```
@@ -103,7 +105,13 @@ http --verify=no POST :8080/api/fetch   0.24s user 0.04s system 4% cpu 6.313 tot
 
 # Search for US senators in a particular state via /api/chat
 
-❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+❯ time http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington?" \
+  filter:='[
+    {"key": "gender", "value": "female"},
+    {"key": "state", "value": "WA"}
+  ]'
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Length: 68
@@ -114,7 +122,7 @@ Keep-Alive: timeout=60
 The US senators from Washington are Patty Murray and Maria Cantwell.
 
 
-http GET   0.22s user 0.03s system 15% cpu 1.567 total
+http POST   0.22s user 0.03s system 15% cpu 1.567 total
 
 # Results [ Ingest (~6.3s), Chat (~1.6s) ]
 ```
@@ -156,7 +164,9 @@ http --verify=no POST :8080/api/fetch   0.26s user 0.05s system 4% cpu 6.288 tot
 
 # Search for US senators in a particular state via /api/chat
 
-❯ time http --verify=no :8080/api/chat q=="Tell me who the senators are from Washington state"
+❯ http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Tell me who the senators are from Washington state"
 HTTP/1.1 200
 Connection: keep-alive
 Content-Length: 148
@@ -167,7 +177,7 @@ Keep-Alive: timeout=60
 The senators from Washington state are Patty Murray and Maria Cantwell. Patty Murray is the Senior Senator and Maria Cantwell is the Junior Senator.
 
 
-http --verify=no :8080/api/chat   0.27s user 0.05s system 7% cpu 4.110 total
+http POST :8080/api/chat   0.27s user 0.05s system 7% cpu 4.110 total
 
 # Results [ Ingest (~6s), Chat (~4s) ]
 ```
@@ -208,7 +218,10 @@ http --verify=no POST :8080/api/fetch   0.26s user 0.04s system 5% cpu 5.808 tot
 
 # Search for US senators in a particular state via /api/multichat
 
-❯ time http --verify=no :8080/api/multichat q=="Who are the senators from Washington state?"
+
+❯ time http POST http://localhost:8080/api/multichat \
+  Content-Type:application/json \
+  question="Who are the senators from Washington state?"
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Type: application/json
@@ -340,7 +353,7 @@ Transfer-Encoding: chunked
 ]
 
 
-http --verify=no :8080/api/multichat   0.25s user 0.05s system 0% cpu 1:55.64 total
+http POST :8080/api/multichat   0.25s user 0.05s system 0% cpu 1:55.64 total
 
 # Results [ Ingest (~6s), MultiChat (~2m) returning 8 accurate responses, 1 partial response, and 3 errors due to deserialization issues ]
 ```
@@ -386,7 +399,13 @@ http --verify=no POST :8080/api/fetch   0.23s user 0.05s system 7% cpu 3.651 tot
 
 # Search for US senators in a particular state via /api/chat
 
-❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+❯ time http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington?" \
+  filter:='[
+    {"key": "gender", "value": "female"},
+    {"key": "state", "value": "WA"}
+  ]'
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Length: 162
@@ -397,7 +416,7 @@ Keep-Alive: timeout=60
 The US senators from Washington are Maria Cantwell (Democrat, Junior Senator) and Patty Murray (Democrat, Senior Senator and President Pro Tempore of the Senate).
 
 
-http GET   0.24s user 0.04s system 12% cpu 2.294 total
+http POST   0.24s user 0.04s system 12% cpu 2.294 total
 
 # Results [ Ingest (~3.7s), Chat (~2.3s) ]
 ```
@@ -441,7 +460,13 @@ http --verify=no POST :8080/api/fetch   0.26s user 0.04s system 5% cpu 5.240 tot
 
 # Search for US senators in a particular state via /api/chat
 
-❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+❯ time http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington?" \
+  filter:='[
+    {"key": "gender", "value": "female"},
+    {"key": "state", "value": "WA"}
+  ]'
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Length: 69
@@ -452,7 +477,7 @@ Keep-Alive: timeout=60
 The US Senators from Washington are Patty Murray and Maria Cantwell.
 
 
-http GET   0.25s user 0.03s system 7% cpu 3.791 total
+http POST   0.25s user 0.03s system 7% cpu 3.791 total
 
 # Results [ Ingest (~5.2s), Chat (~3.8s) ]
 ```
@@ -506,7 +531,13 @@ http --verify=no POST :8080/api/fetch   0.27s user 0.03s system 0% cpu 22:53.42 
 
 # Search for US senators in a particular state via /api/chat
 
-❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+❯ time http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington?" \
+  filter:='[
+    {"key": "gender", "value": "female"},
+    {"key": "state", "value": "WA"}
+  ]'
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Length: 45
@@ -517,7 +548,7 @@ Keep-Alive: timeout=60
 Patty Murray is a US senator from Washington.
 
 
-http GET   0.29s user 0.05s system 0% cpu 3:53.99 total
+http POST   0.29s user 0.05s system 0% cpu 3:53.99 total
 
 
 # Results [ Ingest (~23m), Chat (~4m), partially correct response ]
@@ -557,7 +588,14 @@ Transfer-Encoding: chunked
 
 
 http --verify=no POST :8080/api/fetch   0.24s user 0.03s system 2% cpu 11.328 total
-❯ time http GET 'http://localhost:8080/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+
+❯ time http POST http://localhost:8080/api/chat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington?" \
+  filter:='[
+    {"key": "gender", "value": "female"},
+    {"key": "state", "value": "WA"}
+  ]'
 HTTP/1.1 200 
 Connection: keep-alive
 Content-Length: 134
@@ -571,7 +609,7 @@ The U.S. Senators from Washington (state) as of the context information provided
 2. Patty Murray (D-WA)
 
 
-http GET   0.24s user 0.03s system 0% cpu 8:15.35 total
+http POST   0.24s user 0.03s system 0% cpu 8:15.35 total
 ```
 
 ### Tanzu Application Service 6.0 with GenAI 10 tile
@@ -622,8 +660,12 @@ http --verify=no POST    0.33s user 0.16s system 4% cpu 10.468 total
 
 # Search for US senators in a particular state via /api/chat
 
-➜  ~ time http GET 'https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
-
+➜  ~ time http POST 'https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/chat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington?" \
+  filter:='[
+    {"key": "state", "value": "WA"}
+  ]'
 HTTP/1.1 200 OK
 Content-Length: 54
 Content-Type: text/plain;charset=UTF-8
@@ -633,7 +675,7 @@ X-Vcap-Request-Id: b5d0ce0b-4e95-49db-6dee-cbf3b41ac36e
 John McCain (Republican) and Maria Cantwell (Democrat)
 
 
-http GET   0.33s user 0.13s system 0% cpu 1:20.22 total
+http POST   0.33s user 0.13s system 0% cpu 1:20.22 total
 
 # Results [ Ingest (~10.5s), Chat (~1m20s), partially correct response ]
 ```
@@ -670,19 +712,14 @@ X-Vcap-Request-Id: 9ec10539-e410-4044-58a9-80e1029b5bc4
 
 
 http --verify=no POST    0.33s user 0.17s system 3% cpu 12.727 total
-➜  ~ time http GET 'https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
 
-HTTP/1.1 200 OK
-Content-Length: 185
-Content-Type: text/plain;charset=UTF-8
-Date: Fri, 06 Dec 2024 21:01:45 GMT
-X-Vcap-Request-Id: a12f4738-5f92-4697-6c0b-21363a9272d8
-
- The US senators from Washington are Patty Murray and Maria Cantwell. They are both Democrats representing Washington in the United States Senate as of my knowledge cutoff date in 2023.
-
-
-http GET   0.31s user 0.12s system 0% cpu 2:35.66 total
-➜  ~ time http GET 'https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/chat?q="Who are the US senators from Washington?"&f[state]="WA"&f[gender]="female"'
+➜  ~ time http POST 'https://sanford-accountable-baboon-ls.apps.tas-cdc.kuhn-labs.com/api/chat \
+  Content-Type:application/json \
+  question="Who are the US senators from Washington?" \
+  filter:='[
+    {"key": "gender", "value": "female"},
+    {"key": "state", "value": "WA"}
+  ]'
 
 HTTP/1.1 200 OK
 Content-Length: 227
@@ -693,7 +730,7 @@ X-Vcap-Request-Id: 37daee3a-f369-4b82-4e8a-584a5a9e6255
  The US senators from Washington (state) are Patty Murray and Maria Cantwell. They have been representing Washington in the U.S. Senate since 1993 and 2001, respectively. Their terms are not set to expire until January 3, 2027.
 
 
-http GET   0.33s user 0.13s system 0% cpu 2:44.90 total
+http POST   0.33s user 0.13s system 0% cpu 2:44.90 total
 
 # Results [ Ingest (~12m7s), Chat (~2m45s), correct response ]
 # Embedding model consumption peaked at 517m of RAM
