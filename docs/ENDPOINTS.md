@@ -371,7 +371,7 @@ Similarity search for file metadata matching your query constraints.  (A maximum
 GET /api/files/search?q="{your_inquiry}"
 ```
 
-> Replace `{unique_filename}` above with any topic, concern, or criteria you desire to perform a similarity search 
+> Replace `{your_inquiry}` above with any topic, concern, or criteria you desire to perform a similarity search 
 
 **Sample interaction**
 
