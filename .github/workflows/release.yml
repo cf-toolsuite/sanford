@@ -10,23 +10,50 @@ jobs:
       matrix:
         include:
           - vector-db: chroma
+            model-api: bedrock
+            jar-base-name: sanford-bedrock-chroma
+          - vector-db: chroma
+            model-api: gemini
+            jar-base-name: sanford-gemini-chroma
+          - vector-db: chroma
             model-api: openai
             jar-base-name: sanford-openai-chroma
           - vector-db: chroma
             model-api: ollama
             jar-base-name: sanford-ollama-chroma
+
+          - vector-db: pgvector
+            model-api: bedrock
+            jar-base-name: sanford-bedrock-pgvector
+          - vector-db: pgvector
+            model-api: gemini
+            jar-base-name: sanford-gemini-pgvector
           - vector-db: pgvector
             model-api: openai
             jar-base-name: sanford-openai-pgvector
           - vector-db: pgvector
             model-api: ollama
             jar-base-name: sanford-ollama-pgvector
+
+          - vector-db: redis
+            model-api: bedrock
+            jar-base-name: sanford-bedrock-redis
+          - vector-db: redis
+            model-api: gemini
+            jar-base-name: sanford-gemini-redis
           - vector-db: redis
             model-api: openai
             jar-base-name: sanford-openai-redis
           - vector-db: redis
             model-api: ollama
             jar-base-name: sanford-ollama-redis
+
+          - vector-db: weaviate
+            model-api: bedrock
+            jar-base-name: sanford-bedrock-weaviate
+          - vector-db: weaviate
+            model-api: gemini
+            jar-base-name: sanford-gemini-weaviate
           - vector-db: weaviate
             model-api: openai
             jar-base-name: sanford-openai-weaviate
