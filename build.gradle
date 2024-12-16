@@ -5,6 +5,7 @@ plugins {
 	id 'org.springframework.boot' version '3.4.0'
 	id 'io.spring.dependency-management' version '1.1.6'
 	id 'org.eclipse.jkube.kubernetes' version '1.17.0'
+	id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
 }
 
 group = 'org.cftoolsuite'
@@ -72,6 +73,7 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
 	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-actuator:1.0.7'
 	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-resilience4j:1.0.7'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 	implementation ('de.hs-heilbronn.mi:crawler4j-with-hsqldb:5.1.1') {
 		exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
   	}
@@ -94,7 +96,7 @@ tasks.named('test') {
 
 bootJar {
 	archiveBaseName = project.findProperty('jarBaseName') ?: project.name
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 bootRun {

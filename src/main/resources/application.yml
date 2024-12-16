@@ -76,6 +76,17 @@ app:
     ppt: application/vnd.ms-powerpoint
     pptx: application/vnd.openxmlformats-officedocument.presentationml.presentation
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  packagesToScan: org.cftoolsuite.controller
+  show-actuator: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  writer-with-default-pretty-printer: true
+
 ---
 
 spring:
