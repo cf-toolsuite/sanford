@@ -44,7 +44,7 @@ dependencies {
 		implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter'
 		implementation 'org.springframework.ai:spring-ai-vertex-ai-embedding-spring-boot-starter'
 	}
-	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'gemfire') {
+	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'gemfire') {
 		implementation 'org.springframework.ai:spring-ai-gemfire-store-spring-boot-starter'
 	}
 	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'ollama') {
