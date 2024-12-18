@@ -321,6 +321,8 @@ spring:
   ai:
     vectorstore:
       gemfire:
+        buckets: 1
+        indexName: spring-ai-gemfire-index
         host: ${GEMFIRE_HOST:localhost}
         port: ${GEMFIRE_PORT:7071}
         initialize-schema: true
