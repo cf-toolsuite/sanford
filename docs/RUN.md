@@ -10,6 +10,7 @@
   * [with Ollama](#with-ollama)
   * [with Vector database](#with-vector-database)
     * [Chroma](#chroma)
+    * [Gemfire](#gemfire)
     * [PgVector](#pgvector)
     * [Redis Stack](#redis-stack)
     * [Weaviate](#weaviate)
@@ -318,6 +319,13 @@ and Gradle project properties, like:
 
 ```bash
 ./gradlew build bootRun -Dspring.profiles.active=docker,openai,chroma -Pvector-db-provider=chroma
+```
+> You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
+
+#### Gemfire
+
+```bash
+docker compose -f docker/docker-compose.minio.yml -f docker/docker-compose.gemfire.yml up -d --wait && gradle clean build bootRun -Dspring.profiles.active=gemfire,openai -Pvector-db-provider=gemfire
 ```
 > You also have the option of building with `-Pmodel-api-provider=ollama` then replacing `openai` or `groq-cloud` in `-Dspring.profiles.active` with `ollama`.
 
