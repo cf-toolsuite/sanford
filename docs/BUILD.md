@@ -19,6 +19,17 @@ Adds dependency on:
 ./gradlew clean build -Pvector-db-provider=chroma
 ```
 
+#### [Gemfire](https://gemfire.dev/)
+
+Adds dependency on:
+
+* [spring-ai-gemfire-store-spring-boot-starter](https://docs.spring.io/spring-ai/reference/api/vectordbs/gemfire.html)
+
+
+```bash
+./gradlew clean build -Pvector-db-provider=gemfire
+```
+
 #### [PgVector](https://github.com/pgvector/pgvector)
 
 Adds dependency on:
