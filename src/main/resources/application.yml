@@ -248,6 +248,22 @@ spring:
 
   ai:
     openai:
+      audio:
+        speech:
+          options:
+            # Supported formats are: mp3, opus, aac, flac, wav, and pcm
+            response-format: mp3
+            # Available options are: alloy, echo, fable, onyx, nova, and shimmer
+            voice: nova
+            # The speed of the voice synthesis. The acceptable range is from 0.25 (slowest) to 4.0 (fastest).
+            speed: 1.0f
+        transcription:
+          options:
+            prompt: "Transcribe the audio"
+            # @see https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html#getISOLanguages--
+            language: en
+            # The format of the transcript output, in one of these options: json, text, srt, verbose_json, or vtt
+            response-format: vtt
       chat:
         options:
           model: ${CHAT_MODEL:gpt-4o-mini}
