@@ -1,7 +1,5 @@
 package org.cftoolsuite.controller;
 
-import java.util.List;
-
 import org.cftoolsuite.domain.fetch.FetchRequest;
 import org.cftoolsuite.domain.fetch.FetchResponse;
 import org.cftoolsuite.domain.fetch.FetchResult;
@@ -10,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class FetchController {

@@ -1,8 +1,8 @@
 package org.cftoolsuite.domain.fetch;
 
-import java.util.List;
-
 import org.springframework.context.ApplicationEvent;
+
+import java.util.List;
 
 public class FetchCompletedEvent extends ApplicationEvent {
 

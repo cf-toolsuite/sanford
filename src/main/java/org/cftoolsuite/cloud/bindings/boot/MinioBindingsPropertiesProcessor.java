@@ -1,11 +1,11 @@
 package org.cftoolsuite.cloud.bindings.boot;
 
-import java.util.Map;
-
 import org.springframework.cloud.bindings.Binding;
 import org.springframework.cloud.bindings.Bindings;
 import org.springframework.cloud.bindings.boot.BindingsPropertiesProcessor;
 import org.springframework.core.env.Environment;
+
+import java.util.Map;
 
 public class MinioBindingsPropertiesProcessor implements BindingsPropertiesProcessor {
 

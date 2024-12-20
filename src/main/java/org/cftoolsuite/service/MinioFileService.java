@@ -1,5 +1,17 @@
 package org.cftoolsuite.service;
 
+import io.minio.*;
+import io.minio.errors.*;
+import io.minio.messages.Item;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.cftoolsuite.domain.AppProperties;
+import org.cftoolsuite.domain.FileMetadata;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -10,31 +22,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.cftoolsuite.domain.AppProperties;
-import org.cftoolsuite.domain.FileMetadata;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.PathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.web.multipart.MultipartFile;
-
-import io.minio.GetObjectArgs;
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
-import io.minio.Result;
-import io.minio.StatObjectArgs;
-import io.minio.StatObjectResponse;
-import io.minio.errors.ErrorResponseException;
-import io.minio.errors.InsufficientDataException;
-import io.minio.errors.InternalException;
-import io.minio.errors.InvalidResponseException;
-import io.minio.errors.ServerException;
-import io.minio.errors.XmlParserException;
-import io.minio.messages.Item;
 
 public class MinioFileService implements FileService {
 

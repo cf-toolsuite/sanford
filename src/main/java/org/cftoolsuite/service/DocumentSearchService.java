@@ -1,9 +1,5 @@
 package org.cftoolsuite.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.cftoolsuite.domain.FileMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +9,10 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service

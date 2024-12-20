@@ -1,11 +1,11 @@
 package org.cftoolsuite.service;
 
-import java.util.List;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service

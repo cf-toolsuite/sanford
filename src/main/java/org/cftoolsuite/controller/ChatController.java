@@ -4,7 +4,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.cftoolsuite.domain.chat.Inquiry;
 import org.cftoolsuite.service.chat.ChatService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 

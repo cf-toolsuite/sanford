@@ -1,13 +1,13 @@
 package org.cftoolsuite;
 
-import java.util.Map;
-
 import org.cftoolsuite.domain.AppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class AppPropertiesLogger implements ApplicationListener<ApplicationReadyEvent> {

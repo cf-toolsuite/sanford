@@ -1,13 +1,6 @@
 package org.cftoolsuite.service.fetch;
 
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
-
+import jakarta.annotation.PreDestroy;
 import org.cftoolsuite.domain.FileMetadata;
 import org.cftoolsuite.domain.fetch.FetchCompletedEvent;
 import org.cftoolsuite.domain.fetch.FetchResult;
@@ -18,7 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PreDestroy;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 
 @Component
 public class FetchListener implements ApplicationListener<FetchCompletedEvent> {

@@ -1,10 +1,14 @@
 package org.cftoolsuite.controller;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import crawlercommons.filters.basic.BasicURLNormalizer;
+import de.hshn.mi.crawler4j.frontier.HSQLDBFrontierConfiguration;
+import de.hshn.mi.crawler4j.url.HSQLDBWebURLFactory;
+import edu.uci.ics.crawler4j.crawler.CrawlConfig;
+import edu.uci.ics.crawler4j.crawler.CrawlController;
+import edu.uci.ics.crawler4j.fetcher.PageFetcher;
+import edu.uci.ics.crawler4j.frontier.FrontierConfiguration;
+import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
+import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import org.cftoolsuite.domain.crawl.CrawlRequest;
 import org.cftoolsuite.domain.crawl.CrawlResponse;
 import org.cftoolsuite.service.crawl.CustomWebCrawler;
@@ -15,15 +19,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import crawlercommons.filters.basic.BasicURLNormalizer;
-import de.hshn.mi.crawler4j.frontier.HSQLDBFrontierConfiguration;
-import de.hshn.mi.crawler4j.url.HSQLDBWebURLFactory;
-import edu.uci.ics.crawler4j.crawler.CrawlConfig;
-import edu.uci.ics.crawler4j.crawler.CrawlController;
-import edu.uci.ics.crawler4j.fetcher.PageFetcher;
-import edu.uci.ics.crawler4j.frontier.FrontierConfiguration;
-import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
-import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 public class WebCrawlController {

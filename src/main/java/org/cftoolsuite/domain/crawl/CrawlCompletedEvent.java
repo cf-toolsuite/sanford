@@ -1,8 +1,8 @@
 package org.cftoolsuite.domain.crawl;
 
-import java.nio.file.Path;
-
 import org.springframework.context.ApplicationEvent;
+
+import java.nio.file.Path;
 
 public class CrawlCompletedEvent extends ApplicationEvent {
 

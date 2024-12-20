@@ -1,12 +1,12 @@
 package org.cftoolsuite.config;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+
+import java.util.Arrays;
+import java.util.List;
 
 class OnGroqCloud implements Condition {
 
