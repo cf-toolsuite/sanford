@@ -6,6 +6,7 @@
   * [Fetch](#fetch)
   * [Chat](#chat)
   * [Multichat](#multichat)
+  * [Converse](#converse)
   * [Get Metadata](#get-metadata)
   * [Search](#search)
   * [Summarize](#summarize)
@@ -303,6 +304,16 @@ Transfer-Encoding: chunked
         "totalTokens": 3840
     }
 ]
+```
+
+### Converse
+
+Initiate a voice-based conversation.  Transcribes each audio request to text, gets an answer to the inquiry in the request text, performs text to speech conversion, and returns audio response.
+
+Only available when the `openai` Spring profile has been activated.
+
+```python
+POST /api/converse
 ```
 
 ### Get Metadata
