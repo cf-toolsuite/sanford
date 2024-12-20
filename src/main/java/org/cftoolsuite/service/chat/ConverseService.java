@@ -20,9 +20,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Profile({"openai"})
 @Service
@@ -53,9 +50,7 @@ public class ConverseService {
         this.speechModel = speechModel;
     }
 
-    public AudioResponse respondToAudioRequest(MultipartFile file) throws IOException {
-        // Convert MultipartFile to byte array, then obtain Resource
-        byte[] audioBytes = file.getBytes();
+    public AudioResponse respondToAudioRequest(byte[] audioBytes) {
         Resource audioFile = new ByteArrayResource(audioBytes);
 
         // Transcribe audio request

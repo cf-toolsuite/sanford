@@ -2,18 +2,20 @@ package org.cftoolsuite.controller;
 
 import org.cftoolsuite.domain.chat.AudioResponse;
 import org.cftoolsuite.service.chat.ConverseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Profile({"openai"})
 @RestController
 public class ConverseController {
+
+    private static Logger log = LoggerFactory.getLogger(ConverseController.class);
 
     private final ConverseService converseService;
 
@@ -21,8 +23,8 @@ public class ConverseController {
         this.converseService = converseService;
     }
 
-    @PostMapping("/api/converse")
-    public ResponseEntity<AudioResponse> handleAudioUpload(@RequestParam("file") MultipartFile file) throws IOException {
-        return ResponseEntity.ok(converseService.respondToAudioRequest(file));
+    @PostMapping(value = "/api/converse", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<AudioResponse> handleAudioUpload(@RequestBody byte[] audioBytes) {
+        return ResponseEntity.ok(converseService.respondToAudioRequest(audioBytes));
     }
 }
