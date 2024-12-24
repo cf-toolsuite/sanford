@@ -32,25 +32,29 @@ public class DocumentSearchService {
     public List<FileMetadata> nlSearch(String query) {
         Assert.hasText(query, "Query cannot be null or empty");
         log.debug("Preparing to search with query: {}", query);
-        List<Document> candidates = store.similaritySearch(SearchRequest.query(query).withTopK(TOP_K));
+        List<Document> candidates = store.similaritySearch(
+            SearchRequest.builder().query(query).topK(TOP_K).build()
+        );
         log.debug("Found {} documents", candidates.size());
         log.trace("Document content and metadata: {}", candidates);
         Set<String> fileNames = candidates.stream().map(d -> String.valueOf(d.getMetadata().get("file_name"))).collect(Collectors.toSet());
-        return fileNames.stream().map(f -> fileService.getFileMetadata(f)).collect(Collectors.toList());
+        return fileNames.stream().map(fileService::getFileMetadata).collect(Collectors.toList());
     }
 
     public List<Document> search(String fileName) {
         Assert.hasText(fileName, "File name cannot be null or empty");
         FilterExpressionBuilder b = new FilterExpressionBuilder();
         log.debug("Preparing to search with fileName: {}", fileName);
-        List<Document> candidates = store.similaritySearch(SearchRequest.query("Find any document with any word that occurs in this file name: " + fileName).withFilterExpression(b.eq("file_name", fileName).build()).withSimilarityThresholdAll());
+        List<Document> candidates = store.similaritySearch(
+            SearchRequest.builder().query("Find any document with any word that occurs in this file name: " + fileName).filterExpression(b.eq("file_name", fileName).build()).similarityThresholdAll().build()
+        );
         log.debug("Found {} documents", candidates.size());
         log.trace("Document content and metadata: {}", candidates);
         return candidates;
     }
 
     public void delete(String fileName) {
-        List<String> candidateIds = search(fileName).stream().map(d -> d.getId()).collect(Collectors.toList());
+        List<String> candidateIds = search(fileName).stream().map(Document::getId).collect(Collectors.toList());
         log.debug("Preparing to delete documents with metadata file_name equal to {}", fileName);
         store.delete(candidateIds);
     }
