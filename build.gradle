@@ -83,7 +83,7 @@ dependencies {
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.assertj:assertj-core:3.27.0'
+	testImplementation 'org.assertj:assertj-core:3.27.1'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
