@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Profile({"alting"})
+@Profile({"alting","openrouter"})
 @RestController
 public class MultiChatController {
 

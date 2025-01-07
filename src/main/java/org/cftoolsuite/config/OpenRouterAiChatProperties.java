@@ -4,10 +4,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-@Profile({"alting"})
+@Profile({"openrouter"})
 @Component
-@ConfigurationProperties(prefix = "spring.ai.alting.chat")
-public class AltingAiChatProperties implements MultiChatProperties {
+@ConfigurationProperties(prefix = "spring.ai.openrouter.chat")
+public class OpenRouterAiChatProperties implements MultiChatProperties {
 
     private Options options = new Options();
 

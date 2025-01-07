@@ -20,7 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Profile({"alting"})
+@Profile({"alting","openrouter"})
 @Configuration
 public class MultiChat {
 
@@ -32,7 +32,7 @@ public class MultiChat {
             RetryTemplate retryTemplate,
             FunctionCallbackResolver functionCallbackResolver,
             ResponseErrorHandler responseErrorHandler,
-            AltingAiChatProperties altChatProperties
+            MultiChatProperties multiChatProperties
     ) {
         RestClient.Builder restClientBuilder = RestClient.builder()
                 .defaultHeaders(headers -> headers.set(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate"));
@@ -45,7 +45,7 @@ public class MultiChat {
                 responseErrorHandler
         );
 
-        return altChatProperties.getOptions().getModels().stream().collect(
+        return multiChatProperties.getOptions().getModels().stream().collect(
                 Collectors.toMap(
                     model -> model,
                     model -> {

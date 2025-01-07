@@ -128,6 +128,42 @@ spring:
 spring:
   config:
     activate:
+      on-profile: openrouter
+    import: "${SPRING_CONFIG_IMPORT:optional:file:./config/creds.yml}"
+
+  ai:
+    openrouter:
+      chat:
+        options:
+          models:
+            - google/gemini-2.0-flash-exp:free
+            - meta-llama/llama-3.3-70b-instruct
+            - deepseek/deepseek-chat
+            - qwen/qvq-72b-preview
+            - openai/gpt-4o-2024-11-20
+            - amazon/nova-pro-v1
+            - mistralai/mistral-large-2411
+            - anthropic/claude-3.5-haiku-20241022
+            - perplexity/llama-3.1-sonar-huge-128k-online
+            - pygmalionai/mythalion-13b
+            - anthracite-org/magnum-v2-72b
+            - x-ai/grok-2-1212
+
+    openai:
+      base_url: ${OPENAI_BASE_URL:https://openrouter.ai/api/v1/chat/completions}
+      chat:
+        options:
+          model: ${CHAT_MODEL:mistralai/mistral-7b-instruct}
+      embedding:
+        base_url: ${EMBEDDING_BASEURL:https://api.openai.com}
+        options:
+          model: ${EMBEDDING_MODEL:text-embedding-3-large}
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: arize-phoenix
 
 arize:
@@ -463,5 +499,5 @@ logging:
   level:
     org.cftoolsuite: TRACE
     software.amazon.awssdk: DEBUG
-    org.springframework.ai: DEBUG
+    org.springframework: DEBUG
     com.fasterxml.jackson: TRACE
