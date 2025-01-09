@@ -65,7 +65,7 @@ dependencies {
 		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
 		implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 	}
-	implementation 'io.minio:minio:8.5.14'
+	implementation 'io.minio:minio:8.5.15'
 	implementation 'io.pivotal.cfenv:java-cfenv:3.3.0'
 	implementation 'io.pivotal.cfenv:java-cfenv-boot:3.3.0'
 	implementation 'com.cedarsoftware:json-io:4.30.0'
