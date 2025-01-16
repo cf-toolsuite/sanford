@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DocumentIngestionService {
@@ -140,23 +141,65 @@ public class DocumentIngestionService {
         return enrichedDocuments;
     }
 
-    protected List<Document> loadJson(Resource resource) {
-        JsonReader jsonReader;
-        try {
-            jsonReader = new JsonReader(resource, extractUniqueKeys(resource));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read JSON file", e);
+    private List<Document> loadJson(Resource resource) {
+        if (resource == null) {
+            return Collections.emptyList();
         }
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("file_name", resource.getFilename());
-        List<Document> documents = jsonReader.get();
-        List<Document> enrichedDocuments = new ArrayList<>();
-        for (Document document : documents) {
-            Map<String, Object> customMetadata = new HashMap<>(metadata);
-            customMetadata.putAll(document.getMetadata());
-            enrichedDocuments.add(new Document(document.getContent(), customMetadata));
+
+        JsonReader jsonReader = Optional.of(resource)
+                .map(res -> {
+                    try {
+                        return new JsonReader(res, extractUniqueKeys(res));
+                    } catch (IOException e) {
+                        log.error("---- Failed to read JSON file", e);
+                        return null;
+                    }
+                })
+                .orElseThrow(() -> new RuntimeException("---- Failed to create JsonReader"));
+
+        Map<String, Object> baseMetadata = Optional.ofNullable(resource.getFilename())
+                .map(filename -> {
+                    Map<String, Object> meta = new HashMap<>();
+                    meta.put("file_name", filename);
+                    return meta;
+                })
+                .orElse(new HashMap<>());
+
+        return Optional.ofNullable(jsonReader.get())
+                .map(docs -> docs.stream()
+                        .filter(Objects::nonNull)
+                        .map(document -> enrichDocument(document, baseMetadata))
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+    }
+
+    private Document enrichDocument(Document document, Map<String, Object> baseMetadata) {
+        if (document == null) {
+            return null;
         }
-        return enrichedDocuments;
+
+        return Optional.of(document.getMetadata())
+                .map(documentMetadata -> documentMetadata.entrySet().stream()
+                        .filter(entry -> entry.getKey() != null && entry.getValue() != null)
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (v1, v2) -> v1,
+                                () -> new HashMap<>(baseMetadata)
+                        )))
+                .map(enrichedMetadata -> {
+                    try {
+                        return new Document(
+                                Optional.ofNullable(document.getText()).orElse(""),
+                                enrichedMetadata
+                        );
+                    } catch (IllegalArgumentException e) {
+                        log.error("---- Failed to create document with metadata", e);
+                        return null;
+                    }
+                })
+                .orElse(null);
     }
 
     private String[] extractUniqueKeys(Resource resource) throws IOException {
@@ -167,17 +210,50 @@ public class DocumentIngestionService {
     }
 
     private void extractKeys(JsonNode jsonNode, String currentPath, Set<String> keys) {
+        if (jsonNode == null || jsonNode.isNull()) {
+            return;
+        }
+
         if (jsonNode.isObject()) {
             jsonNode.fields().forEachRemaining(entry -> {
-                String newPath = currentPath.isEmpty() ? entry.getKey() : currentPath + "." + entry.getKey();
-                keys.add(newPath);
-                extractKeys(entry.getValue(), newPath, keys);
+                JsonNode value = entry.getValue();
+                if (!value.isNull()) {
+                    String newPath = currentPath.isEmpty() ? entry.getKey() : currentPath + "." + entry.getKey();
+                    // Only add the key if it has a non-null value
+                    if (isValidValue(value)) {
+                        keys.add(newPath);
+                    }
+                    extractKeys(value, newPath, keys);
+                }
             });
         } else if (jsonNode.isArray()) {
-            for (int i = 0; i < jsonNode.size(); i++) {
-                extractKeys(jsonNode.get(i), currentPath + "[" + i + "]", keys);
+            // Only process array if it's not empty
+            if (!jsonNode.isEmpty()) {
+                for (int i = 0; i < jsonNode.size(); i++) {
+                    JsonNode element = jsonNode.get(i);
+                    if (!element.isNull()) {
+                        extractKeys(element, currentPath + "[" + i + "]", keys);
+                    }
+                }
             }
         }
+    }
+
+    private boolean isValidValue(JsonNode node) {
+        if (node.isNull()) {
+            return false;
+        }
+        if (node.isTextual()) {
+            return !node.asText().isEmpty();
+        }
+        if (node.isArray()) {
+            return !node.isEmpty();
+        }
+        if (node.isObject()) {
+            return !node.isEmpty();
+        }
+        // For numbers, booleans, etc.
+        return true;
     }
 
     protected List<Document> loadText(String fileName, Resource resource) {
