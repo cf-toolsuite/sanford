@@ -158,7 +158,7 @@ You may also optionally specify filter metadata in your request, e.g.
 ### Multichat
 
 Converse with an AI chatbot who is aware of all uploaded content.  Ask a question, get multiple responses from various pre-configured models.
-(This endpoint is only available when the `alting` Spring profile is activated).  Consult `spring.ai.alting.chat.options.models` in [application.yml](../src/main/resources/application.yml) for models participating in each request.
+(This endpoint is only available when the `alting` or `openrouter` Spring profile is activated).  Consult `spring.ai.alting.chat.options.models` or `spring.ai.openrouter.chat.options.models` in [application.yml](../src/main/resources/application.yml) for models participating in each request.
 
 ```python
 POST /api/multichat
