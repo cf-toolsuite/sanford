@@ -7,6 +7,7 @@
   * [with OpenAI](#with-openai)
   * [with Groq Cloud](#with-groq-cloud)
   * [with Alting](#with-alting)
+  * [with Deepseek](#with-deepseek)
   * [with Ollama](#with-ollama)
   * [with Vector database](#with-vector-database)
     * [Chroma](#chroma)
@@ -276,6 +277,32 @@ Open a terminal shell and execute
 
 ```bash
 ./gradlew build bootRun -Dspring.profiles.active=docker,alting,{vector_db_provider} -Pvector-db-provider={vector_db_provider}
+```
+> Replace `{vector_db_provider}` with one of [ `chroma`, `pgvector`, `redis`, `weaviate` ]
+
+### with Deepseek
+
+Build and run a version of the utility that is compatible for use with [Deepseek](https://api-docs.deepseek.com/).  You will need to [obtain an API key](https://platform.deepseek.com/api_keys).
+Note that Deepseek does not currently have support for text embedding. So if you intend to run with the `deepseek` Spring profile activated, you will also need to provide additional credentials
+
+Before launching the app:
+
+* Create a `config` folder which would be a sibling of the `build` folder.  Create a file named `creds.yml` inside that folder.  Add your own API key into that file.
+
+```yaml
+spring:
+  ai:
+    openai:
+      api-key: {REDACTED-1}
+      embedding:
+        api-key: {REDACTED-2}
+```
+> Replace `{REDACTED-1}` and `{REDACTED-2}` above with your Deepseek API and OpenAI keys respectively.
+
+Open a terminal shell and execute
+
+```bash
+./gradlew build bootRun -Dspring.profiles.active=docker,deepseek,{vector_db_provider} -Pvector-db-provider={vector_db_provider}
 ```
 > Replace `{vector_db_provider}` with one of [ `chroma`, `pgvector`, `redis`, `weaviate` ]
 

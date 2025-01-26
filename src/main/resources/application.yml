@@ -197,6 +197,25 @@ spring:
 spring:
   config:
     activate:
+      on-profile: deepseek
+    import: "${SPRING_CONFIG_IMPORT:optional:file:./config/creds.yml}"
+
+  ai:
+    openai:
+      base_url: ${OPENAI_BASE_URL:https://api.deepseek.com}
+      chat:
+        options:
+          model: ${CHAT_MODEL:deepseek-chat}
+      embedding:
+        base_url: ${EMBEDDING_BASEURL:https://api.openai.com}
+        options:
+          model: ${EMBEDDING_MODEL:text-embedding-3-large}
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: gemini
 
   autoconfigure:
