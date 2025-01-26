@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Profile({"alting"})
+@Profile({"alting","openrouter"})
 @Service
 public class MultiChatService {
 
