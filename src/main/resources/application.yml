@@ -150,7 +150,7 @@ spring:
             - x-ai/grok-2-1212
 
     openai:
-      base_url: ${OPENAI_BASE_URL:https://openrouter.ai/api/v1/chat/completions}
+      base_url: ${OPENAI_BASE_URL:https://openrouter.ai/api}
       chat:
         options:
           model: ${CHAT_MODEL:mistralai/mistral-7b-instruct}
