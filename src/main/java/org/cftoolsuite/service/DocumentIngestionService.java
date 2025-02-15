@@ -136,7 +136,7 @@ public class DocumentIngestionService {
         for (Document document : documents) {
             Map<String, Object> customMetadata = new HashMap<>(metadata);
             customMetadata.putAll(document.getMetadata());
-            enrichedDocuments.add(new Document(document.getContent(), customMetadata));
+            enrichedDocuments.add(new Document(document.getText(), customMetadata));
         }
         return enrichedDocuments;
     }
