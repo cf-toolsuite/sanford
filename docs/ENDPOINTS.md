@@ -186,7 +186,7 @@ Transfer-Encoding: chunked
     {
         "content": "The US senators from Washington are Patty Murray and Maria Cantwell.",
         "errorMessage": null,
-        "generationTokens": 14,
+        "completionTokens": 14,
         "modelName": "neversleep/llama-3.1-lumimaid-70b",
         "promptTokens": 3230,
         "responseTime": "8s19ms",
@@ -196,7 +196,7 @@ Transfer-Encoding: chunked
     {
         "content": " The two US senators from Washington are Patty Murray and Maria Cantwell.",
         "errorMessage": null,
-        "generationTokens": 16,
+        "completionTokens": 16,
         "modelName": "gryphe/mythomax-l2-13b",
         "promptTokens": 2989,
         "responseTime": "4s47ms",
@@ -206,7 +206,7 @@ Transfer-Encoding: chunked
     {
         "content": " The US senators from Washington are Sen. Patty Murray and Sen. Maria Cantwell.",
         "errorMessage": null,
-        "generationTokens": 19,
+        "completionTokens": 19,
         "modelName": "mistralai/mixtral-8x7b-instruct",
         "promptTokens": 4592,
         "responseTime": "2s833ms",
@@ -216,7 +216,7 @@ Transfer-Encoding: chunked
     {
         "content": null,
         "errorMessage": "Error while extracting response for type [org.springframework.ai.openai.api.OpenAiApi$ChatCompletion] and content type [application/json]",
-        "generationTokens": null,
+        "completionTokens": null,
         "modelName": "qwen/qwen-2.5-7b-instruct",
         "promptTokens": null,
         "responseTime": null,
@@ -226,7 +226,7 @@ Transfer-Encoding: chunked
     {
         "content": "The US senators from Washington are:\n- Senior Senator: Patty Murray (Democrat)\n- Junior Senator: Not mentioned in the provided context, but according to external knowledge, it is Maria Cantwell. However, following the rules: I don't know who the junior senator is based on the given context.",
         "errorMessage": null,
-        "generationTokens": 61,
+        "completionTokens": 61,
         "modelName": "perplexity/llama-3.1-sonar-huge-128k-online",
         "promptTokens": 3219,
         "responseTime": "11s634ms",
@@ -236,7 +236,7 @@ Transfer-Encoding: chunked
     {
         "content": "The U.S. senators from Washington are:\n\nPatty Murray (D-WA) - Senior Senator \nCory Booker (D-NJ) - Junior Senator\n\nHowever, there seems to be an error in the provided information. Cory Booker is not a senator from Washington, he is the senior senator from New Jersey. Patty Murray is indeed the senior senator from Washington. The junior senator from Washington is not mentioned in the given context.",
         "errorMessage": null,
-        "generationTokens": 88,
+        "completionTokens": 88,
         "modelName": "anthracite-org/magnum-v4-72b",
         "promptTokens": 3739,
         "responseTime": "11s623ms",
@@ -246,7 +246,7 @@ Transfer-Encoding: chunked
     {
         "content": "The US senators from Washington are Sen. Patty Murray [D-WA] and Sen. Maria Cantwell [D-WA].",
         "errorMessage": null,
-        "generationTokens": 26,
+        "completionTokens": 26,
         "modelName": "openai/gpt-4o-mini",
         "promptTokens": 3293,
         "responseTime": "3s9ms",
@@ -256,7 +256,7 @@ Transfer-Encoding: chunked
     {
         "content": null,
         "errorMessage": "Error while extracting response for type [org.springframework.ai.openai.api.OpenAiApi$ChatCompletion] and content type [application/json]",
-        "generationTokens": null,
+        "completionTokens": null,
         "modelName": "anthropic/claude-3.5-sonnet-20240620:beta",
         "promptTokens": null,
         "responseTime": null,
@@ -266,7 +266,7 @@ Transfer-Encoding: chunked
     {
         "content": null,
         "errorMessage": "Error while extracting response for type [org.springframework.ai.openai.api.OpenAiApi$ChatCompletion] and content type [application/json]",
-        "generationTokens": null,
+        "completionTokens": null,
         "modelName": "google/gemini-pro-1.5",
         "promptTokens": null,
         "responseTime": null,
@@ -276,7 +276,7 @@ Transfer-Encoding: chunked
     {
         "content": "The US senators from Washington are:\n1. Senior Senator Patty Murray (Democrat)\n2. Junior Senator Maria Cantwell (Democrat)",
         "errorMessage": null,
-        "generationTokens": 0,
+        "completionTokens": 0,
         "modelName": "nousresearch/hermes-3-llama-3.1-405b",
         "promptTokens": 0,
         "responseTime": "3s575ms",
@@ -286,7 +286,7 @@ Transfer-Encoding: chunked
     {
         "content": "Patty Murray (D) and Marco Rubio (R) are the US senators from Washington.",
         "errorMessage": null,
-        "generationTokens": 22,
+        "completionTokens": 22,
         "modelName": "pygmalionai/mythalion-13b",
         "promptTokens": 4628,
         "responseTime": "4s900ms",
@@ -296,7 +296,7 @@ Transfer-Encoding: chunked
     {
         "content": "The US senators from Washington are:\n- **Patty Murray** [D-WA], who is the Senior Senator and holds the leadership title of President Pro Tempore of the Senate.\n- **The Junior Senator's information is not provided in the given context.**",
         "errorMessage": null,
-        "generationTokens": 53,
+        "completionTokens": 53,
         "modelName": "x-ai/grok-beta",
         "promptTokens": 3787,
         "responseTime": "4s7ms",

@@ -67,7 +67,7 @@ public class MultiChat {
                             chatOptions.setModel(model);
                             OpenAiChatModel openAiChatModel = new OpenAiChatModel(
                                     openAiApi,
-                                    chatProperties.getOptions(),
+                                    chatOptions,
                                     DefaultToolCallingManager.builder().observationRegistry(observationRegistry).build(),
                                     retryTemplate,
                                     observationRegistry
