@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.cyclonedx.bom' version '2.2.0'
 	id 'com.gorylenko.gradle-git-properties' version '2.5.0'
-	id 'org.springframework.boot' version '3.4.3'
+	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.eclipse.jkube.kubernetes' version '1.18.1'
 	id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
@@ -32,32 +32,32 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
+	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'bedrock') {
-		implementation 'org.springframework.ai:spring-ai-bedrock-ai-spring-boot-starter'
-		implementation 'org.springframework.ai:spring-ai-bedrock-converse-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-starter-model-bedrock'
+		implementation 'org.springframework.ai:spring-ai-starter-model-bedrock-converse'
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'chroma') {
-		implementation 'org.springframework.ai:spring-ai-chroma-store-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-starter-vector-store-chroma'
 	}
 	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'gemini') {
-		implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter'
-		implementation 'org.springframework.ai:spring-ai-vertex-ai-embedding-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-starter-model-vertex-ai-gemini'
+		implementation 'org.springframework.ai:spring-ai-starter-model-vertex-ai-embedding'
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'gemfire') {
-		implementation 'org.springframework.ai:spring-ai-gemfire-store-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-starter-vector-store-gemfire'
 	}
 	if (project.hasProperty('model-api-provider') && project.getProperty('model-api-provider') == 'ollama') {
-		implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'pgvector') {
-		implementation 'org.springframework.ai:spring-ai-pgvector-store-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-starter-vector-store-pgvector'
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'redis') {
-		implementation 'org.springframework.ai:spring-ai-redis-store-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-starter-vector-store-redis'
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'weaviate') {
-		implementation 'org.springframework.ai:spring-ai-weaviate-store-spring-boot-starter'
+		implementation 'org.springframework.ai:spring-ai-starter-vector-store-weaviate'
 	}
 	implementation 'org.apache.commons:commons-lang3'
 	if (project.hasProperty('vector-db-provider') || project.hasProperty('model-api-provider')) {
@@ -66,9 +66,9 @@ dependencies {
 		implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 	}
 	implementation 'io.minio:minio:8.5.17'
-	implementation 'io.pivotal.cfenv:java-cfenv:3.3.0'
-	implementation 'io.pivotal.cfenv:java-cfenv-boot:3.3.0'
-	implementation 'com.cedarsoftware:json-io:4.40.0'
+	implementation 'io.pivotal.cfenv:java-cfenv:3.4.0'
+	implementation 'io.pivotal.cfenv:java-cfenv-boot:3.4.0'
+	implementation 'com.cedarsoftware:json-io:4.52.0'
 	implementation 'org.springframework.cloud:spring-cloud-bindings:2.0.4'
 	implementation 'org.springframework.ai:spring-ai-spring-cloud-bindings'
 	implementation 'org.springframework.ai:spring-ai-markdown-document-reader'
@@ -76,7 +76,7 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
 	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-actuator:1.1.1'
 	implementation 'io.github.springboot-addons:spring-boot-starter-httpclient5-resilience4j:1.1.1'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 	implementation ('de.hs-heilbronn.mi:crawler4j-with-hsqldb:5.1.1') {
 		exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
   	}

@@ -2,8 +2,8 @@ package org.cftoolsuite.config;
 
 import io.micrometer.common.util.StringUtils;
 import io.micrometer.observation.ObservationRegistry;
-import org.springframework.ai.autoconfigure.openai.OpenAiChatProperties;
-import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
+import org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties;
+import org.springframework.ai.model.openai.autoconfigure.OpenAiConnectionProperties;
 import org.springframework.ai.model.SimpleApiKey;
 import org.springframework.ai.model.tool.DefaultToolCallingManager;
 import org.springframework.ai.openai.OpenAiChatModel;
