@@ -1,8 +1,8 @@
 plugins {
 	id 'java'
-	id 'org.cyclonedx.bom' version '2.2.0'
+	id 'org.cyclonedx.bom' version '2.3.0'
 	id 'com.gorylenko.gradle-git-properties' version '2.5.0'
-	id 'org.springframework.boot' version '3.4.4'
+	id 'org.springframework.boot' version '3.4.5'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.eclipse.jkube.kubernetes' version '1.18.1'
 	id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
@@ -19,13 +19,10 @@ java {
 
 repositories {
 	mavenCentral()
-	maven { url 'https://packages.atlassian.com/repository/public' }
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
 }
 
 ext {
-	set('springAiVersion', "1.0.0-SNAPSHOT")
+	set('springAiVersion', "1.0.0-M7")
 }
 
 dependencies {
@@ -58,6 +55,10 @@ dependencies {
 	}
 	if (project.hasProperty('vector-db-provider') && project.getProperty('vector-db-provider') == 'weaviate') {
 		implementation 'org.springframework.ai:spring-ai-starter-vector-store-weaviate'
+	}
+	if (project.hasProperty('vector-db-provider')) {
+		implementation 'org.springframework.ai:spring-ai-rag'
+		implementation 'org.springframework.ai:spring-ai-advisors-vector-store'
 	}
 	implementation 'org.apache.commons:commons-lang3'
 	if (project.hasProperty('vector-db-provider') || project.hasProperty('model-api-provider')) {

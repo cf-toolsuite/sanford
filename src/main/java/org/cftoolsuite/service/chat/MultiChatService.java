@@ -3,7 +3,7 @@ package org.cftoolsuite.service.chat;
 import org.cftoolsuite.domain.chat.FilterMetadata;
 import org.cftoolsuite.domain.chat.MultiChatResponse;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.metadata.DefaultUsage;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
