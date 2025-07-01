@@ -16,7 +16,7 @@ import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfi
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
-import org.springframework.ai.chat.transformer.KeywordMetadataEnricher;
+import org.springframework.ai.model.transformer.KeywordMetadataEnricher;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.ByteArrayResource;
