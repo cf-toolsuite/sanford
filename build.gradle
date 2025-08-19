@@ -70,7 +70,7 @@ dependencies {
 	implementation 'io.minio:minio:8.5.17'
 	implementation 'io.pivotal.cfenv:java-cfenv:3.5.0'
 	implementation 'io.pivotal.cfenv:java-cfenv-boot:3.5.0'
-	implementation 'com.cedarsoftware:json-io:4.59.0'
+	implementation 'com.cedarsoftware:json-io:4.60.0'
 	implementation 'org.springframework.cloud:spring-cloud-bindings:2.0.4'
 	implementation 'org.springframework.ai:spring-ai-spring-cloud-bindings'
 	implementation 'org.springframework.ai:spring-ai-markdown-document-reader'
