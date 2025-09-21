@@ -100,6 +100,10 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+processResources {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 bootJar {
 	archiveBaseName = project.findProperty('jarBaseName') ?: project.name
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
