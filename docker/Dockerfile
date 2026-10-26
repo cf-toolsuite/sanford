@@ -1,5 +1,5 @@
 # Use official OpenJDK image
-FROM bellsoft/liberica-openjdk-debian:21.0.5-cds
+FROM bellsoft/liberica-openjdk-debian:21.0.12.1-cds
 
 # Set working directory
 WORKDIR /app
