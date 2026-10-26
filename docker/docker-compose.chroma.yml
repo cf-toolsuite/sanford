@@ -3,7 +3,7 @@ include:
 
 services:
   chroma:
-    image: chromadb/chroma:0.6.1
+    image: chromadb/chroma:0.6.3
     environment:
       - IS_PERSISTENT=TRUE
     volumes:
